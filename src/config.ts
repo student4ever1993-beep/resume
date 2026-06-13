@@ -187,7 +187,7 @@ export const contactConfig: ContactConfig = {
   title: "Let's Build Something Together",
   subtitle: "I'm always open to discussing new projects, creative ideas, or opportunities to be part of your vision.",
   items: [
-    { icon: "Phone", value: "+968-9511-9284" },
+    { icon: "Phone", value: "+968" },
     { icon: "Mail", value: "Alya_alsiyabi93@outlook.com" },
     { icon: "MapPin", value: "Al-Seeb, Muscat, Oman" },
   ],
