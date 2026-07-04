@@ -1,6 +1,16 @@
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.rtl-font {
+  font-family: 'Cairo', 'Inter', system-ui, sans-serif !important;
+}
+
+.rtl-font h1, .rtl-font h2, .rtl-font h3, .rtl-font h4, .rtl-font h5, .rtl-font h6 {
+  font-family: 'Cairo', 'Space Grotesk', system-ui, sans-serif !important;
+}
 
 @layer base {
   :root {

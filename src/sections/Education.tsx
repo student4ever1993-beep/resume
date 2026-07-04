@@ -1,14 +1,26 @@
 import { useEffect, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { educationConfig, workshopsConfig } from '../config';
 
 gsap.registerPlugin(ScrollTrigger);
 
+interface EducationEntry {
+  degree: string;
+  institution: string;
+  period: string;
+  status?: string;
+}
+
 export default function Education() {
+  const { t, i18n } = useTranslation();
   const sectionRef = useRef<HTMLDivElement>(null);
   const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
   const badgesRef = useRef<HTMLDivElement>(null);
+
+  const isRtl = i18n.language === 'ar';
+  const entries = t('education.entries', { returnObjects: true }) as EducationEntry[];
+  const workshops = t('education.workshops', { returnObjects: true }) as string[];
 
   useEffect(() => {
     const ctx = gsap.context(() => {
@@ -53,7 +65,7 @@ export default function Education() {
     }, sectionRef);
 
     return () => ctx.revert();
-  }, []);
+  }, [i18n.language]);
 
   return (
     <section
@@ -77,27 +89,27 @@ export default function Education() {
           <div style={{ textAlign: 'center', marginBottom: '48px' }}>
             <p
               style={{
-                fontFamily: 'Inter, system-ui, sans-serif',
+                fontFamily: isRtl ? 'Cairo, system-ui, sans-serif' : 'Inter, system-ui, sans-serif',
                 fontSize: '11px',
                 fontWeight: 600,
                 color: '#00d4ff',
-                letterSpacing: '3px',
+                letterSpacing: isRtl ? '0' : '3px',
                 textTransform: 'uppercase',
                 marginBottom: '20px',
               }}
             >
-              {educationConfig.sectionLabel}
+              {t('education.sectionLabel')}
             </p>
             <h2
               style={{
-                fontFamily: '"Space Grotesk", system-ui, sans-serif',
+                fontFamily: isRtl ? 'Cairo, system-ui, sans-serif' : '"Space Grotesk", system-ui, sans-serif',
                 fontSize: 'clamp(32px, 4vw, 48px)',
                 fontWeight: 500,
                 color: '#e0e0e8',
-                letterSpacing: '-0.01em',
+                letterSpacing: isRtl ? '0' : '-0.01em',
               }}
             >
-              {educationConfig.title}
+              {t('education.title')}
             </h2>
           </div>
 
@@ -109,7 +121,7 @@ export default function Education() {
               gap: '24px',
             }}
           >
-            {educationConfig.entries.map((entry, i) => (
+            {Array.isArray(entries) && entries.map((entry, i) => (
               <div
                 key={entry.institution}
                 ref={(el) => { cardRefs.current[i] = el; }}
@@ -121,6 +133,7 @@ export default function Education() {
                   position: 'relative',
                   overflow: 'hidden',
                   transition: 'border-color 0.3s ease',
+                  textAlign: isRtl ? 'right' : 'left',
                 }}
                 onMouseEnter={(e) => {
                   (e.currentTarget as HTMLDivElement).style.borderColor = 'rgba(0, 212, 255, 0.25)';
@@ -141,7 +154,15 @@ export default function Education() {
                   }}
                 />
 
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
+                <div
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '12px',
+                    marginBottom: '16px',
+                    flexDirection: isRtl ? 'row-reverse' : 'row',
+                  }}
+                >
                   <p
                     style={{
                       fontFamily: '"JetBrains Mono", monospace',
@@ -156,14 +177,14 @@ export default function Education() {
                   {entry.status && (
                     <span
                       style={{
-                        fontFamily: 'Inter, system-ui, sans-serif',
+                        fontFamily: isRtl ? 'Cairo, system-ui, sans-serif' : 'Inter, system-ui, sans-serif',
                         fontSize: '10px',
                         fontWeight: 600,
                         color: '#050508',
                         background: '#00d4ff',
                         padding: '3px 10px',
                         borderRadius: '100px',
-                        letterSpacing: '0.5px',
+                        letterSpacing: isRtl ? '0' : '0.5px',
                         textTransform: 'uppercase',
                       }}
                     >
@@ -174,7 +195,7 @@ export default function Education() {
 
                 <h3
                   style={{
-                    fontFamily: '"Space Grotesk", system-ui, sans-serif',
+                    fontFamily: isRtl ? 'Cairo, system-ui, sans-serif' : '"Space Grotesk", system-ui, sans-serif',
                     fontSize: '18px',
                     fontWeight: 500,
                     color: '#f5f5f0',
@@ -186,7 +207,7 @@ export default function Education() {
                 </h3>
                 <p
                   style={{
-                    fontFamily: 'Inter, system-ui, sans-serif',
+                    fontFamily: isRtl ? 'Cairo, system-ui, sans-serif' : 'Inter, system-ui, sans-serif',
                     fontSize: '13px',
                     fontWeight: 400,
                     color: '#8b8b9a',
@@ -205,27 +226,27 @@ export default function Education() {
           <div style={{ textAlign: 'center', marginBottom: '40px' }}>
             <p
               style={{
-                fontFamily: 'Inter, system-ui, sans-serif',
+                fontFamily: isRtl ? 'Cairo, system-ui, sans-serif' : 'Inter, system-ui, sans-serif',
                 fontSize: '11px',
                 fontWeight: 600,
                 color: '#00d4ff',
-                letterSpacing: '3px',
+                letterSpacing: isRtl ? '0' : '3px',
                 textTransform: 'uppercase',
                 marginBottom: '20px',
               }}
             >
-              {workshopsConfig.sectionLabel}
+              {t('education.workshopsLabel')}
             </p>
             <h2
               style={{
-                fontFamily: '"Space Grotesk", system-ui, sans-serif',
+                fontFamily: isRtl ? 'Cairo, system-ui, sans-serif' : '"Space Grotesk", system-ui, sans-serif',
                 fontSize: 'clamp(24px, 3vw, 36px)',
                 fontWeight: 500,
                 color: '#e0e0e8',
-                letterSpacing: '-0.01em',
+                letterSpacing: isRtl ? '0' : '-0.01em',
               }}
             >
-              {workshopsConfig.title}
+              {t('education.workshopsTitle')}
             </h2>
           </div>
 
@@ -237,14 +258,15 @@ export default function Education() {
               flexWrap: 'wrap',
               justifyContent: 'center',
               gap: '10px',
+              flexDirection: isRtl ? 'row-reverse' : 'row',
             }}
           >
-            {workshopsConfig.items.map((item) => (
+            {Array.isArray(workshops) && workshops.map((item) => (
               <span
                 key={item}
                 className="workshop-badge"
                 style={{
-                  fontFamily: 'Inter, system-ui, sans-serif',
+                  fontFamily: isRtl ? 'Cairo, system-ui, sans-serif' : 'Inter, system-ui, sans-serif',
                   fontSize: '12px',
                   fontWeight: 500,
                   color: '#e0e0e8',
