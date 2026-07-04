@@ -1,13 +1,23 @@
 import { useEffect, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { experienceConfig } from '../config';
 
 gsap.registerPlugin(ScrollTrigger);
 
+interface ExperienceEntry {
+  title: string;
+  company: string;
+  period: string;
+}
+
 export default function Experience() {
+  const { t, i18n } = useTranslation();
   const sectionRef = useRef<HTMLDivElement>(null);
   const entryRefs = useRef<(HTMLDivElement | null)[]>([]);
+
+  const isRtl = i18n.language === 'ar';
+  const entries = t('experience.entries', { returnObjects: true }) as ExperienceEntry[];
 
   useEffect(() => {
     const ctx = gsap.context(() => {
@@ -15,7 +25,7 @@ export default function Experience() {
         if (!el) return;
         gsap.fromTo(
           el,
-          { opacity: 0, x: -30 },
+          { opacity: 0, x: isRtl ? 30 : -30 },
           {
             opacity: 1,
             x: 0,
@@ -32,7 +42,7 @@ export default function Experience() {
     }, sectionRef);
 
     return () => ctx.revert();
-  }, []);
+  }, [i18n.language]);
 
   return (
     <section
@@ -55,37 +65,44 @@ export default function Experience() {
         <div style={{ marginBottom: '64px', textAlign: 'center' }}>
           <p
             style={{
-              fontFamily: 'Inter, system-ui, sans-serif',
+              fontFamily: isRtl ? 'Cairo, system-ui, sans-serif' : 'Inter, system-ui, sans-serif',
               fontSize: '11px',
               fontWeight: 600,
               color: '#00d4ff',
-              letterSpacing: '3px',
+              letterSpacing: isRtl ? '0' : '3px',
               textTransform: 'uppercase',
               marginBottom: '20px',
             }}
           >
-            {experienceConfig.sectionLabel}
+            {t('experience.sectionLabel')}
           </p>
           <h2
             style={{
-              fontFamily: '"Space Grotesk", system-ui, sans-serif',
+              fontFamily: isRtl ? 'Cairo, system-ui, sans-serif' : '"Space Grotesk", system-ui, sans-serif',
               fontSize: 'clamp(32px, 4vw, 48px)',
               fontWeight: 500,
               color: '#e0e0e8',
-              letterSpacing: '-0.01em',
+              letterSpacing: isRtl ? '0' : '-0.01em',
             }}
           >
-            {experienceConfig.title}
+            {t('experience.title')}
           </h2>
         </div>
 
         {/* Timeline */}
-        <div style={{ position: 'relative', paddingLeft: '40px' }}>
+        <div
+          style={{
+            position: 'relative',
+            paddingLeft: isRtl ? '0' : '40px',
+            paddingRight: isRtl ? '40px' : '0',
+          }}
+        >
           {/* Timeline Line */}
           <div
             style={{
               position: 'absolute',
-              left: '7px',
+              left: isRtl ? 'auto' : '7px',
+              right: isRtl ? '7px' : 'auto',
               top: '8px',
               bottom: '8px',
               width: '2px',
@@ -93,20 +110,21 @@ export default function Experience() {
             }}
           />
 
-          {experienceConfig.entries.map((entry, i) => (
+          {Array.isArray(entries) && entries.map((entry, i) => (
             <div
               key={entry.company + entry.period}
               ref={(el) => { entryRefs.current[i] = el; }}
               style={{
                 position: 'relative',
-                marginBottom: i < experienceConfig.entries.length - 1 ? '48px' : '0',
+                marginBottom: i < entries.length - 1 ? '48px' : '0',
               }}
             >
               {/* Dot */}
               <div
                 style={{
                   position: 'absolute',
-                  left: '-40px',
+                  left: isRtl ? 'auto' : '-40px',
+                  right: isRtl ? '-40px' : 'auto',
                   top: '6px',
                   width: '16px',
                   height: '16px',
@@ -125,6 +143,7 @@ export default function Experience() {
                   borderRadius: '4px',
                   padding: '28px 32px',
                   transition: 'border-color 0.3s ease, background 0.3s ease',
+                  textAlign: isRtl ? 'right' : 'left',
                 }}
                 onMouseEnter={(e) => {
                   (e.currentTarget as HTMLDivElement).style.borderColor = 'rgba(0, 212, 255, 0.2)';
@@ -149,7 +168,7 @@ export default function Experience() {
                 </p>
                 <h3
                   style={{
-                    fontFamily: '"Space Grotesk", system-ui, sans-serif',
+                    fontFamily: isRtl ? 'Cairo, system-ui, sans-serif' : '"Space Grotesk", system-ui, sans-serif',
                     fontSize: '20px',
                     fontWeight: 500,
                     color: '#f5f5f0',
@@ -161,7 +180,7 @@ export default function Experience() {
                 </h3>
                 <p
                   style={{
-                    fontFamily: 'Inter, system-ui, sans-serif',
+                    fontFamily: isRtl ? 'Cairo, system-ui, sans-serif' : 'Inter, system-ui, sans-serif',
                     fontSize: '14px',
                     fontWeight: 400,
                     color: '#8b8b9a',

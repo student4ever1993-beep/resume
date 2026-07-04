@@ -1,14 +1,32 @@
 import { useEffect, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { projectsConfig } from '../config';
 
 gsap.registerPlugin(ScrollTrigger);
 
+interface LocalizedProject {
+  name: string;
+  role: string;
+  contribution: string;
+  client: string;
+  image?: string;
+}
+
 export default function Projects() {
+  const { t, i18n } = useTranslation();
   const sectionRef = useRef<HTMLDivElement>(null);
   const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
-  const projects = projectsConfig.projects;
+
+  const isRtl = i18n.language === 'ar';
+  const localizedList = t('projects.list', { returnObjects: true }) as LocalizedProject[];
+
+  // Merge the image properties from configuration
+  const projects = Array.isArray(localizedList) ? localizedList.map((project, idx) => ({
+    ...project,
+    image: projectsConfig.projects[idx]?.image
+  })) : [];
 
   useEffect(() => {
     const ctx = gsap.context(() => {
@@ -33,7 +51,7 @@ export default function Projects() {
     }, sectionRef);
 
     return () => ctx.revert();
-  }, []);
+  }, [i18n.language]);
 
   if (projects.length === 0) return null;
 
@@ -56,34 +74,30 @@ export default function Projects() {
       >
         {/* Section Header */}
         <div style={{ marginBottom: '64px', textAlign: 'center' }}>
-          {projectsConfig.sectionLabel && (
-            <p
-              style={{
-                fontFamily: 'Inter, system-ui, sans-serif',
-                fontSize: '11px',
-                fontWeight: 600,
-                color: '#00d4ff',
-                letterSpacing: '3px',
-                textTransform: 'uppercase',
-                marginBottom: '20px',
-              }}
-            >
-              {projectsConfig.sectionLabel}
-            </p>
-          )}
-          {projectsConfig.title && (
-            <h2
-              style={{
-                fontFamily: '"Space Grotesk", system-ui, sans-serif',
-                fontSize: 'clamp(32px, 4vw, 48px)',
-                fontWeight: 500,
-                color: '#e0e0e8',
-                letterSpacing: '-0.01em',
-              }}
-            >
-              {projectsConfig.title}
-            </h2>
-          )}
+          <p
+            style={{
+              fontFamily: isRtl ? 'Cairo, system-ui, sans-serif' : 'Inter, system-ui, sans-serif',
+              fontSize: '11px',
+              fontWeight: 600,
+              color: '#00d4ff',
+              letterSpacing: isRtl ? '0' : '3px',
+              textTransform: 'uppercase',
+              marginBottom: '20px',
+            }}
+          >
+            {t('projects.sectionLabel')}
+          </p>
+          <h2
+            style={{
+              fontFamily: isRtl ? 'Cairo, system-ui, sans-serif' : '"Space Grotesk", system-ui, sans-serif',
+              fontSize: 'clamp(32px, 4vw, 48px)',
+              fontWeight: 500,
+              color: '#e0e0e8',
+              letterSpacing: isRtl ? '0' : '-0.01em',
+            }}
+          >
+            {t('projects.title')}
+          </h2>
         </div>
 
         {/* Project Cards Grid */}
@@ -105,6 +119,7 @@ export default function Projects() {
                 overflow: 'hidden',
                 transition: 'transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease',
                 cursor: 'default',
+                textAlign: isRtl ? 'right' : 'left',
               }}
               onMouseEnter={(e) => {
                 const el = e.currentTarget as HTMLDivElement;
@@ -175,14 +190,14 @@ export default function Projects() {
                 {/* Role Badge */}
                 <span
                   style={{
-                    fontFamily: '"JetBrains Mono", monospace',
+                    fontFamily: isRtl ? 'Cairo, system-ui, sans-serif' : '"JetBrains Mono", monospace',
                     fontSize: '10px',
-                    fontWeight: 400,
+                    fontWeight: 500,
                     color: '#00d4ff',
                     background: 'rgba(0, 212, 255, 0.08)',
                     padding: '4px 10px',
                     borderRadius: '100px',
-                    letterSpacing: '0.5px',
+                    letterSpacing: isRtl ? '0' : '0.5px',
                     display: 'inline-block',
                     marginBottom: '12px',
                   }}
@@ -192,7 +207,7 @@ export default function Projects() {
 
                 <h3
                   style={{
-                    fontFamily: '"Space Grotesk", system-ui, sans-serif',
+                    fontFamily: isRtl ? 'Cairo, system-ui, sans-serif' : '"Space Grotesk", system-ui, sans-serif',
                     fontSize: '18px',
                     fontWeight: 500,
                     color: '#f5f5f0',
@@ -205,7 +220,7 @@ export default function Projects() {
 
                 <p
                   style={{
-                    fontFamily: 'Inter, system-ui, sans-serif',
+                    fontFamily: isRtl ? 'Cairo, system-ui, sans-serif' : 'Inter, system-ui, sans-serif',
                     fontSize: '13px',
                     fontWeight: 400,
                     color: '#8b8b9a',
@@ -225,14 +240,14 @@ export default function Projects() {
                 >
                   <p
                     style={{
-                      fontFamily: 'Inter, system-ui, sans-serif',
+                      fontFamily: isRtl ? 'Cairo, system-ui, sans-serif' : 'Inter, system-ui, sans-serif',
                       fontSize: '11px',
                       fontWeight: 500,
-                      color: '#6b6b7a',
-                      letterSpacing: '0.5px',
+                      color: '#8b8b9a',
+                      letterSpacing: isRtl ? '0' : '0.5px',
                     }}
                   >
-                    <span style={{ color: '#4a4a5a' }}>Client: </span>
+                    <span style={{ color: '#4a4a5a' }}>{t('projects.clientLabel')}: </span>
                     {project.client}
                   </p>
                 </div>

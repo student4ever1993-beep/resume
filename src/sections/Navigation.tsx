@@ -1,12 +1,16 @@
 import { useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { getLenis } from '../hooks/useLenis';
 import { navigationConfig } from '../config';
 
 export default function Navigation() {
+  const { t, i18n } = useTranslation();
   const [scrolled, setScrolled] = useState(false);
   const [isLightSection, setIsLightSection] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const navRef = useRef<HTMLElement>(null);
+
+  const isRtl = i18n.language === 'ar';
 
   useEffect(() => {
     const handleScroll = () => {
@@ -67,9 +71,19 @@ export default function Navigation() {
     }
   };
 
-  if (!navigationConfig.brandName && navigationConfig.links.length === 0) {
-    return null;
-  }
+  const toggleLanguage = () => {
+    const nextLang = i18n.language === 'en' ? 'ar' : 'en';
+    i18n.changeLanguage(nextLang);
+  };
+
+  // Nav links localized mapping
+  const links = [
+    { label: t('nav.about'), target: '#manifesto' },
+    { label: t('nav.experience'), target: '#experience' },
+    { label: t('nav.skills'), target: '#skills' },
+    { label: t('nav.projects'), target: '#projects' },
+    { label: t('nav.contact'), target: '#contact' },
+  ];
 
   return (
     <>
@@ -95,6 +109,7 @@ export default function Navigation() {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
+            flexDirection: isRtl ? 'row-reverse' : 'row',
           }}
         >
           {navigationConfig.brandName ? (
@@ -119,27 +134,28 @@ export default function Navigation() {
             <div />
           )}
 
-          {/* Desktop Links */}
+          {/* Desktop Links & Language Switcher */}
           <div
             className="nav-desktop-links"
             style={{
               display: 'flex',
-              gap: '36px',
+              gap: '30px',
               alignItems: 'center',
+              flexDirection: isRtl ? 'row-reverse' : 'row',
             }}
           >
-            {navigationConfig.links.map((item) => (
+            {links.map((item) => (
               <a
                 key={`${item.label}-${item.target}`}
                 href={item.target}
                 onClick={(e) => handleNavClick(e, item.target)}
                 className="nav-link"
                 style={{
-                  fontFamily: 'Inter, system-ui, sans-serif',
-                  fontSize: '11px',
+                  fontFamily: isRtl ? 'Cairo, system-ui, sans-serif' : 'Inter, system-ui, sans-serif',
+                  fontSize: '12px',
                   fontWeight: 600,
                   color: baseTextColor,
-                  letterSpacing: '1.3px',
+                  letterSpacing: isRtl ? '0' : '1.3px',
                   textDecoration: 'none',
                   textTransform: 'uppercase',
                   transition: 'color 0.4s ease, opacity 0.4s ease',
@@ -157,55 +173,103 @@ export default function Navigation() {
                 {item.label}
               </a>
             ))}
+
+            {/* Language Switch Button */}
+            <button
+              onClick={toggleLanguage}
+              style={{
+                fontFamily: isRtl ? 'Inter, system-ui, sans-serif' : 'Cairo, system-ui, sans-serif',
+                fontSize: '12px',
+                fontWeight: 700,
+                color: '#00d4ff',
+                backgroundColor: 'rgba(0, 212, 255, 0.08)',
+                border: '1px solid rgba(0, 212, 255, 0.3)',
+                borderRadius: '4px',
+                padding: '6px 12px',
+                cursor: 'pointer',
+                transition: 'background 0.3s ease, color 0.3s ease',
+                marginLeft: isRtl ? '0' : '10px',
+                marginRight: isRtl ? '10px' : '0',
+              }}
+              onMouseEnter={(e) => {
+                const el = e.currentTarget as HTMLButtonElement;
+                el.style.backgroundColor = 'rgba(0, 212, 255, 0.16)';
+              }}
+              onMouseLeave={(e) => {
+                const el = e.currentTarget as HTMLButtonElement;
+                el.style.backgroundColor = 'rgba(0, 212, 255, 0.08)';
+              }}
+            >
+              {i18n.language === 'en' ? 'عربي' : 'EN'}
+            </button>
           </div>
 
-          {/* Mobile Hamburger */}
-          <button
-            className="nav-mobile-toggle"
-            onClick={() => setMenuOpen(!menuOpen)}
-            aria-label="Toggle menu"
-            style={{
-              display: 'none',
-              background: 'none',
-              border: 'none',
-              cursor: 'pointer',
-              padding: '8px',
-              zIndex: 102,
-              flexDirection: 'column',
-              gap: '5px',
-            }}
-          >
-            <span
+          {/* Mobile Hamburger & Lang Switcher */}
+          <div style={{ display: 'none', alignItems: 'center', gap: '10px', flexDirection: isRtl ? 'row-reverse' : 'row' }} className="nav-mobile-toggle">
+            <button
+              onClick={toggleLanguage}
               style={{
-                display: 'block',
-                width: '24px',
-                height: '2px',
-                background: baseTextColor,
-                transition: 'transform 0.3s ease, opacity 0.3s ease',
-                transform: menuOpen ? 'rotate(45deg) translate(5px, 5px)' : 'none',
+                fontFamily: isRtl ? 'Inter, system-ui, sans-serif' : 'Cairo, system-ui, sans-serif',
+                fontSize: '11px',
+                fontWeight: 700,
+                color: '#00d4ff',
+                backgroundColor: 'rgba(0, 212, 255, 0.08)',
+                border: '1px solid rgba(0, 212, 255, 0.3)',
+                borderRadius: '4px',
+                padding: '4px 10px',
+                cursor: 'pointer',
+                zIndex: 102,
               }}
-            />
-            <span
+            >
+              {i18n.language === 'en' ? 'عربي' : 'EN'}
+            </button>
+
+            <button
+              onClick={() => setMenuOpen(!menuOpen)}
+              aria-label="Toggle menu"
               style={{
-                display: 'block',
-                width: '24px',
-                height: '2px',
-                background: baseTextColor,
-                transition: 'opacity 0.3s ease',
-                opacity: menuOpen ? 0 : 1,
+                background: 'none',
+                border: 'none',
+                cursor: 'pointer',
+                padding: '8px',
+                zIndex: 102,
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '5px',
               }}
-            />
-            <span
-              style={{
-                display: 'block',
-                width: '24px',
-                height: '2px',
-                background: baseTextColor,
-                transition: 'transform 0.3s ease, opacity 0.3s ease',
-                transform: menuOpen ? 'rotate(-45deg) translate(5px, -5px)' : 'none',
-              }}
-            />
-          </button>
+            >
+              <span
+                style={{
+                  display: 'block',
+                  width: '24px',
+                  height: '2px',
+                  background: baseTextColor,
+                  transition: 'transform 0.3s ease, opacity 0.3s ease',
+                  transform: menuOpen ? 'rotate(45deg) translate(5px, 5px)' : 'none',
+                }}
+              />
+              <span
+                style={{
+                  display: 'block',
+                  width: '24px',
+                  height: '2px',
+                  background: baseTextColor,
+                  transition: 'opacity 0.3s ease',
+                  opacity: menuOpen ? 0 : 1,
+                }}
+              />
+              <span
+                style={{
+                  display: 'block',
+                  width: '24px',
+                  height: '2px',
+                  background: baseTextColor,
+                  transition: 'transform 0.3s ease, opacity 0.3s ease',
+                  transform: menuOpen ? 'rotate(-45deg) translate(5px, -5px)' : 'none',
+                }}
+              />
+            </button>
+          </div>
         </div>
       </nav>
 
@@ -228,17 +292,17 @@ export default function Navigation() {
           transition: 'opacity 0.4s ease',
         }}
       >
-        {navigationConfig.links.map((item) => (
+        {links.map((item) => (
           <a
             key={`mobile-${item.label}-${item.target}`}
             href={item.target}
             onClick={(e) => handleNavClick(e, item.target)}
             style={{
-              fontFamily: '"Space Grotesk", system-ui, sans-serif',
+              fontFamily: isRtl ? 'Cairo, system-ui, sans-serif' : '"Space Grotesk", system-ui, sans-serif',
               fontSize: '24px',
               fontWeight: 500,
               color: '#e0e0e8',
-              letterSpacing: '3px',
+              letterSpacing: isRtl ? '0' : '3px',
               textDecoration: 'none',
               textTransform: 'uppercase',
               transition: 'color 0.3s ease',

@@ -1,6 +1,12 @@
+import { useTranslation } from 'react-i18next';
 import { footerConfig } from '../config';
 
 export default function Footer() {
+  const { t, i18n } = useTranslation();
+  const isRtl = i18n.language === 'ar';
+  
+  const taglines = t('footer.tagline', { returnObjects: true }) as string[];
+
   const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
     if (href.startsWith('#')) {
       e.preventDefault();
@@ -8,6 +14,28 @@ export default function Footer() {
       if (el) el.scrollIntoView({ behavior: 'smooth' });
     }
   };
+
+  // Build the local columns
+  const columns = [
+    {
+      heading: t('footer.columns.navigate'),
+      links: [
+        { label: t('nav.about'), href: "#manifesto" },
+        { label: t('nav.experience'), href: "#experience" },
+        { label: t('nav.skills'), href: "#skills" },
+        { label: t('nav.projects'), href: "#projects" },
+        { label: t('nav.contact'), href: "#contact" },
+      ],
+    },
+    {
+      heading: t('footer.columns.connect'),
+      links: [
+        { label: isRtl ? 'البريد الإلكتروني' : 'Email', href: "mailto:Alya_alsiyabi93@outlook.com" },
+        { label: isRtl ? 'لينكد إن' : 'LinkedIn', href: "#" },
+        { label: isRtl ? 'جيت هاب' : 'GitHub', href: "#" },
+      ],
+    },
+  ];
 
   return (
     <footer
@@ -17,6 +45,7 @@ export default function Footer() {
         position: 'relative',
         zIndex: 2,
         padding: '80px 24px 40px',
+        textAlign: isRtl ? 'right' : 'left',
       }}
     >
       <div
@@ -39,11 +68,11 @@ export default function Footer() {
           >
             {footerConfig.brandName}
           </p>
-          {footerConfig.brandTaglineLines.map((line) => (
+          {Array.isArray(taglines) && taglines.map((line) => (
             <p
               key={line}
               style={{
-                fontFamily: 'Inter, system-ui, sans-serif',
+                fontFamily: isRtl ? 'Cairo, system-ui, sans-serif' : 'Inter, system-ui, sans-serif',
                 fontSize: '13px',
                 fontWeight: 400,
                 color: '#8b8b9a',
@@ -62,17 +91,18 @@ export default function Footer() {
             gap: '80px',
             marginTop: '48px',
             flexWrap: 'wrap',
+            flexDirection: isRtl ? 'row-reverse' : 'row',
           }}
         >
-          {footerConfig.columns.map((column) => (
+          {columns.map((column) => (
             <div key={column.heading}>
               <p
                 style={{
-                  fontFamily: 'Inter, system-ui, sans-serif',
+                  fontFamily: isRtl ? 'Cairo, system-ui, sans-serif' : 'Inter, system-ui, sans-serif',
                   fontSize: '11px',
                   fontWeight: 600,
                   color: '#00d4ff',
-                  letterSpacing: '2px',
+                  letterSpacing: isRtl ? '0' : '2px',
                   textTransform: 'uppercase',
                   marginBottom: '20px',
                 }}
@@ -86,7 +116,7 @@ export default function Footer() {
                       href={link.href}
                       onClick={(e) => handleNavClick(e, link.href)}
                       style={{
-                        fontFamily: 'Inter, system-ui, sans-serif',
+                        fontFamily: isRtl ? 'Cairo, system-ui, sans-serif' : 'Inter, system-ui, sans-serif',
                         fontSize: '13px',
                         fontWeight: 400,
                         color: '#8b8b9a',
@@ -116,17 +146,18 @@ export default function Footer() {
             marginTop: '60px',
             paddingTop: '24px',
             borderTop: '1px solid rgba(0, 212, 255, 0.06)',
+            textAlign: isRtl ? 'center' : 'left',
           }}
         >
           <p
             style={{
-              fontFamily: 'Inter, system-ui, sans-serif',
+              fontFamily: isRtl ? 'Cairo, system-ui, sans-serif' : 'Inter, system-ui, sans-serif',
               fontSize: '12px',
               fontWeight: 400,
               color: '#4a4a5a',
             }}
           >
-            {footerConfig.copyright}
+            {t('footer.copyright')}
           </p>
         </div>
       </div>

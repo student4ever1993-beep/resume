@@ -1,15 +1,24 @@
 import { useEffect, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import HeritageHelix from '../effects/HeritageHelix';
-import { anatomyConfig } from '../config';
 
 gsap.registerPlugin(ScrollTrigger);
 
+interface SkillPillar {
+  label: string;
+  title: string;
+  body: string;
+}
+
 export default function Anatomy() {
+  const { t, i18n } = useTranslation();
   const sectionRef = useRef<HTMLDivElement>(null);
   const pillarRefs = useRef<(HTMLDivElement | null)[]>([]);
-  const pillars = anatomyConfig.pillars;
+
+  const isRtl = i18n.language === 'ar';
+  const pillars = t('skills.pillars', { returnObjects: true }) as SkillPillar[];
 
   useEffect(() => {
     const ctx = gsap.context(() => {
@@ -36,11 +45,7 @@ export default function Anatomy() {
     }, sectionRef);
 
     return () => ctx.revert();
-  }, []);
-
-  if (!anatomyConfig.sectionLabel && !anatomyConfig.title && pillars.length === 0) {
-    return null;
-  }
+  }, [i18n.language]);
 
   return (
     <section
@@ -59,35 +64,31 @@ export default function Anatomy() {
           padding: '100px 24px 50px',
         }}
       >
-        {anatomyConfig.sectionLabel && (
-          <p
-            style={{
-              fontFamily: 'Inter, system-ui, sans-serif',
-              fontSize: '11px',
-              fontWeight: 600,
-              color: '#00a8cc',
-              letterSpacing: '3px',
-              textTransform: 'uppercase',
-              marginBottom: '20px',
-            }}
-          >
-            {anatomyConfig.sectionLabel}
-          </p>
-        )}
-        {anatomyConfig.title && (
-          <h2
-            style={{
-              fontFamily: '"Space Grotesk", system-ui, sans-serif',
-              fontSize: 'clamp(32px, 4vw, 48px)',
-              fontWeight: 500,
-              lineHeight: 1.1,
-              color: '#050508',
-              letterSpacing: '-0.01em',
-            }}
-          >
-            {anatomyConfig.title}
-          </h2>
-        )}
+        <p
+          style={{
+            fontFamily: isRtl ? 'Cairo, system-ui, sans-serif' : 'Inter, system-ui, sans-serif',
+            fontSize: '11px',
+            fontWeight: 600,
+            color: '#00a8cc',
+            letterSpacing: isRtl ? '0' : '3px',
+            textTransform: 'uppercase',
+            marginBottom: '20px',
+          }}
+        >
+          {t('skills.sectionLabel')}
+        </p>
+        <h2
+          style={{
+            fontFamily: isRtl ? 'Cairo, system-ui, sans-serif' : '"Space Grotesk", system-ui, sans-serif',
+            fontSize: 'clamp(32px, 4vw, 48px)',
+            fontWeight: 500,
+            lineHeight: 1.1,
+            color: '#050508',
+            letterSpacing: isRtl ? '0' : '-0.01em',
+          }}
+        >
+          {t('skills.title')}
+        </h2>
       </div>
 
       {/* Split Layout */}
@@ -97,6 +98,7 @@ export default function Anatomy() {
           maxWidth: '1400px',
           margin: '0 auto',
           minHeight: '100vh',
+          flexDirection: isRtl ? 'row-reverse' : 'row',
         }}
       >
         {/* Left: Sticky HeritageHelix */}
@@ -122,10 +124,11 @@ export default function Anatomy() {
           style={{
             width: '50%',
             padding: '0 48px',
+            textAlign: isRtl ? 'right' : 'left',
           }}
           className="w-full md:w-1/2"
         >
-          {pillars.map((pillar, i) => (
+          {Array.isArray(pillars) && pillars.map((pillar, i) => (
             <div
               key={pillar.label}
               ref={(el) => { pillarRefs.current[i] = el; }}
@@ -136,11 +139,11 @@ export default function Anatomy() {
             >
               <p
                 style={{
-                  fontFamily: 'Inter, system-ui, sans-serif',
+                  fontFamily: isRtl ? 'Cairo, system-ui, sans-serif' : 'Inter, system-ui, sans-serif',
                   fontSize: '11px',
                   fontWeight: 600,
                   color: '#00a8cc',
-                  letterSpacing: '3px',
+                  letterSpacing: isRtl ? '0' : '3px',
                   textTransform: 'uppercase',
                   marginBottom: '24px',
                 }}
@@ -149,7 +152,7 @@ export default function Anatomy() {
               </p>
               <h3
                 style={{
-                  fontFamily: '"Space Grotesk", system-ui, sans-serif',
+                  fontFamily: isRtl ? 'Cairo, system-ui, sans-serif' : '"Space Grotesk", system-ui, sans-serif',
                   fontSize: '26px',
                   fontWeight: 600,
                   lineHeight: 1.3,
@@ -161,12 +164,13 @@ export default function Anatomy() {
               </h3>
               <p
                 style={{
-                  fontFamily: 'Inter, system-ui, sans-serif',
+                  fontFamily: isRtl ? 'Cairo, system-ui, sans-serif' : 'Inter, system-ui, sans-serif',
                   fontSize: '14px',
                   fontWeight: 400,
                   lineHeight: 1.6,
                   color: '#4a4a5a',
                   maxWidth: '480px',
+                  margin: isRtl ? '0 0 0 auto' : '0 auto 0 0',
                 }}
               >
                 {pillar.body}

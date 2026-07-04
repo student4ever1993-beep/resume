@@ -1,22 +1,22 @@
 import { useEffect, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import SplitType from 'split-type';
-import { manifestoConfig } from '../config';
 
 gsap.registerPlugin(ScrollTrigger);
 
 export default function Manifesto() {
+  const { t, i18n } = useTranslation();
   const containerRef = useRef<HTMLDivElement>(null);
   const textRef = useRef<HTMLParagraphElement>(null);
   const splitRef = useRef<SplitType | null>(null);
   const tlRef = useRef<gsap.core.Timeline | null>(null);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const hasManifestoContent = manifestoConfig.sectionLabel || manifestoConfig.text;
+
+  const isRtl = i18n.language === 'ar';
 
   useEffect(() => {
-    if (!hasManifestoContent) return;
-
     const textEl = textRef.current;
     const containerEl = containerRef.current;
     if (!textEl || !containerEl) return;
@@ -87,11 +87,7 @@ export default function Manifesto() {
       if (tlRef.current) tlRef.current.kill();
       if (splitRef.current) splitRef.current.revert();
     };
-  }, [hasManifestoContent]);
-
-  if (!hasManifestoContent) {
-    return null;
-  }
+  }, [i18n.language]); // Re-run when language changes
 
   return (
     <section
@@ -111,40 +107,36 @@ export default function Manifesto() {
           padding: '140px 0',
         }}
       >
-        {manifestoConfig.sectionLabel && (
-          <p
-            style={{
-              fontFamily: 'Inter, system-ui, sans-serif',
-              fontSize: '11px',
-              fontWeight: 600,
-              color: '#00d4ff',
-              letterSpacing: '3px',
-              textTransform: 'uppercase',
-              marginBottom: '48px',
-              textAlign: 'center',
-            }}
-          >
-            {manifestoConfig.sectionLabel}
-          </p>
-        )}
+        <p
+          style={{
+            fontFamily: isRtl ? 'Cairo, system-ui, sans-serif' : 'Inter, system-ui, sans-serif',
+            fontSize: '11px',
+            fontWeight: 600,
+            color: '#00d4ff',
+            letterSpacing: isRtl ? '0' : '3px',
+            textTransform: 'uppercase',
+            marginBottom: '48px',
+            textAlign: 'center',
+          }}
+        >
+          {t('manifesto.sectionLabel')}
+        </p>
 
-        {manifestoConfig.text && (
-          <p
-            ref={textRef}
-            className="manifesto-text"
-            style={{
-              fontFamily: '"Space Grotesk", system-ui, sans-serif',
-              fontSize: 'clamp(1.4rem, 3.5vw, 2.6rem)',
-              fontWeight: 400,
-              lineHeight: 1.25,
-              color: '#e0e0e8',
-              textAlign: 'center',
-              textWrap: 'balance',
-            }}
-          >
-            {manifestoConfig.text}
-          </p>
-        )}
+        <p
+          ref={textRef}
+          className="manifesto-text"
+          style={{
+            fontFamily: isRtl ? 'Cairo, system-ui, sans-serif' : '"Space Grotesk", system-ui, sans-serif',
+            fontSize: isRtl ? 'clamp(1.2rem, 3.2vw, 2.3rem)' : 'clamp(1.4rem, 3.5vw, 2.6rem)',
+            fontWeight: isRtl ? 400 : 400,
+            lineHeight: isRtl ? 1.6 : 1.25,
+            color: '#e0e0e8',
+            textAlign: 'center',
+            textWrap: 'balance',
+          }}
+        >
+          {t('manifesto.text')}
+        </p>
       </div>
     </section>
   );
