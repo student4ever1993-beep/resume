@@ -3,7 +3,9 @@ import { useLenis } from './hooks/useLenis';
 import Navigation from './sections/Navigation';
 import Hero from './sections/Hero';
 import Manifesto from './sections/Manifesto';
+import Experience from './sections/Experience';
 import Anatomy from './sections/Anatomy';
+import Education from './sections/Education';
 import Projects from './sections/Projects';
 import Contact from './sections/Contact';
 import Footer from './sections/Footer';
@@ -33,7 +35,9 @@ function App() {
       <main>
         <Hero />
         <Manifesto />
+        <Experience />
         <Anatomy />
+        <Education />
         <Projects />
         <Contact />
         <Footer />
