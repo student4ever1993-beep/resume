@@ -123,6 +123,7 @@ export default function Manifesto() {
         </p>
 
         <p
+          key={i18n.language}
           ref={textRef}
           className="manifesto-text"
           style={{
