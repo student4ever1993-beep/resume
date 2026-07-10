@@ -107,7 +107,7 @@ export default function Contact() {
             fontFamily: isRtl ? 'Cairo, system-ui, sans-serif' : 'Inter, system-ui, sans-serif',
             fontSize: '11px',
             fontWeight: 600,
-            color: '#00d4ff',
+            color: '#c9a84c',
             letterSpacing: isRtl ? '0' : '3px',
             textTransform: 'uppercase',
             marginBottom: '24px',
@@ -168,7 +168,7 @@ export default function Contact() {
                 gap: '12px',
               }}
             >
-              <span style={{ color: '#00d4ff' }}>{iconMap[item.icon] || null}</span>
+              <span style={{ color: '#c9a84c' }}>{iconMap[item.icon] || null}</span>
               <span
                 style={{
                   fontFamily: 'Inter, system-ui, sans-serif',
@@ -209,7 +209,7 @@ export default function Contact() {
                 transition: 'color 0.3s ease',
               }}
               onMouseEnter={(e) => {
-                (e.target as HTMLAnchorElement).style.color = '#00d4ff';
+                (e.target as HTMLAnchorElement).style.color = '#c9a84c';
               }}
               onMouseLeave={(e) => {
                 (e.target as HTMLAnchorElement).style.color = '#8b8b9a';

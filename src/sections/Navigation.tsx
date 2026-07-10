@@ -57,7 +57,7 @@ export default function Navigation() {
   }, [menuOpen]);
 
   const baseTextColor = isLightSection && !menuOpen ? '#050508' : '#e0e0e8';
-  const hoverTextColor = '#00d4ff';
+  const hoverTextColor = '#c9a84c';
 
   const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, targetId: string) => {
     e.preventDefault();
@@ -112,27 +112,27 @@ export default function Navigation() {
             flexDirection: isRtl ? 'row-reverse' : 'row',
           }}
         >
-          {navigationConfig.brandName ? (
-            <a
-              href="#hero"
-              onClick={(e) => handleNavClick(e, '#hero')}
+          <a
+            href="#hero"
+            onClick={(e) => handleNavClick(e, '#hero')}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              textDecoration: 'none',
+              zIndex: 102,
+            }}
+          >
+            <img
+              src="/images/logo.png"
+              alt="Alya Al Siyabi Logo"
               style={{
-                fontFamily: '"Space Grotesk", system-ui, sans-serif',
-                fontSize: '20px',
-                fontWeight: 500,
-                color: baseTextColor,
-                letterSpacing: '2px',
-                textDecoration: 'none',
-                textTransform: 'uppercase',
-                transition: 'color 0.6s ease',
-                zIndex: 102,
+                height: scrolled ? '65px' : '90px',
+                width: 'auto',
+                objectFit: 'contain',
+                transition: 'height 0.6s cubic-bezier(0.16, 1, 0.3, 1)',
               }}
-            >
-              {navigationConfig.brandName}
-            </a>
-          ) : (
-            <div />
-          )}
+            />
+          </a>
 
           {/* Desktop Links & Language Switcher */}
           <div
@@ -181,9 +181,9 @@ export default function Navigation() {
                 fontFamily: isRtl ? 'Inter, system-ui, sans-serif' : 'Cairo, system-ui, sans-serif',
                 fontSize: '12px',
                 fontWeight: 700,
-                color: '#00d4ff',
-                backgroundColor: 'rgba(0, 212, 255, 0.08)',
-                border: '1px solid rgba(0, 212, 255, 0.3)',
+                color: '#c9a84c',
+                backgroundColor: 'rgba(201, 168, 76, 0.08)',
+                border: '1px solid rgba(201, 168, 76, 0.3)',
                 borderRadius: '4px',
                 padding: '6px 12px',
                 cursor: 'pointer',
@@ -193,11 +193,11 @@ export default function Navigation() {
               }}
               onMouseEnter={(e) => {
                 const el = e.currentTarget as HTMLButtonElement;
-                el.style.backgroundColor = 'rgba(0, 212, 255, 0.16)';
+                el.style.backgroundColor = 'rgba(201, 168, 76, 0.16)';
               }}
               onMouseLeave={(e) => {
                 const el = e.currentTarget as HTMLButtonElement;
-                el.style.backgroundColor = 'rgba(0, 212, 255, 0.08)';
+                el.style.backgroundColor = 'rgba(201, 168, 76, 0.08)';
               }}
             >
               {i18n.language === 'en' ? 'عربي' : 'EN'}
@@ -212,9 +212,9 @@ export default function Navigation() {
                 fontFamily: isRtl ? 'Inter, system-ui, sans-serif' : 'Cairo, system-ui, sans-serif',
                 fontSize: '11px',
                 fontWeight: 700,
-                color: '#00d4ff',
-                backgroundColor: 'rgba(0, 212, 255, 0.08)',
-                border: '1px solid rgba(0, 212, 255, 0.3)',
+                color: '#c9a84c',
+                backgroundColor: 'rgba(201, 168, 76, 0.08)',
+                border: '1px solid rgba(201, 168, 76, 0.3)',
                 borderRadius: '4px',
                 padding: '4px 10px',
                 cursor: 'pointer',
@@ -308,7 +308,7 @@ export default function Navigation() {
               transition: 'color 0.3s ease',
             }}
             onMouseEnter={(e) => {
-              (e.target as HTMLAnchorElement).style.color = '#00d4ff';
+              (e.target as HTMLAnchorElement).style.color = '#c9a84c';
             }}
             onMouseLeave={(e) => {
               (e.target as HTMLAnchorElement).style.color = '#e0e0e8';

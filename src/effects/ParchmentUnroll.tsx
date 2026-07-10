@@ -44,15 +44,15 @@ export default function ParchmentUnroll() {
         ctx!.beginPath();
         ctx!.moveTo(0, 1);
         ctx!.lineTo(w * progressRef.current, 1);
-        ctx!.strokeStyle = 'rgba(0, 212, 255, 0.6)';
+        ctx!.strokeStyle = 'rgba(201, 168, 76, 0.6)';
         ctx!.lineWidth = 2;
         ctx!.stroke();
 
         // Glow effect at the tip
         const tipX = w * progressRef.current;
         const gradient = ctx!.createRadialGradient(tipX, 1, 0, tipX, 1, 20);
-        gradient.addColorStop(0, 'rgba(0, 212, 255, 0.4)');
-        gradient.addColorStop(1, 'rgba(0, 212, 255, 0)');
+        gradient.addColorStop(0, 'rgba(201, 168, 76, 0.4)');
+        gradient.addColorStop(1, 'rgba(201, 168, 76, 0)');
         ctx!.beginPath();
         ctx!.arc(tipX, 1, 20, 0, Math.PI * 2);
         ctx!.fillStyle = gradient;

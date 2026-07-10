@@ -25,7 +25,14 @@ const resources = {
       },
       manifesto: {
         sectionLabel: "ABOUT ME",
-        text: "With over 5 years of professional experience in Systems Analysis, combined with a background in Chemical Engineering and Digital Marketing, I bring a unique blend of technical and analytical expertise. Currently pursuing a Master's in Digital Transformation and Innovation at UTAS, I have participated in numerous workshops and training programs inside and outside Oman, continuously demonstrating creative initiatives and ideas for tackling complex challenges."
+        text: "With over 5 years of professional experience in Systems Analysis, combined with a background in Chemical Engineering and Digital Marketing, I bring a unique blend of technical and analytical expertise. Currently pursuing a Master's in Digital Transformation and Innovation at UTAS, I have participated in numerous workshops and training programs inside and outside Oman, continuously demonstrating creative initiatives and ideas for tackling complex challenges.",
+        introQuote: "Bridging the gap between process engineering, software systems, and digital strategy.",
+        stats: {
+          experience: { value: "5+ Years", label: "Systems Analysis" },
+          masters: { value: "MSc UTAS", label: "Digital Innovation" },
+          bachelors: { value: "BSc GUtech", label: "Process Engineering" },
+          projects: { value: "11+ Systems", label: "Delivered Projects" }
+        }
       },
       experience: {
         sectionLabel: "CAREER",
@@ -228,7 +235,14 @@ const resources = {
       },
       manifesto: {
         sectionLabel: "نبذة عني",
-        text: "مع أكثر من 5 سنوات من الخبرة المهنية في تحليل النظم، بالإضافة إلى خلفية في الهندسة الكيميائية والتسويق الرقمي، أمتلك مزيجاً فريداً من الخبرات التقنية والتحليلية. أتابع حالياً دراسة الماجستير في التحول الرقمي والابتكار في جامعة التقنية والعلوم التطبيقية (UTAS)، وشاركت في العديد من ورش العمل والبرامج التدريبية داخل وخارج سلطنة عمان، مع السعي المستمر لتقديم مبادرات وأفكار إبداعية لمواجهة التحديات المعقدة."
+        text: "مع أكثر من 5 سنوات من الخبرة المهنية في تحليل النظم، بالإضافة إلى خلفية في الهندسة الكيميائية والتسويق الرقمي، أمتلك مزيجاً فريداً من الخبرات التقنية والتحليلية. أتابع حالياً دراسة الماجستير في التحول الرقمي والابتكار في جامعة التقنية والعلوم التطبيقية (UTAS)، وشاركت في العديد من ورش العمل والبرامج التدريبية داخل وخارج سلطنة عمان، مع السعي المستمر لتقديم مبادرات وأفكار إبداعية لمواجهة التحديات المعقدة.",
+        introQuote: "ربط الفجوة بين هندسة العمليات، النظم البرمجية، واستراتيجيات التحول الرقمي.",
+        stats: {
+          experience: { value: "٥+ سنوات", label: "تحليل النظم والعمليات" },
+          masters: { value: "ماجستير UTAS", label: "الابتكار الرقمي" },
+          bachelors: { value: "بكالوريوس GUtech", label: "هندسة العمليات" },
+          projects: { value: "١١+ مشروعاً", label: "الأنظمة المنفذة" }
+        }
       },
       experience: {
         sectionLabel: "المسار المهني",

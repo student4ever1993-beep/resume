@@ -92,7 +92,7 @@ export default function Education() {
                 fontFamily: isRtl ? 'Cairo, system-ui, sans-serif' : 'Inter, system-ui, sans-serif',
                 fontSize: '11px',
                 fontWeight: 600,
-                color: '#00d4ff',
+                color: '#c9a84c',
                 letterSpacing: isRtl ? '0' : '3px',
                 textTransform: 'uppercase',
                 marginBottom: '20px',
@@ -126,8 +126,8 @@ export default function Education() {
                 key={entry.institution}
                 ref={(el) => { cardRefs.current[i] = el; }}
                 style={{
-                  background: 'rgba(0, 212, 255, 0.03)',
-                  border: '1px solid rgba(0, 212, 255, 0.1)',
+                  background: 'rgba(201, 168, 76, 0.03)',
+                  border: '1px solid rgba(201, 168, 76, 0.1)',
                   borderRadius: '4px',
                   padding: '36px 32px',
                   position: 'relative',
@@ -136,10 +136,10 @@ export default function Education() {
                   textAlign: isRtl ? 'right' : 'left',
                 }}
                 onMouseEnter={(e) => {
-                  (e.currentTarget as HTMLDivElement).style.borderColor = 'rgba(0, 212, 255, 0.25)';
+                  (e.currentTarget as HTMLDivElement).style.borderColor = 'rgba(201, 168, 76, 0.25)';
                 }}
                 onMouseLeave={(e) => {
-                  (e.currentTarget as HTMLDivElement).style.borderColor = 'rgba(0, 212, 255, 0.1)';
+                  (e.currentTarget as HTMLDivElement).style.borderColor = 'rgba(201, 168, 76, 0.1)';
                 }}
               >
                 {/* Accent bar */}
@@ -150,7 +150,7 @@ export default function Education() {
                     left: 0,
                     right: 0,
                     height: '3px',
-                    background: 'linear-gradient(90deg, #00d4ff, rgba(0, 212, 255, 0.2))',
+                    background: 'linear-gradient(90deg, #c9a84c, rgba(201, 168, 76, 0.2))',
                   }}
                 />
 
@@ -168,7 +168,7 @@ export default function Education() {
                       fontFamily: '"JetBrains Mono", monospace',
                       fontSize: '11px',
                       fontWeight: 400,
-                      color: '#00d4ff',
+                      color: '#c9a84c',
                       letterSpacing: '1px',
                     }}
                   >
@@ -181,7 +181,7 @@ export default function Education() {
                         fontSize: '10px',
                         fontWeight: 600,
                         color: '#050508',
-                        background: '#00d4ff',
+                        background: '#c9a84c',
                         padding: '3px 10px',
                         borderRadius: '100px',
                         letterSpacing: isRtl ? '0' : '0.5px',
@@ -229,7 +229,7 @@ export default function Education() {
                 fontFamily: isRtl ? 'Cairo, system-ui, sans-serif' : 'Inter, system-ui, sans-serif',
                 fontSize: '11px',
                 fontWeight: 600,
-                color: '#00d4ff',
+                color: '#c9a84c',
                 letterSpacing: isRtl ? '0' : '3px',
                 textTransform: 'uppercase',
                 marginBottom: '20px',
@@ -270,8 +270,8 @@ export default function Education() {
                   fontSize: '12px',
                   fontWeight: 500,
                   color: '#e0e0e8',
-                  background: 'rgba(0, 212, 255, 0.06)',
-                  border: '1px solid rgba(0, 212, 255, 0.12)',
+                  background: 'rgba(201, 168, 76, 0.06)',
+                  border: '1px solid rgba(201, 168, 76, 0.12)',
                   padding: '10px 18px',
                   borderRadius: '100px',
                   transition: 'background 0.3s ease, border-color 0.3s ease, color 0.3s ease',
@@ -279,14 +279,14 @@ export default function Education() {
                 }}
                 onMouseEnter={(e) => {
                   const el = e.currentTarget as HTMLSpanElement;
-                  el.style.background = 'rgba(0, 212, 255, 0.12)';
-                  el.style.borderColor = 'rgba(0, 212, 255, 0.3)';
-                  el.style.color = '#00d4ff';
+                  el.style.background = 'rgba(201, 168, 76, 0.12)';
+                  el.style.borderColor = 'rgba(201, 168, 76, 0.3)';
+                  el.style.color = '#c9a84c';
                 }}
                 onMouseLeave={(e) => {
                   const el = e.currentTarget as HTMLSpanElement;
-                  el.style.background = 'rgba(0, 212, 255, 0.06)';
-                  el.style.borderColor = 'rgba(0, 212, 255, 0.12)';
+                  el.style.background = 'rgba(201, 168, 76, 0.06)';
+                  el.style.borderColor = 'rgba(201, 168, 76, 0.12)';
                   el.style.color = '#e0e0e8';
                 }}
               >

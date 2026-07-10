@@ -54,6 +54,7 @@ export default function Hero() {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
+        backgroundColor: '#050508',
       }}
     >
       {/* Video Background */}
@@ -71,6 +72,8 @@ export default function Hero() {
             height: '100%',
             objectFit: 'cover',
             zIndex: 0,
+            opacity: 0.35,
+            mixBlendMode: 'luminosity',
           }}
         >
           <source src={heroConfig.videoPath} type="video/mp4" />
@@ -82,7 +85,7 @@ export default function Hero() {
         style={{
           position: 'absolute',
           inset: 0,
-          background: 'linear-gradient(to bottom, rgba(5,5,8,0.3) 0%, rgba(5,5,8,0.6) 60%, rgba(5,5,8,0.9) 100%)',
+          background: 'radial-gradient(circle at 50% 50%, rgba(201, 168, 76, 0.03) 0%, transparent 70%), linear-gradient(to bottom, rgba(5,5,8,0.3) 0%, rgba(5,5,8,0.6) 60%, rgba(5,5,8,0.95) 100%)',
           zIndex: 1,
         }}
       />
@@ -105,7 +108,7 @@ export default function Hero() {
             fontFamily: isRtl ? 'Cairo, system-ui, sans-serif' : 'Inter, system-ui, sans-serif',
             fontSize: '11px',
             fontWeight: 600,
-            color: '#00d4ff',
+            color: '#c9a84c',
             letterSpacing: isRtl ? '0' : '3px',
             textTransform: 'uppercase',
             marginBottom: '20px',
@@ -129,7 +132,7 @@ export default function Hero() {
         >
           {t('hero.titleLine')}
           <br />
-          <em style={{ fontStyle: 'normal', color: '#00d4ff' }}>{t('hero.titleEmphasis')}</em>
+          <em style={{ fontStyle: 'normal', color: '#c9a84c' }}>{t('hero.titleEmphasis')}</em>
         </h1>
 
         <p
@@ -167,18 +170,18 @@ export default function Hero() {
             letterSpacing: isRtl ? '0' : '2px',
             textTransform: 'uppercase',
             textDecoration: 'none',
-            borderBottom: '1px solid rgba(0, 212, 255, 0.3)',
+            borderBottom: '1px solid rgba(201, 168, 76, 0.3)',
             paddingBottom: '4px',
             opacity: 0,
             display: 'inline-block',
             transition: 'border-color 0.4s ease, color 0.4s ease',
           }}
           onMouseEnter={(e) => {
-            (e.target as HTMLAnchorElement).style.borderBottomColor = '#00d4ff';
-            (e.target as HTMLAnchorElement).style.color = '#00d4ff';
+            (e.target as HTMLAnchorElement).style.borderBottomColor = '#c9a84c';
+            (e.target as HTMLAnchorElement).style.color = '#c9a84c';
           }}
           onMouseLeave={(e) => {
-            (e.target as HTMLAnchorElement).style.borderBottomColor = 'rgba(0, 212, 255, 0.3)';
+            (e.target as HTMLAnchorElement).style.borderBottomColor = 'rgba(201, 168, 76, 0.3)';
             (e.target as HTMLAnchorElement).style.color = '#f5f5f0';
           }}
         >

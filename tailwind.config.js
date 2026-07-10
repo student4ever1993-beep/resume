@@ -13,8 +13,8 @@ module.exports = {
         void: "#050508",
         charcoal: "#0a0a0f",
         slate: "#13131f",
-        cyan: "#00d4ff",
-        "cyan-dim": "#00a8cc",
+        gold: "#c9a84c",
+        "gold-dim": "#a68a3a",
         platinum: "#e0e0e8",
         silver: "#8b8b9a",
         "warm-white": "#f5f5f0",
@@ -71,9 +71,9 @@ module.exports = {
       },
       boxShadow: {
         xs: "0 1px 2px 0 rgb(0 0 0 / 0.05)",
-        subtle: "0px 2px 10px -3px rgba(0, 212, 255, 0.1)",
+        subtle: "0px 2px 10px -3px rgba(201, 168, 76, 0.1)",
         elevated: "0px 8px 32px 0px rgba(0, 0, 0, 0.4)",
-        glow: "0px 0px 40px rgba(0, 212, 255, 0.15)",
+        glow: "0px 0px 40px rgba(201, 168, 76, 0.15)",
       },
       keyframes: {
         "accordion-down": {
@@ -93,8 +93,8 @@ module.exports = {
           "50%": { transform: "translateY(-10px)" },
         },
         "pulse-glow": {
-          "0%, 100%": { boxShadow: "0 0 20px rgba(0, 212, 255, 0.1)" },
-          "50%": { boxShadow: "0 0 40px rgba(0, 212, 255, 0.25)" },
+          "0%, 100%": { boxShadow: "0 0 20px rgba(201, 168, 76, 0.1)" },
+          "50%": { boxShadow: "0 0 40px rgba(201, 168, 76, 0.25)" },
         },
       },
       animation: {

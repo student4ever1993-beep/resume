@@ -101,7 +101,7 @@ export default function Footer() {
                   fontFamily: isRtl ? 'Cairo, system-ui, sans-serif' : 'Inter, system-ui, sans-serif',
                   fontSize: '11px',
                   fontWeight: 600,
-                  color: '#00d4ff',
+                  color: '#c9a84c',
                   letterSpacing: isRtl ? '0' : '2px',
                   textTransform: 'uppercase',
                   marginBottom: '20px',
@@ -145,7 +145,7 @@ export default function Footer() {
           style={{
             marginTop: '60px',
             paddingTop: '24px',
-            borderTop: '1px solid rgba(0, 212, 255, 0.06)',
+            borderTop: '1px solid rgba(201, 168, 76, 0.06)',
             textAlign: isRtl ? 'center' : 'left',
           }}
         >

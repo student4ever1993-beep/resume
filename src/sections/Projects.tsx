@@ -79,7 +79,7 @@ export default function Projects() {
               fontFamily: isRtl ? 'Cairo, system-ui, sans-serif' : 'Inter, system-ui, sans-serif',
               fontSize: '11px',
               fontWeight: 600,
-              color: '#00d4ff',
+              color: '#c9a84c',
               letterSpacing: isRtl ? '0' : '3px',
               textTransform: 'uppercase',
               marginBottom: '20px',
@@ -113,8 +113,8 @@ export default function Projects() {
               key={project.name}
               ref={(el) => { cardRefs.current[i] = el; }}
               style={{
-                background: 'rgba(0, 212, 255, 0.02)',
-                border: '1px solid rgba(0, 212, 255, 0.08)',
+                background: 'rgba(201, 168, 76, 0.02)',
+                border: '1px solid rgba(201, 168, 76, 0.08)',
                 borderRadius: '4px',
                 overflow: 'hidden',
                 transition: 'transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease',
@@ -124,13 +124,13 @@ export default function Projects() {
               onMouseEnter={(e) => {
                 const el = e.currentTarget as HTMLDivElement;
                 el.style.transform = 'translateY(-4px)';
-                el.style.borderColor = 'rgba(0, 212, 255, 0.2)';
-                el.style.boxShadow = '0 12px 40px rgba(0, 212, 255, 0.06)';
+                el.style.borderColor = 'rgba(201, 168, 76, 0.2)';
+                el.style.boxShadow = '0 12px 40px rgba(201, 168, 76, 0.06)';
               }}
               onMouseLeave={(e) => {
                 const el = e.currentTarget as HTMLDivElement;
                 el.style.transform = 'translateY(0)';
-                el.style.borderColor = 'rgba(0, 212, 255, 0.08)';
+                el.style.borderColor = 'rgba(201, 168, 76, 0.08)';
                 el.style.boxShadow = 'none';
               }}
             >
@@ -165,7 +165,7 @@ export default function Projects() {
                   style={{
                     width: '100%',
                     aspectRatio: '16/10',
-                    background: 'linear-gradient(135deg, rgba(0, 212, 255, 0.08) 0%, rgba(0, 80, 120, 0.12) 100%)',
+                    background: 'linear-gradient(135deg, rgba(201, 168, 76, 0.08) 0%, rgba(120, 90, 30, 0.12) 100%)',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
@@ -176,7 +176,7 @@ export default function Projects() {
                       fontFamily: '"Space Grotesk", system-ui, sans-serif',
                       fontSize: '36px',
                       fontWeight: 600,
-                      color: 'rgba(0, 212, 255, 0.2)',
+                      color: 'rgba(201, 168, 76, 0.2)',
                       letterSpacing: '2px',
                     }}
                   >
@@ -193,8 +193,8 @@ export default function Projects() {
                     fontFamily: isRtl ? 'Cairo, system-ui, sans-serif' : '"JetBrains Mono", monospace',
                     fontSize: '10px',
                     fontWeight: 500,
-                    color: '#00d4ff',
-                    background: 'rgba(0, 212, 255, 0.08)',
+                    color: '#c9a84c',
+                    background: 'rgba(201, 168, 76, 0.08)',
                     padding: '4px 10px',
                     borderRadius: '100px',
                     letterSpacing: isRtl ? '0' : '0.5px',
@@ -234,7 +234,7 @@ export default function Projects() {
                 {/* Client */}
                 <div
                   style={{
-                    borderTop: '1px solid rgba(0, 212, 255, 0.06)',
+                    borderTop: '1px solid rgba(201, 168, 76, 0.06)',
                     paddingTop: '12px',
                   }}
                 >

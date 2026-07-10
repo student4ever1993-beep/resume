@@ -68,7 +68,7 @@ export default function Experience() {
               fontFamily: isRtl ? 'Cairo, system-ui, sans-serif' : 'Inter, system-ui, sans-serif',
               fontSize: '11px',
               fontWeight: 600,
-              color: '#00d4ff',
+              color: '#c9a84c',
               letterSpacing: isRtl ? '0' : '3px',
               textTransform: 'uppercase',
               marginBottom: '20px',
@@ -106,7 +106,7 @@ export default function Experience() {
               top: '8px',
               bottom: '8px',
               width: '2px',
-              background: 'linear-gradient(to bottom, #00d4ff, rgba(0, 212, 255, 0.1))',
+              background: 'linear-gradient(to bottom, #c9a84c, rgba(201, 168, 76, 0.1))',
             }}
           />
 
@@ -129,29 +129,29 @@ export default function Experience() {
                   width: '16px',
                   height: '16px',
                   borderRadius: '50%',
-                  border: '3px solid #00d4ff',
-                  backgroundColor: i === 0 ? '#00d4ff' : '#0a0a0f',
-                  boxShadow: i === 0 ? '0 0 12px rgba(0, 212, 255, 0.4)' : 'none',
+                  border: '3px solid #c9a84c',
+                  backgroundColor: i === 0 ? '#c9a84c' : '#0a0a0f',
+                  boxShadow: i === 0 ? '0 0 12px rgba(201, 168, 76, 0.4)' : 'none',
                 }}
               />
 
               {/* Content */}
               <div
                 style={{
-                  background: 'rgba(0, 212, 255, 0.03)',
-                  border: '1px solid rgba(0, 212, 255, 0.08)',
+                  background: 'rgba(201, 168, 76, 0.03)',
+                  border: '1px solid rgba(201, 168, 76, 0.08)',
                   borderRadius: '4px',
                   padding: '28px 32px',
                   transition: 'border-color 0.3s ease, background 0.3s ease',
                   textAlign: isRtl ? 'right' : 'left',
                 }}
                 onMouseEnter={(e) => {
-                  (e.currentTarget as HTMLDivElement).style.borderColor = 'rgba(0, 212, 255, 0.2)';
-                  (e.currentTarget as HTMLDivElement).style.background = 'rgba(0, 212, 255, 0.06)';
+                  (e.currentTarget as HTMLDivElement).style.borderColor = 'rgba(201, 168, 76, 0.2)';
+                  (e.currentTarget as HTMLDivElement).style.background = 'rgba(201, 168, 76, 0.06)';
                 }}
                 onMouseLeave={(e) => {
-                  (e.currentTarget as HTMLDivElement).style.borderColor = 'rgba(0, 212, 255, 0.08)';
-                  (e.currentTarget as HTMLDivElement).style.background = 'rgba(0, 212, 255, 0.03)';
+                  (e.currentTarget as HTMLDivElement).style.borderColor = 'rgba(201, 168, 76, 0.08)';
+                  (e.currentTarget as HTMLDivElement).style.background = 'rgba(201, 168, 76, 0.03)';
                 }}
               >
                 <p
@@ -159,7 +159,7 @@ export default function Experience() {
                     fontFamily: '"JetBrains Mono", monospace',
                     fontSize: '11px',
                     fontWeight: 400,
-                    color: '#00d4ff',
+                    color: '#c9a84c',
                     letterSpacing: '1px',
                     marginBottom: '8px',
                   }}
