@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { getLenis } from '../hooks/useLenis';
-import { navigationConfig } from '../config';
+//import { navigationConfig } from '../config';
 
 export default function Navigation() {
   const { t, i18n } = useTranslation();
