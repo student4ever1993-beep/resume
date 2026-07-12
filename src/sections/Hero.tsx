@@ -1,55 +1,101 @@
 import { useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import gsap from 'gsap';
-import { heroConfig } from '../config';
+import { Github, Linkedin, Mail } from 'lucide-react';
+import HeroSphere from '../effects/HeroSphere';
+import { contactConfig } from '../config';
 
 export default function Hero() {
   const { t, i18n } = useTranslation();
   const containerRef = useRef<HTMLDivElement>(null);
-  const titleRef = useRef<HTMLHeadingElement>(null);
+  const eyebrowRef = useRef<HTMLDivElement>(null);
+  const nameRef = useRef<HTMLHeadingElement>(null);
+  const emphasisRef = useRef<HTMLDivElement>(null);
   const subtitleRef = useRef<HTMLParagraphElement>(null);
+  const taglineRef = useRef<HTMLParagraphElement>(null);
   const ctaRef = useRef<HTMLAnchorElement>(null);
+  const socialsRef = useRef<HTMLDivElement>(null);
+  const sparkleRef = useRef<HTMLDivElement>(null);
 
   const isRtl = i18n.language === 'ar';
 
   useEffect(() => {
-    const tl = gsap.timeline({ delay: 0.4 });
+    const tl = gsap.timeline({ delay: 0.5 });
 
     tl.fromTo(
-      titleRef.current,
-      { opacity: 0, y: 40, filter: 'blur(10px)' },
-      { opacity: 1, y: 0, filter: 'blur(0px)', duration: 1.4, ease: 'power2.out' }
+      eyebrowRef.current,
+      { opacity: 0, y: -20 },
+      { opacity: 1, y: 0, duration: 0.8, ease: 'power2.out' }
     )
+      .fromTo(
+        nameRef.current,
+        { opacity: 0, y: 40, filter: 'blur(10px)' },
+        { opacity: 1, y: 0, filter: 'blur(0px)', duration: 1.2, ease: 'power2.out' },
+        '-=0.4'
+      )
+      .fromTo(
+        emphasisRef.current,
+        { opacity: 0, y: 30, filter: 'blur(8px)' },
+        { opacity: 1, y: 0, filter: 'blur(0px)', duration: 1.0, ease: 'power2.out' },
+        '-=0.6'
+      )
       .fromTo(
         subtitleRef.current,
         { opacity: 0, y: 20 },
-        { opacity: 0.85, y: 0, duration: 1.0, ease: 'power2.out' },
-        '-=0.6'
+        { opacity: 0.8, y: 0, duration: 0.8, ease: 'power2.out' },
+        '-=0.4'
+      )
+      .fromTo(
+        taglineRef.current,
+        { opacity: 0, y: 20 },
+        { opacity: 1, y: 0, duration: 0.8, ease: 'power2.out' },
+        '-=0.3'
+      )
+      .fromTo(
+        ctaRef.current,
+        { opacity: 0, scale: 0.9 },
+        { opacity: 1, scale: 1, duration: 0.7, ease: 'back.out(1.7)' },
+        '-=0.3'
+      )
+      .fromTo(
+        socialsRef.current,
+        { opacity: 0, y: 15 },
+        { opacity: 1, y: 0, duration: 0.6, ease: 'power2.out' },
+        '-=0.2'
       );
 
-    if (ctaRef.current) {
-      tl.fromTo(
-        ctaRef.current,
-        { opacity: 0, y: 10 },
-        { opacity: 1, y: 0, duration: 0.8, ease: 'power2.out' },
-        '-=0.4'
-      );
+    // Sparkle float animation
+    if (sparkleRef.current) {
+      gsap.to(sparkleRef.current, {
+        y: -8,
+        duration: 3,
+        ease: 'sine.inOut',
+        yoyo: true,
+        repeat: -1,
+      });
     }
 
     return () => {
       tl.kill();
     };
-  }, [i18n.language]); // Re-run animation if language changes so ref elements align nicely
+  }, [i18n.language]);
+
+  const socialLinks = [
+    { icon: <Github size={16} />, label: 'GitHub', href: contactConfig.socialLinks.find(l => l.label === 'GitHub')?.href || '#' },
+    { icon: <Linkedin size={16} />, label: 'LinkedIn', href: contactConfig.socialLinks.find(l => l.label === 'LinkedIn')?.href || '#' },
+    { icon: <Mail size={16} />, label: 'Email', href: `mailto:${contactConfig.items.find(i => i.icon === 'Mail')?.value || ''}` },
+  ];
 
   return (
     <section
       id="hero"
       ref={containerRef}
+      className="hero-section"
       style={{
         position: 'relative',
         width: '100%',
         height: '100vh',
-        minHeight: '600px',
+        minHeight: '700px',
         overflow: 'hidden',
         display: 'flex',
         alignItems: 'center',
@@ -57,53 +103,66 @@ export default function Hero() {
         backgroundColor: '#050508',
       }}
     >
-      {/* Video Background */}
-      {heroConfig.videoPath && (
-        <video
-          autoPlay
-          muted
-          loop
-          playsInline
-          style={{
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            width: '100%',
-            height: '100%',
-            objectFit: 'cover',
-            zIndex: 0,
-            opacity: 0.35,
-            mixBlendMode: 'luminosity',
-          }}
-        >
-          <source src={heroConfig.videoPath} type="video/mp4" />
-        </video>
-      )}
+      {/* 3D Sphere Background */}
+      <HeroSphere />
 
-      {/* Dark Overlay */}
+      {/* Radial gradient overlays for depth */}
       <div
         style={{
           position: 'absolute',
           inset: 0,
-          background: 'radial-gradient(circle at 50% 50%, rgba(201, 168, 76, 0.03) 0%, transparent 70%), linear-gradient(to bottom, rgba(5,5,8,0.3) 0%, rgba(5,5,8,0.6) 60%, rgba(5,5,8,0.95) 100%)',
-          zIndex: 1,
+          background: 'radial-gradient(ellipse 80% 60% at 50% 50%, transparent 35%, rgba(5,5,8,0.7) 100%)',
+          zIndex: 2,
+          pointerEvents: 'none',
+        }}
+      />
+      <div
+        style={{
+          position: 'absolute',
+          inset: 0,
+          background: 'linear-gradient(to bottom, rgba(5,5,8,0.4) 0%, transparent 20%, transparent 80%, rgba(5,5,8,0.95) 100%)',
+          zIndex: 2,
+          pointerEvents: 'none',
         }}
       />
 
-      {/* Content Panel */}
+      {/* Decorative sparkle — bottom right */}
       <div
-        className="liquid-glass"
+        ref={sparkleRef}
+        className="hero-sparkle"
+        style={{
+          position: 'absolute',
+          bottom: '15%',
+          right: '8%',
+          zIndex: 3,
+          color: 'rgba(224, 224, 232, 0.6)',
+          fontSize: '28px',
+          fontWeight: 300,
+          pointerEvents: 'none',
+        }}
+      >
+        ✦
+      </div>
+
+      {/* Content */}
+      <div
+        className="hero-content"
         style={{
           position: 'relative',
           zIndex: 10,
-          maxWidth: '680px',
-          width: '90%',
-          padding: '56px 48px 48px',
-          borderRadius: '2px',
           textAlign: 'center',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          gap: '0',
+          width: '90%',
+          maxWidth: '800px',
+          direction: isRtl ? 'rtl' : 'ltr',
         }}
       >
-        <p
+        {/* Eyebrow Badge */}
+        <div
+          ref={eyebrowRef}
           style={{
             fontFamily: isRtl ? 'Cairo, system-ui, sans-serif' : 'Inter, system-ui, sans-serif',
             fontSize: '11px',
@@ -111,42 +170,65 @@ export default function Hero() {
             color: '#c9a84c',
             letterSpacing: isRtl ? '0' : '3px',
             textTransform: 'uppercase',
-            marginBottom: '20px',
+            border: '1px solid rgba(201, 168, 76, 0.4)',
+            padding: '6px 20px',
+            borderRadius: '2px',
+            marginBottom: '32px',
+            opacity: 0,
+            background: 'rgba(201, 168, 76, 0.06)',
           }}
         >
           {t('hero.eyebrow')}
-        </p>
+        </div>
 
+        {/* Name */}
         <h1
-          ref={titleRef}
+          ref={nameRef}
+          className="hero-name"
           style={{
             fontFamily: isRtl ? 'Cairo, system-ui, sans-serif' : '"Space Grotesk", system-ui, sans-serif',
-            fontSize: isRtl ? 'clamp(36px, 5.5vw, 64px)' : 'clamp(42px, 6vw, 72px)',
+            fontSize: 'clamp(36px, 6vw, 72px)',
             fontWeight: 600,
             color: '#f5f5f0',
-            lineHeight: 1.25,
-            marginBottom: '20px',
+            lineHeight: 1.1,
+            marginBottom: '8px',
             opacity: 0,
             letterSpacing: isRtl ? '0' : '-0.02em',
           }}
         >
           {t('hero.titleLine')}
-          <br />
-          <em style={{ fontStyle: 'normal', color: '#c9a84c' }}>{t('hero.titleEmphasis')}</em>
         </h1>
 
+        {/* Emphasis — Digital Transformation */}
+        <div
+          ref={emphasisRef}
+          className="hero-emphasis"
+          style={{
+            fontFamily: isRtl ? 'Cairo, system-ui, sans-serif' : '"Space Grotesk", Georgia, serif',
+            fontSize: 'clamp(28px, 5vw, 60px)',
+            fontWeight: 500,
+            color: '#c9a84c',
+            lineHeight: 1.2,
+            marginBottom: '20px',
+            opacity: 0,
+            fontStyle: isRtl ? 'normal' : 'italic',
+          }}
+        >
+          {t('hero.titleEmphasis')}
+        </div>
+
+        {/* Subtitle — Role & Location */}
         <p
           ref={subtitleRef}
+          className="hero-subtitle"
           style={{
             fontFamily: isRtl ? 'Cairo, system-ui, sans-serif' : 'Inter, system-ui, sans-serif',
-            fontSize: '14px',
+            fontSize: 'clamp(12px, 1.5vw, 14px)',
             fontWeight: 400,
             color: '#8b8b9a',
-            lineHeight: 1.7,
-            marginBottom: '32px',
+            lineHeight: 1.6,
+            marginBottom: '24px',
             opacity: 0,
-            maxWidth: '520px',
-            margin: '0 auto 32px',
           }}
         >
           {t('hero.subtitleLine1')}
@@ -154,39 +236,107 @@ export default function Hero() {
           {t('hero.subtitleLine2')}
         </p>
 
+        {/* Tagline */}
+        <p
+          ref={taglineRef}
+          className="hero-tagline"
+          style={{
+            fontFamily: isRtl ? 'Cairo, system-ui, sans-serif' : '"Space Grotesk", system-ui, sans-serif',
+            fontSize: 'clamp(20px, 3.5vw, 36px)',
+            fontWeight: 400,
+            color: '#e0e0e8',
+            lineHeight: 1.3,
+            marginBottom: '32px',
+            opacity: 0,
+            letterSpacing: isRtl ? '0' : '-0.01em',
+          }}
+        >
+          {t('hero.tagline')}
+        </p>
+
+        {/* CTA Button */}
         <a
           ref={ctaRef}
-          href="#projects"
+          href="#contact"
           onClick={(e) => {
             e.preventDefault();
-            const el = document.querySelector('#projects');
+            const el = document.querySelector('#contact');
             if (el) el.scrollIntoView({ behavior: 'smooth' });
           }}
+          className="hero-cta"
           style={{
             fontFamily: isRtl ? 'Cairo, system-ui, sans-serif' : 'Inter, system-ui, sans-serif',
-            fontSize: '12px',
+            fontSize: '13px',
             fontWeight: 600,
-            color: '#f5f5f0',
+            color: '#c9a84c',
             letterSpacing: isRtl ? '0' : '2px',
             textTransform: 'uppercase',
             textDecoration: 'none',
-            borderBottom: '1px solid rgba(201, 168, 76, 0.3)',
-            paddingBottom: '4px',
-            opacity: 0,
+            border: '1px solid rgba(201, 168, 76, 0.5)',
+            borderRadius: '2px',
+            padding: '14px 36px',
             display: 'inline-block',
-            transition: 'border-color 0.4s ease, color 0.4s ease',
+            opacity: 0,
+            transition: 'background 0.4s ease, color 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease',
+            background: 'rgba(201, 168, 76, 0.04)',
           }}
           onMouseEnter={(e) => {
-            (e.target as HTMLAnchorElement).style.borderBottomColor = '#c9a84c';
-            (e.target as HTMLAnchorElement).style.color = '#c9a84c';
+            const el = e.currentTarget;
+            el.style.background = 'rgba(201, 168, 76, 0.12)';
+            el.style.borderColor = '#c9a84c';
+            el.style.boxShadow = '0 0 30px rgba(201, 168, 76, 0.15)';
           }}
           onMouseLeave={(e) => {
-            (e.target as HTMLAnchorElement).style.borderBottomColor = 'rgba(201, 168, 76, 0.3)';
-            (e.target as HTMLAnchorElement).style.color = '#f5f5f0';
+            const el = e.currentTarget;
+            el.style.background = 'rgba(201, 168, 76, 0.04)';
+            el.style.borderColor = 'rgba(201, 168, 76, 0.5)';
+            el.style.boxShadow = 'none';
           }}
         >
-          {t('hero.ctaText')}
+          {t('hero.contactCta')}
         </a>
+
+        {/* Social Links */}
+        <div
+          ref={socialsRef}
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '28px',
+            marginTop: '40px',
+            opacity: 0,
+            flexDirection: isRtl ? 'row-reverse' : 'row',
+          }}
+        >
+          {socialLinks.map((link) => (
+            <a
+              key={link.label}
+              href={link.href}
+              target={link.href.startsWith('mailto:') ? undefined : '_blank'}
+              rel={link.href.startsWith('mailto:') ? undefined : 'noopener noreferrer'}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                fontFamily: 'Inter, system-ui, sans-serif',
+                fontSize: '12px',
+                fontWeight: 500,
+                color: '#8b8b9a',
+                textDecoration: 'none',
+                transition: 'color 0.3s ease',
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.color = '#c9a84c';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.color = '#8b8b9a';
+              }}
+            >
+              {link.icon}
+              <span>{link.label}</span>
+            </a>
+          ))}
+        </div>
       </div>
     </section>
   );

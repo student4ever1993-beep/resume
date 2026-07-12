@@ -21,7 +21,9 @@ const resources = {
         titleEmphasis: "Digital Transformation",
         subtitleLine1: "Systems Analyst at AMAN Consultancy & Business Development.",
         subtitleLine2: "Based in Muscat, Oman.",
-        ctaText: "View My Work"
+        ctaText: "View My Work",
+        tagline: "Let's build the next challenge together",
+        contactCta: "Contact Me"
       },
       manifesto: {
         sectionLabel: "ABOUT ME",
@@ -231,7 +233,9 @@ const resources = {
         titleEmphasis: "التحول الرقمي",
         subtitleLine1: "محللة نظم في شركة أمان للاستشارات وتطوير الأعمال.",
         subtitleLine2: "مسقط، سلطنة عمان.",
-        ctaText: "عرض أعمالي"
+        ctaText: "عرض أعمالي",
+        tagline: "لنبني التحدي القادم معاً",
+        contactCta: "تواصل معي"
       },
       manifesto: {
         sectionLabel: "نبذة عني",

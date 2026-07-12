@@ -23,6 +23,8 @@ export interface HeroConfig {
   subtitleLine2: string
   ctaText: string
   ctaTargetId: string
+  tagline: string
+  contactCta: string
 }
 
 export interface ManifestoConfig {
@@ -148,6 +150,8 @@ export const heroConfig: HeroConfig = {
   subtitleLine2: "Based in Muscat, Oman.",
   ctaText: "View My Work",
   ctaTargetId: "#projects",
+  tagline: "Let's build the next challenge together",
+  contactCta: "Contact Me",
 }
 
 // ─── About / Manifesto ─────────────────────────────────────
