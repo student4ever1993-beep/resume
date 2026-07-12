@@ -13,7 +13,15 @@ export default function HeroSphere() {
     // ── Scene setup ──────────────────────────────────────────
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 1000);
-    camera.position.z = 5;
+
+    // Responsive: push camera back on smaller screens so sphere isn't overwhelming
+    const getCameraZ = (width: number) => {
+      if (width < 480) return 8.5;   // phone
+      if (width < 768) return 7.5;   // small tablet
+      if (width < 1024) return 6.5;  // tablet
+      return 5;                       // desktop
+    };
+    camera.position.z = getCameraZ(container.clientWidth);
 
     const renderer = new THREE.WebGLRenderer({
       antialias: true,
@@ -203,6 +211,7 @@ export default function HeroSphere() {
       const w = container.clientWidth;
       const h = container.clientHeight;
       camera.aspect = w / h;
+      camera.position.z = getCameraZ(w);
       camera.updateProjectionMatrix();
       renderer.setSize(w, h);
     };

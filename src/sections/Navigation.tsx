@@ -126,7 +126,7 @@ export default function Navigation() {
               src="/images/logo.png"
               alt="Alya Al Siyabi Logo"
               style={{
-                height: scrolled ? '65px' : '90px',
+                height: scrolled ? '40px' : '55px',
                 width: 'auto',
                 objectFit: 'contain',
                 transition: 'height 0.6s cubic-bezier(0.16, 1, 0.3, 1)',
