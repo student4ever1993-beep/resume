@@ -30,7 +30,6 @@ export default function Manifesto() {
   const statsGridRef = useRef<HTMLDivElement>(null);
 
   const isRtl = i18n.language === 'ar';
-
   const stats = t('manifesto.stats', { returnObjects: true }) as ManifestoStats;
 
   useEffect(() => {
@@ -98,11 +97,11 @@ export default function Manifesto() {
     });
     ro.observe(containerEl);
 
-    // Floating animation for visual image
+    // Floating animation for laptop visual
     const floatAnim = gsap.to(visualRef.current, {
-      y: -15,
-      rotation: 1,
-      duration: 3,
+      y: -12,
+      rotation: 0.5,
+      duration: 4,
       repeat: -1,
       yoyo: true,
       ease: 'power1.inOut',
@@ -112,11 +111,11 @@ export default function Manifesto() {
     if (statsGridRef.current) {
       gsap.fromTo(
         statsGridRef.current.children,
-        { opacity: 0, y: 30 },
+        { opacity: 0, y: 25 },
         {
           opacity: 1,
           y: 0,
-          stagger: 0.15,
+          stagger: 0.1,
           duration: 0.8,
           ease: 'power2.out',
           scrollTrigger: {
@@ -134,7 +133,7 @@ export default function Manifesto() {
       if (tlRef.current) tlRef.current.kill();
       if (splitRef.current) splitRef.current.revert();
     };
-  }, [i18n.language]); // Re-run when language changes
+  }, [i18n.language]);
 
   return (
     <section
@@ -146,16 +145,15 @@ export default function Manifesto() {
         overflow: 'hidden',
       }}
     >
-      {/* Background visual glows */}
+      {/* Soft golden light glow in background */}
       <div
         style={{
           position: 'absolute',
-          top: '20%',
-          left: isRtl ? 'auto' : '10%',
-          right: isRtl ? '10%' : 'auto',
-          width: '400px',
-          height: '400px',
-          background: 'radial-gradient(circle, rgba(201, 168, 76, 0.05) 0%, transparent 70%)',
+          top: '30%',
+          right: '5%',
+          width: '500px',
+          height: '500px',
+          background: 'radial-gradient(circle, rgba(201, 168, 76, 0.04) 0%, transparent 70%)',
           pointerEvents: 'none',
           zIndex: 1,
         }}
@@ -171,110 +169,66 @@ export default function Manifesto() {
           zIndex: 2,
         }}
       >
-        <p
-          style={{
-            fontFamily: isRtl ? 'Cairo, system-ui, sans-serif' : 'Inter, system-ui, sans-serif',
-            fontSize: '11px',
-            fontWeight: 600,
-            color: '#c9a84c',
-            letterSpacing: isRtl ? '0' : '3px',
-            textTransform: 'uppercase',
-            marginBottom: '48px',
-            textAlign: 'center',
-          }}
-        >
-          {t('manifesto.sectionLabel')}
-        </p>
-
-        {/* Split Grid Layout */}
+        {/* Layout Grid: Text on left (or right if RTL), Graphic on opposite */}
         <div
           style={{
             display: 'grid',
             gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
-            gap: '64px',
+            gap: '48px',
             alignItems: 'center',
-            flexDirection: isRtl ? 'row-reverse' : 'row',
           }}
         >
-          {/* Column 1: Image / Visual Card */}
-          <div
-            ref={visualRef}
-            style={{
-              display: 'flex',
-              justifyContent: 'center',
-              alignItems: 'center',
-              position: 'relative',
-            }}
-          >
-            {/* Glowing border card */}
-            <div
-              style={{
-                position: 'relative',
-                borderRadius: '8px',
-                padding: '12px',
-                background: 'rgba(201, 168, 76, 0.02)',
-                border: '1px solid rgba(201, 168, 76, 0.1)',
-                boxShadow: '0 24px 48px rgba(0, 0, 0, 0.5), inset 0 1px 1px rgba(201, 168, 76, 0.05)',
-                maxWidth: '440px',
-                width: '100%',
-              }}
-            >
-              {/* Outer decorative corners */}
-              <div style={{ position: 'absolute', top: -2, left: -2, width: 12, height: 12, borderTop: '2px solid #c9a84c', borderLeft: '2px solid #c9a84c' }} />
-              <div style={{ position: 'absolute', top: -2, right: -2, width: 12, height: 12, borderTop: '2px solid #c9a84c', borderRight: '2px solid #c9a84c' }} />
-              <div style={{ position: 'absolute', bottom: -2, left: -2, width: 12, height: 12, borderBottom: '2px solid #c9a84c', borderLeft: '2px solid #c9a84c' }} />
-              <div style={{ position: 'absolute', bottom: -2, right: -2, width: 12, height: 12, borderBottom: '2px solid #c9a84c', borderRight: '2px solid #c9a84c' }} />
-
-              <img
-                src="/images/about-visual.png"
-                alt="Alya Al Siyabi Digital Transformation Visual"
-                style={{
-                  width: '100%',
-                  height: 'auto',
-                  borderRadius: '6px',
-                  display: 'block',
-                  opacity: 0.9,
-                  transition: 'opacity 0.3s ease',
-                }}
-              />
-            </div>
-          </div>
-
-          {/* Column 2: Info Text & Highlights */}
+          {/* Column 1: Info Content (Text + Cards) */}
           <div
             style={{
               display: 'flex',
               flexDirection: 'column',
               textAlign: isRtl ? 'right' : 'left',
+              order: isRtl ? 1 : 1, // Let standard flow handle layout or override
             }}
           >
+            {/* Eyebrow Label */}
+            <p
+              style={{
+                fontFamily: isRtl ? 'Cairo, system-ui, sans-serif' : 'Inter, system-ui, sans-serif',
+                fontSize: '11px',
+                fontWeight: 600,
+                color: '#c9a84c',
+                letterSpacing: isRtl ? '0' : '3px',
+                textTransform: 'uppercase',
+                marginBottom: '20px',
+              }}
+            >
+              {t('manifesto.sectionLabel')}
+            </p>
+
             {/* Bold Intro Quote */}
             <h3
               style={{
                 fontFamily: isRtl ? 'Cairo, system-ui, sans-serif' : '"Space Grotesk", system-ui, sans-serif',
-                fontSize: '24px',
+                fontSize: 'clamp(22px, 3vw, 30px)',
                 fontWeight: 500,
-                lineHeight: 1.35,
+                lineHeight: 1.4,
                 color: '#f5f5f0',
                 marginBottom: '24px',
                 borderLeft: isRtl ? 'none' : '3px solid #c9a84c',
                 borderRight: isRtl ? '3px solid #c9a84c' : 'none',
-                paddingLeft: isRtl ? '0' : '16px',
-                paddingRight: isRtl ? '16px' : '0',
+                paddingLeft: isRtl ? '0' : '20px',
+                paddingRight: isRtl ? '20px' : '0',
               }}
             >
               {t('manifesto.introQuote')}
             </h3>
 
-            {/* Split Text Paragraph */}
+            {/* Paragraph Text */}
             <p
               key={i18n.language}
               ref={textRef}
               style={{
                 fontFamily: isRtl ? 'Cairo, system-ui, sans-serif' : 'Inter, system-ui, sans-serif',
-                fontSize: '15px',
+                fontSize: 'clamp(14px, 2vw, 15px)',
                 fontWeight: 400,
-                lineHeight: 1.7,
+                lineHeight: 1.75,
                 color: '#8b8b9a',
                 marginBottom: '40px',
               }}
@@ -282,7 +236,7 @@ export default function Manifesto() {
               {t('manifesto.text')}
             </p>
 
-            {/* Stats Grid */}
+            {/* 4 Stats Cards Grid */}
             <div
               ref={statsGridRef}
               style={{
@@ -291,153 +245,246 @@ export default function Manifesto() {
                 gap: '16px',
               }}
             >
-              {/* Stat 1 */}
+              {/* Stat 1: Experience */}
               <div
                 style={{
                   background: 'rgba(201, 168, 76, 0.02)',
-                  border: '1px solid rgba(201, 168, 76, 0.08)',
-                  borderRadius: '4px',
-                  padding: '20px',
+                  border: '1px solid rgba(201, 168, 76, 0.12)',
+                  borderRadius: '6px',
+                  padding: '20px 24px',
                   display: 'flex',
                   flexDirection: 'column',
                   gap: '8px',
-                  transition: 'border-color 0.3s ease, background 0.3s ease',
+                  position: 'relative',
+                  transition: 'all 0.3s ease',
+                  textAlign: isRtl ? 'right' : 'left',
                 }}
-                className="hover:border-gold-dim hover:bg-gold/[0.04]"
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.borderColor = 'rgba(201, 168, 76, 0.35)';
+                  e.currentTarget.style.background = 'rgba(201, 168, 76, 0.05)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.borderColor = 'rgba(201, 168, 76, 0.12)';
+                  e.currentTarget.style.background = 'rgba(201, 168, 76, 0.02)';
+                }}
               >
-                <Briefcase size={20} color="#c9a84c" />
-                <span
-                  style={{
-                    fontFamily: '"Space Grotesk", system-ui, sans-serif',
-                    fontSize: '22px',
-                    fontWeight: 600,
-                    color: '#f5f5f0',
-                    lineHeight: 1.1,
-                  }}
-                >
-                  {stats?.experience?.value}
-                </span>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexDirection: isRtl ? 'row-reverse' : 'row' }}>
+                  <span
+                    style={{
+                      fontFamily: isRtl ? 'Cairo, system-ui, sans-serif' : '"Space Grotesk", system-ui, sans-serif',
+                      fontSize: 'clamp(18px, 2.5vw, 22px)',
+                      fontWeight: 600,
+                      color: '#f5f5f0',
+                    }}
+                  >
+                    {stats?.experience?.value}
+                  </span>
+                  <Briefcase size={18} color="#c9a84c" />
+                </div>
                 <span
                   style={{
                     fontFamily: isRtl ? 'Cairo, system-ui, sans-serif' : 'Inter, system-ui, sans-serif',
                     fontSize: '12px',
                     color: '#8b8b9a',
+                    lineHeight: 1.4,
                   }}
                 >
                   {stats?.experience?.label}
                 </span>
               </div>
 
-              {/* Stat 2 */}
+              {/* Stat 2: Masters */}
               <div
                 style={{
                   background: 'rgba(201, 168, 76, 0.02)',
-                  border: '1px solid rgba(201, 168, 76, 0.08)',
-                  borderRadius: '4px',
-                  padding: '20px',
+                  border: '1px solid rgba(201, 168, 76, 0.12)',
+                  borderRadius: '6px',
+                  padding: '20px 24px',
                   display: 'flex',
                   flexDirection: 'column',
                   gap: '8px',
-                  transition: 'border-color 0.3s ease, background 0.3s ease',
+                  position: 'relative',
+                  transition: 'all 0.3s ease',
+                  textAlign: isRtl ? 'right' : 'left',
                 }}
-                className="hover:border-gold-dim hover:bg-gold/[0.04]"
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.borderColor = 'rgba(201, 168, 76, 0.35)';
+                  e.currentTarget.style.background = 'rgba(201, 168, 76, 0.05)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.borderColor = 'rgba(201, 168, 76, 0.12)';
+                  e.currentTarget.style.background = 'rgba(201, 168, 76, 0.02)';
+                }}
               >
-                <GraduationCap size={20} color="#c9a84c" />
-                <span
-                  style={{
-                    fontFamily: '"Space Grotesk", system-ui, sans-serif',
-                    fontSize: '22px',
-                    fontWeight: 600,
-                    color: '#f5f5f0',
-                    lineHeight: 1.1,
-                  }}
-                >
-                  {stats?.masters?.value}
-                </span>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexDirection: isRtl ? 'row-reverse' : 'row' }}>
+                  <span
+                    style={{
+                      fontFamily: isRtl ? 'Cairo, system-ui, sans-serif' : '"Space Grotesk", system-ui, sans-serif',
+                      fontSize: 'clamp(18px, 2.5vw, 22px)',
+                      fontWeight: 600,
+                      color: '#f5f5f0',
+                    }}
+                  >
+                    {stats?.masters?.value}
+                  </span>
+                  <GraduationCap size={18} color="#c9a84c" />
+                </div>
                 <span
                   style={{
                     fontFamily: isRtl ? 'Cairo, system-ui, sans-serif' : 'Inter, system-ui, sans-serif',
                     fontSize: '12px',
                     color: '#8b8b9a',
+                    lineHeight: 1.4,
                   }}
                 >
                   {stats?.masters?.label}
                 </span>
               </div>
 
-              {/* Stat 3 */}
+              {/* Stat 3: Bachelors */}
               <div
                 style={{
                   background: 'rgba(201, 168, 76, 0.02)',
-                  border: '1px solid rgba(201, 168, 76, 0.08)',
-                  borderRadius: '4px',
-                  padding: '20px',
+                  border: '1px solid rgba(201, 168, 76, 0.12)',
+                  borderRadius: '6px',
+                  padding: '20px 24px',
                   display: 'flex',
                   flexDirection: 'column',
                   gap: '8px',
-                  transition: 'border-color 0.3s ease, background 0.3s ease',
+                  position: 'relative',
+                  transition: 'all 0.3s ease',
+                  textAlign: isRtl ? 'right' : 'left',
                 }}
-                className="hover:border-gold-dim hover:bg-gold/[0.04]"
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.borderColor = 'rgba(201, 168, 76, 0.35)';
+                  e.currentTarget.style.background = 'rgba(201, 168, 76, 0.05)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.borderColor = 'rgba(201, 168, 76, 0.12)';
+                  e.currentTarget.style.background = 'rgba(201, 168, 76, 0.02)';
+                }}
               >
-                <Settings size={20} color="#c9a84c" />
-                <span
-                  style={{
-                    fontFamily: '"Space Grotesk", system-ui, sans-serif',
-                    fontSize: '22px',
-                    fontWeight: 600,
-                    color: '#f5f5f0',
-                    lineHeight: 1.1,
-                  }}
-                >
-                  {stats?.bachelors?.value}
-                </span>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexDirection: isRtl ? 'row-reverse' : 'row' }}>
+                  <span
+                    style={{
+                      fontFamily: isRtl ? 'Cairo, system-ui, sans-serif' : '"Space Grotesk", system-ui, sans-serif',
+                      fontSize: 'clamp(18px, 2.5vw, 22px)',
+                      fontWeight: 600,
+                      color: '#f5f5f0',
+                    }}
+                  >
+                    {stats?.bachelors?.value}
+                  </span>
+                  <Settings size={18} color="#c9a84c" />
+                </div>
                 <span
                   style={{
                     fontFamily: isRtl ? 'Cairo, system-ui, sans-serif' : 'Inter, system-ui, sans-serif',
                     fontSize: '12px',
                     color: '#8b8b9a',
+                    lineHeight: 1.4,
                   }}
                 >
                   {stats?.bachelors?.label}
                 </span>
               </div>
 
-              {/* Stat 4 */}
+              {/* Stat 4: Projects */}
               <div
                 style={{
                   background: 'rgba(201, 168, 76, 0.02)',
-                  border: '1px solid rgba(201, 168, 76, 0.08)',
-                  borderRadius: '4px',
-                  padding: '20px',
+                  border: '1px solid rgba(201, 168, 76, 0.12)',
+                  borderRadius: '6px',
+                  padding: '20px 24px',
                   display: 'flex',
                   flexDirection: 'column',
                   gap: '8px',
-                  transition: 'border-color 0.3s ease, background 0.3s ease',
+                  position: 'relative',
+                  transition: 'all 0.3s ease',
+                  textAlign: isRtl ? 'right' : 'left',
                 }}
-                className="hover:border-gold-dim hover:bg-gold/[0.04]"
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.borderColor = 'rgba(201, 168, 76, 0.35)';
+                  e.currentTarget.style.background = 'rgba(201, 168, 76, 0.05)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.borderColor = 'rgba(201, 168, 76, 0.12)';
+                  e.currentTarget.style.background = 'rgba(201, 168, 76, 0.02)';
+                }}
               >
-                <Award size={20} color="#c9a84c" />
-                <span
-                  style={{
-                    fontFamily: '"Space Grotesk", system-ui, sans-serif',
-                    fontSize: '22px',
-                    fontWeight: 600,
-                    color: '#f5f5f0',
-                    lineHeight: 1.1,
-                  }}
-                >
-                  {stats?.projects?.value}
-                </span>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexDirection: isRtl ? 'row-reverse' : 'row' }}>
+                  <span
+                    style={{
+                      fontFamily: isRtl ? 'Cairo, system-ui, sans-serif' : '"Space Grotesk", system-ui, sans-serif',
+                      fontSize: 'clamp(18px, 2.5vw, 22px)',
+                      fontWeight: 600,
+                      color: '#f5f5f0',
+                    }}
+                  >
+                    {stats?.projects?.value}
+                  </span>
+                  <Award size={18} color="#c9a84c" />
+                </div>
                 <span
                   style={{
                     fontFamily: isRtl ? 'Cairo, system-ui, sans-serif' : 'Inter, system-ui, sans-serif',
                     fontSize: '12px',
                     color: '#8b8b9a',
+                    lineHeight: 1.4,
                   }}
                 >
                   {stats?.projects?.label}
                 </span>
               </div>
+            </div>
+          </div>
+
+          {/* Column 2: Laptop face Visual Graphic */}
+          <div
+            ref={visualRef}
+            style={{
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              position: 'relative',
+              order: isRtl ? 2 : 2,
+            }}
+          >
+            <div
+              style={{
+                position: 'relative',
+                width: '100%',
+                maxWidth: '480px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              {/* Soft glow behind image */}
+              <div
+                style={{
+                  position: 'absolute',
+                  width: '380px',
+                  height: '380px',
+                  borderRadius: '50%',
+                  background: 'radial-gradient(circle, rgba(201, 168, 76, 0.18) 0%, transparent 70%)',
+                  filter: 'blur(28px)',
+                  zIndex: 1,
+                  pointerEvents: 'none',
+                }}
+              />
+              <img
+                src="/images/about_laptop_face.png"
+                alt="Alya Al Siyabi Digital Transformation Concept"
+                style={{
+                  width: '100%',
+                  height: 'auto',
+                  borderRadius: '6px',
+                  display: 'block',
+                  zIndex: 2,
+                  mixBlendMode: 'screen',
+                }}
+              />
             </div>
           </div>
         </div>
