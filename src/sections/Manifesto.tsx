@@ -4,6 +4,7 @@ import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import SplitType from 'split-type';
 import { Briefcase, GraduationCap, Award, Settings } from 'lucide-react';
+import HeroBackground from '../effects/HeroBackground';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -145,19 +146,7 @@ export default function Manifesto() {
         overflow: 'hidden',
       }}
     >
-      {/* Soft golden light glow in background */}
-      <div
-        style={{
-          position: 'absolute',
-          top: '30%',
-          right: '5%',
-          width: '500px',
-          height: '500px',
-          background: 'radial-gradient(circle, rgba(201, 168, 76, 0.04) 0%, transparent 70%)',
-          pointerEvents: 'none',
-          zIndex: 1,
-        }}
-      />
+      <HeroBackground showSphere={false} />
 
       <div
         ref={containerRef}
@@ -166,7 +155,7 @@ export default function Manifesto() {
           margin: '0 auto',
           padding: '120px 24px',
           position: 'relative',
-          zIndex: 2,
+          zIndex: 10,
         }}
       >
         {/* Layout Grid: Text on left (or right if RTL), Graphic on opposite */}
