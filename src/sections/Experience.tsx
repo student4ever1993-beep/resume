@@ -230,18 +230,13 @@ export default function Experience() {
             }}
           >
             <div
-              className="liquid-glass"
+              className={`liquid-glass flex flex-col md:flex-row items-center justify-between gap-6 ${isRtl ? 'md:flex-row-reverse' : ''}`}
               style={{
                 borderRadius: '12px',
                 padding: '24px 32px',
                 border: '1px solid rgba(201, 168, 76, 0.3)',
                 boxShadow: '0 12px 40px rgba(0, 0, 0, 0.6), inset 0 0 25px rgba(201, 168, 76, 0.08)',
-                textAlign: isRtl ? 'right' : 'left',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                flexDirection: isRtl ? 'row-reverse' : 'row',
-                gap: '16px',
+                textAlign: 'center',
               }}
             >
               {/* Glowing Golden Top Accent Dot */}
@@ -260,10 +255,10 @@ export default function Experience() {
               />
 
               {/* Left Side: Logo and Text */}
-              <div style={{ display: 'flex', alignItems: 'center', gap: '24px', flexDirection: isRtl ? 'row-reverse' : 'row', flex: '1 1 auto' }}>
+              <div className={`flex flex-col md:flex-row items-center gap-6 w-full md:w-auto ${isRtl ? 'md:flex-row-reverse' : ''}`}>
                 {/* Logo */}
                 {activeLogo && (
-                  <div style={{ flexShrink: 0 }}>
+                  <div className="shrink-0">
                     <img 
                       src={activeLogo} 
                       alt={activeEntry.company} 
@@ -280,7 +275,7 @@ export default function Experience() {
                 )}
                 
                 {/* Title & Company */}
-                <div style={{ textAlign: isRtl ? 'right' : 'left' }}>
+                <div className={`text-center ${isRtl ? 'md:text-right' : 'md:text-left'}`}>
                   <h3
                     style={{
                       fontFamily: isRtl ? 'Cairo, system-ui, sans-serif' : '"Space Grotesk", system-ui, sans-serif',
@@ -309,7 +304,7 @@ export default function Experience() {
               </div>
 
               {/* Right Side: Date */}
-              <div style={{ flexShrink: 0, display: 'flex', alignItems: 'center' }}>
+              <div className="mt-4 md:mt-0 flex justify-center shrink-0">
                 <span
                   style={{
                     fontFamily: isRtl ? 'Cairo, system-ui, sans-serif' : '"JetBrains Mono", monospace',
@@ -475,13 +470,13 @@ export default function Experience() {
               width: '100%',
               zIndex: 10,
               padding: '8px 0',
-              overflowX: 'auto',
-              whiteSpace: 'nowrap',
+              whiteSpace: 'normal',
             }}
           >
             <div
               style={{
-                display: 'inline-flex',
+                display: 'flex',
+                flexWrap: 'wrap',
                 gap: '12px',
                 padding: '0 8px',
                 width: '100%',

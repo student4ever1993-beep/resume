@@ -230,7 +230,8 @@ export default function Anatomy() {
               </div>
 
               {/* Dynamic Nodes around the dial */}
-              {pillars.map((pillar, i) => {
+              
+                {pillars.map((_, i) => {
                 const angle = i * angleStep;
                 return (
                   <div 
