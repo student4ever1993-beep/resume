@@ -137,6 +137,14 @@ export default function Experience() {
 
   const activeEntry = entries[activeIdx] || entries[0] || { title: '', company: '', period: '' };
 
+  const logos = [
+    '/images/aman.svg',
+    '/images/Tk.jpeg',
+    '/images/ms.jpg',
+    '/images/waterauth.png'
+  ];
+  const activeLogo = logos[activeIdx];
+
   return (
     <section
       id="experience"
@@ -222,13 +230,13 @@ export default function Experience() {
             }}
           >
             <div
-              className="liquid-glass"
+              className={`liquid-glass flex flex-col md:flex-row items-center justify-between gap-6 ${isRtl ? 'md:flex-row-reverse' : ''}`}
               style={{
-                borderRadius: '8px',
-                padding: '28px 36px',
+                borderRadius: '12px',
+                padding: '24px 32px',
                 border: '1px solid rgba(201, 168, 76, 0.3)',
                 boxShadow: '0 12px 40px rgba(0, 0, 0, 0.6), inset 0 0 25px rgba(201, 168, 76, 0.08)',
-                textAlign: isRtl ? 'right' : 'left',
+                textAlign: 'center',
               }}
             >
               {/* Glowing Golden Top Accent Dot */}
@@ -246,54 +254,72 @@ export default function Experience() {
                 }}
               />
 
-              {/* Date display inside card */}
-              <div
-                style={{
-                  display: 'flex',
-                  justifyContent: isRtl ? 'flex-start' : 'flex-end',
-                  marginBottom: '14px',
-                }}
-              >
+              {/* Left Side: Logo and Text */}
+              <div className={`flex flex-col md:flex-row items-center gap-6 w-full md:w-auto ${isRtl ? 'md:flex-row-reverse' : ''}`}>
+                {/* Logo */}
+                {activeLogo && (
+                  <div className="shrink-0">
+                    <img 
+                      src={activeLogo} 
+                      alt={activeEntry.company} 
+                      style={{ 
+                        width: '80px', 
+                        height: '80px', 
+                        objectFit: 'contain', 
+                        borderRadius: '12px', 
+                        backgroundColor: 'rgba(255, 255, 255, 0.95)', 
+                        padding: '12px' 
+                      }} 
+                    />
+                  </div>
+                )}
+                
+                {/* Title & Company */}
+                <div className={`text-center ${isRtl ? 'md:text-right' : 'md:text-left'}`}>
+                  <h3
+                    style={{
+                      fontFamily: isRtl ? 'Cairo, system-ui, sans-serif' : '"Space Grotesk", system-ui, sans-serif',
+                      fontSize: 'clamp(20px, 3.5vw, 28px)',
+                      fontWeight: 600,
+                      color: '#f5f5f0',
+                      marginBottom: '6px',
+                      lineHeight: 1.2,
+                    }}
+                  >
+                    {activeEntry.title}
+                  </h3>
+                  <p
+                    style={{
+                      fontFamily: isRtl ? 'Cairo, system-ui, sans-serif' : 'Inter, system-ui, sans-serif',
+                      fontSize: 'clamp(15px, 2.5vw, 18px)',
+                      fontWeight: 500,
+                      color: '#c9a84c',
+                      lineHeight: 1.4,
+                      margin: 0,
+                    }}
+                  >
+                    {activeEntry.company}
+                  </p>
+                </div>
+              </div>
+
+              {/* Right Side: Date */}
+              <div className="mt-4 md:mt-0 flex justify-center shrink-0">
                 <span
                   style={{
                     fontFamily: isRtl ? 'Cairo, system-ui, sans-serif' : '"JetBrains Mono", monospace',
-                    fontSize: '12px',
-                    fontWeight: 600,
+                    fontSize: '14px',
+                    fontWeight: 500,
                     color: '#c9a84c',
-                    backgroundColor: 'rgba(201, 168, 76, 0.08)',
-                    padding: '4px 14px',
-                    borderRadius: '20px',
-                    border: '1px solid rgba(201, 168, 76, 0.25)',
+                    backgroundColor: 'transparent',
+                    padding: '8px 24px',
+                    borderRadius: '24px',
+                    border: '1px solid rgba(201, 168, 76, 0.4)',
                   }}
                 >
                   {activeEntry.period}
                 </span>
               </div>
-
-              {/* Title & Company */}
-              <h3
-                style={{
-                  fontFamily: isRtl ? 'Cairo, system-ui, sans-serif' : '"Space Grotesk", system-ui, sans-serif',
-                  fontSize: 'clamp(20px, 3.2vw, 26px)',
-                  fontWeight: 500,
-                  color: '#f5f5f0',
-                  marginBottom: '12px',
-                  lineHeight: 1.4,
-                }}
-              >
-                {activeEntry.title}
-              </h3>
-              <p
-                style={{
-                  fontFamily: isRtl ? 'Cairo, system-ui, sans-serif' : 'Inter, system-ui, sans-serif',
-                  fontSize: 'clamp(14px, 2.2vw, 16px)',
-                  fontWeight: 400,
-                  color: '#8b8b9a',
-                  lineHeight: 1.6,
-                }}
-              >
-                {activeEntry.company}
-              </p>
             </div>
           </div>
 
@@ -444,13 +470,13 @@ export default function Experience() {
               width: '100%',
               zIndex: 10,
               padding: '8px 0',
-              overflowX: 'auto',
-              whiteSpace: 'nowrap',
+              whiteSpace: 'normal',
             }}
           >
             <div
               style={{
-                display: 'inline-flex',
+                display: 'flex',
+                flexWrap: 'wrap',
                 gap: '12px',
                 padding: '0 8px',
                 width: '100%',

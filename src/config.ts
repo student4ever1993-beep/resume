@@ -123,7 +123,7 @@ export interface FooterConfig {
 export const siteConfig: SiteConfig = {
   language: "en",
   siteTitle: "Alya Al Siyabi — Systems Analyst & Developer",
-  siteDescription: "Alya Al Siyabi is a Systems Analyst and Developer at AMAN Consultancy & Business Development, based in Muscat, Oman. Specializing in digital transformation, web development, and process engineering.",
+  siteDescription: "Alya Al Siyabi is a Systems Analyst and Developer at AMAN, based in Muscat, Oman. Specializing in digital transformation, web development, and process engineering.",
 }
 
 // ─── Navigation ────────────────────────────────────────────
@@ -146,7 +146,7 @@ export const heroConfig: HeroConfig = {
   eyebrow: "SYSTEMS ANALYST & DEVELOPER",
   titleLine: "ALYA AL SIYABI",
   titleEmphasis: "Digital Transformation",
-  subtitleLine1: "Systems Analyst at AMAN Consultancy & Business Development.",
+  subtitleLine1: "Systems Analyst at AMAN.",
   subtitleLine2: "Based in Muscat, Oman.",
   ctaText: "View My Work",
   ctaTargetId: "#projects",
@@ -168,8 +168,8 @@ export const experienceConfig: ExperienceConfig = {
   title: "Professional Experience",
   entries: [
     {
-      title: "Systems Analyst – Digital Transformation Department",
-      company: "AMAN Consultancy & Business Development",
+      title: "Systems Analyst  & Coder",
+      company: "AMAN",
       period: "2021 – Present",
     },
     {
