@@ -75,12 +75,13 @@ export interface WorkshopsConfig {
   items: string[]
 }
 
-export interface ProjectConfig {
-  name: string
-  role: string
-  contribution: string
-  client: string
-  image?: string
+interface ProjectConfig {
+  name: string;
+  role: string;
+  contribution: string;
+  client: string;
+  image?: string;
+  tags?: string[]; // add this
 }
 
 export interface ProjectsConfig {
@@ -273,6 +274,7 @@ export const projectsConfig: ProjectsConfig = {
   projects: [
     {
       name: "Elite Company",
+      tags: ["Power BI", "ASP .Net Clean Architecture", "Microsoft SQL Server","Next.js"],
       role: "Developer / Systems Analyst",
       contribution: "Participated in design and development; contributed to demo using Power BI and building system",
       client: "Ministry of Commerce, Industry, and Investment Promotion (MOCIP)",
@@ -281,6 +283,7 @@ export const projectsConfig: ProjectsConfig = {
     {
       name: "Agrohub",
       role: "Developer",
+      tags: ["ASP .Net Clean Architecture", "React.js", "PostgreSQL"],
       contribution: "Main developer",
       client: "ADC Somalia",
       image: "images/agro.png",
@@ -288,12 +291,15 @@ export const projectsConfig: ProjectsConfig = {
     {
       name: "Fostering System",
       role: "Developer / Systems Analyst",
+      tags: ["ASP .Net Clean Architecture", "PostgreSQL", "Angular"],
       contribution: "Participated in design and development, contributed to demo",
       client: "Small and Medium Enterprise Development Authority (ASMED)",
       image: "images/Tassaid.png",
     },
     {
       name: "Al-Washaq System",
+            tags: ["Laravel", "MySQL"],
+
       role: "Developer / Systems Analyst",
       contribution: "Developed system modules",
       client: "Environmental Authority (EA)",
@@ -304,11 +310,15 @@ export const projectsConfig: ProjectsConfig = {
       role: "Developer",
       contribution: "Developed application functionality",
       client: "Aman",
+            tags: ["Laravel", "MySQL"],
+
       image: "images/jobportaman.png",
     },
     {
       name: "Simple Ticketing System",
       role: "Developer",
+            tags: ["ASP .NET MVC", "Microsoft SQL Server"],
+
       contribution: "Developed core features",
       client: "Aman",
     },
@@ -317,6 +327,8 @@ export const projectsConfig: ProjectsConfig = {
       role: "Web Developer",
       contribution: "Developed and maintained website",
       client: "Rakeeza",
+            tags: ["Laravel", "MySQL"],
+
       image: "images/rakeeza.png",
     },
     {
@@ -324,23 +336,29 @@ export const projectsConfig: ProjectsConfig = {
       role: "Web Developer",
       contribution: "Developed and maintained website",
       client: "Aluminum Watad",
+            tags: ["Laravel", "MySQL"],
+
       image: "images/watad.png",
     },
     {
       name: "Alfaisal Medical Services Website",
       role: "Web Developer",
+            tags: ["Laravel", "MySQL"],
+
       contribution: "Developed and maintained website",
       client: "Alfaisal Medical Services",
     },
     {
       name: "AI Chatbots (TRA & DXB Chat)",
-      role: "Tester",
-      contribution: "Tested AI chatbots",
+      role: "Tester and Bot Developer",
+      contribution: "Tested AI chatbots",      tags: ["JS", "AIDA FLOW"],
+
       client: "TRA / Dubai Airports",
       image: "images/tra_chatbot.png",
     },
     {
-      name: "Multiple RFPs",
+      name: "Multiple RFPs",      tags: ["Figma", "Viso"],
+
       role: "Systems Analyst",
       contribution: "Conducted requirements analysis",
       client: "Various",
