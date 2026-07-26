@@ -23,7 +23,8 @@ const resources = {
         subtitleLine2: "Based in Muscat, Oman.",
         ctaText: "View My Work",
         tagline: "Let's build the next challenge together",
-        contactCta: "Contact Me"
+        contactCta: "Contact Me",
+        downloadCv: "Download CV"
       },
       manifesto: {
         sectionLabel: "ABOUT ME",
@@ -235,7 +236,8 @@ const resources = {
         subtitleLine2: "مسقط، سلطنة عمان.",
         ctaText: "عرض أعمالي",
         tagline: "لنبني التحدي القادم معاً",
-        contactCta: "تواصل معي"
+        contactCta: "تواصل معي",
+        downloadCv: "تحميل السيرة الذاتية"
       },
       manifesto: {
         sectionLabel: "نبذة عني",
