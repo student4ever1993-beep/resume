@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import gsap from 'gsap';
-import { Github, Linkedin, Mail } from 'lucide-react';
+import { Download, Github, Linkedin, Mail } from 'lucide-react';
 import HeroBackground from '../effects/HeroBackground';
 import { contactConfig } from '../config';
 
@@ -14,6 +14,7 @@ export default function Hero() {
   const subtitleRef = useRef<HTMLParagraphElement>(null);
   const taglineRef = useRef<HTMLParagraphElement>(null);
   const ctaRef = useRef<HTMLAnchorElement>(null);
+  const downloadCvRef = useRef<HTMLAnchorElement>(null);
   const socialsRef = useRef<HTMLDivElement>(null);
   const sparkleRef = useRef<HTMLDivElement>(null);
 
@@ -52,9 +53,9 @@ export default function Hero() {
         '-=0.3'
       )
       .fromTo(
-        ctaRef.current,
+        [ctaRef.current, downloadCvRef.current],
         { opacity: 0, scale: 0.9 },
-        { opacity: 1, scale: 1, duration: 0.7, ease: 'back.out(1.7)' },
+        { opacity: 1, scale: 1, duration: 0.7, ease: 'back.out(1.7)', stagger: 0.1 },
         '-=0.3'
       )
       .fromTo(
@@ -233,47 +234,97 @@ export default function Hero() {
           {t('hero.tagline')}
         </p>
 
-        {/* CTA Button */}
-        <a
-          ref={ctaRef}
-          href="#contact"
-          onClick={(e) => {
-            e.preventDefault();
-            const el = document.querySelector('#contact');
-            if (el) el.scrollIntoView({ behavior: 'smooth' });
-          }}
-          className="hero-cta"
+        {/* CTA Buttons */}
+        <div
           style={{
-            fontFamily: isRtl ? 'Cairo, system-ui, sans-serif' : 'Inter, system-ui, sans-serif',
-            fontSize: '13px',
-            fontWeight: 600,
-            color: '#c9a84c',
-            letterSpacing: isRtl ? '0' : '2px',
-            textTransform: 'uppercase',
-            textDecoration: 'none',
-            border: '1px solid rgba(201, 168, 76, 0.5)',
-            borderRadius: '2px',
-            padding: '14px 36px',
-            display: 'inline-block',
-            opacity: 0,
-            transition: 'background 0.4s ease, color 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease',
-            background: 'rgba(201, 168, 76, 0.04)',
-          }}
-          onMouseEnter={(e) => {
-            const el = e.currentTarget;
-            el.style.background = 'rgba(201, 168, 76, 0.12)';
-            el.style.borderColor = '#c9a84c';
-            el.style.boxShadow = '0 0 30px rgba(201, 168, 76, 0.15)';
-          }}
-          onMouseLeave={(e) => {
-            const el = e.currentTarget;
-            el.style.background = 'rgba(201, 168, 76, 0.04)';
-            el.style.borderColor = 'rgba(201, 168, 76, 0.5)';
-            el.style.boxShadow = 'none';
+            display: 'flex',
+            alignItems: 'center',
+            gap: '16px',
+            flexWrap: 'wrap',
+            justifyContent: 'center',
+            flexDirection: isRtl ? 'row-reverse' : 'row',
           }}
         >
-          {t('hero.contactCta')}
-        </a>
+          <a
+            ref={ctaRef}
+            href="#contact"
+            onClick={(e) => {
+              e.preventDefault();
+              const el = document.querySelector('#contact');
+              if (el) el.scrollIntoView({ behavior: 'smooth' });
+            }}
+            className="hero-cta"
+            style={{
+              fontFamily: isRtl ? 'Cairo, system-ui, sans-serif' : 'Inter, system-ui, sans-serif',
+              fontSize: '13px',
+              fontWeight: 600,
+              color: '#c9a84c',
+              letterSpacing: isRtl ? '0' : '2px',
+              textTransform: 'uppercase',
+              textDecoration: 'none',
+              border: '1px solid rgba(201, 168, 76, 0.5)',
+              borderRadius: '2px',
+              padding: '14px 36px',
+              display: 'inline-block',
+              opacity: 0,
+              transition: 'background 0.4s ease, color 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease',
+              background: 'rgba(201, 168, 76, 0.04)',
+            }}
+            onMouseEnter={(e) => {
+              const el = e.currentTarget;
+              el.style.background = 'rgba(201, 168, 76, 0.12)';
+              el.style.borderColor = '#c9a84c';
+              el.style.boxShadow = '0 0 30px rgba(201, 168, 76, 0.15)';
+            }}
+            onMouseLeave={(e) => {
+              const el = e.currentTarget;
+              el.style.background = 'rgba(201, 168, 76, 0.04)';
+              el.style.borderColor = 'rgba(201, 168, 76, 0.5)';
+              el.style.boxShadow = 'none';
+            }}
+          >
+            {t('hero.contactCta')}
+          </a>
+
+          <a
+            ref={downloadCvRef}
+            href="/Alya-Al-Siyabi-CV.pdf"
+            download="Alya-Al-Siyabi-CV.pdf"
+            className="hero-cta hero-cta-download"
+            style={{
+              fontFamily: isRtl ? 'Cairo, system-ui, sans-serif' : 'Inter, system-ui, sans-serif',
+              fontSize: '13px',
+              fontWeight: 600,
+              color: '#050508',
+              letterSpacing: isRtl ? '0' : '2px',
+              textTransform: 'uppercase',
+              textDecoration: 'none',
+              border: '1px solid #c9a84c',
+              borderRadius: '2px',
+              padding: '14px 32px',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '10px',
+              opacity: 0,
+              transition: 'background 0.4s ease, box-shadow 0.4s ease',
+              background: '#c9a84c',
+              flexDirection: isRtl ? 'row-reverse' : 'row',
+            }}
+            onMouseEnter={(e) => {
+              const el = e.currentTarget;
+              el.style.background = '#e0bd5a';
+              el.style.boxShadow = '0 0 30px rgba(201, 168, 76, 0.35)';
+            }}
+            onMouseLeave={(e) => {
+              const el = e.currentTarget;
+              el.style.background = '#c9a84c';
+              el.style.boxShadow = 'none';
+            }}
+          >
+            <Download size={14} />
+            {t('hero.downloadCv')}
+          </a>
+        </div>
 
         {/* Social Links */}
         <div
