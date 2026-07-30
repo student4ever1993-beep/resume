@@ -140,6 +140,31 @@ export default function Hero() {
           direction: isRtl ? 'rtl' : 'ltr',
         }}
       >
+        {/* Brain Image Overlay */}
+        <div
+          style={{
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -55%)',
+            width: '120%',
+            maxWidth: '650px',
+            aspectRatio: '1',
+            zIndex: -1,
+            pointerEvents: 'none',
+            mixBlendMode: 'screen',
+            opacity: 0.9,
+            WebkitMaskImage: 'radial-gradient(ellipse at center, black 40%, transparent 70%)',
+            maskImage: 'radial-gradient(ellipse at center, black 40%, transparent 70%)',
+          }}
+        >
+          <img
+            src="/images/glowing_gold_brain.png"
+            alt="Digital Brain"
+            style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+          />
+        </div>
+
         {/* Eyebrow Badge */}
         <div
           ref={eyebrowRef}
@@ -167,11 +192,12 @@ export default function Hero() {
           className="hero-name"
           style={{
             fontFamily: isRtl ? 'Cairo, system-ui, sans-serif' : '"Space Grotesk", system-ui, sans-serif',
-            fontSize: 'clamp(36px, 6vw, 72px)',
-            fontWeight: 600,
-            color: '#f5f5f0',
+            fontSize: 'clamp(48px, 7vw, 90px)',
+            fontWeight: 800,
+            color: '#fff9dc',
+            textShadow: '0 1px 0 #d4b75a, 0 2px 0 #b38728, 0 3px 0 #aa771c, 0 4px 0 #8c5d0a, 0 5px 0 #6e4604, 0 10px 20px rgba(0,0,0,0.9), 0 0 30px rgba(201, 168, 76, 0.7)',
             lineHeight: 1.1,
-            marginBottom: '8px',
+            marginBottom: '0',
             opacity: 0,
             letterSpacing: isRtl ? '0' : '-0.02em',
           }}
@@ -185,11 +211,12 @@ export default function Hero() {
           className="hero-emphasis"
           style={{
             fontFamily: isRtl ? 'Cairo, system-ui, sans-serif' : '"Space Grotesk", Georgia, serif',
-            fontSize: 'clamp(28px, 5vw, 60px)',
-            fontWeight: 500,
-            color: '#c9a84c',
+            fontSize: 'clamp(40px, 6vw, 76px)',
+            fontWeight: 800,
+            color: '#fff9dc',
+            textShadow: '0 1px 0 #d4b75a, 0 2px 0 #b38728, 0 3px 0 #aa771c, 0 4px 0 #8c5d0a, 0 5px 0 #6e4604, 0 10px 20px rgba(0,0,0,0.9), 0 0 30px rgba(201, 168, 76, 0.7)',
             lineHeight: 1.2,
-            marginBottom: '20px',
+            marginBottom: '30px',
             opacity: 0,
             fontStyle: isRtl ? 'normal' : 'italic',
           }}
