@@ -377,7 +377,7 @@ export const contactConfig: ContactConfig = {
     { icon: "MapPin", value: "Al-Seeb, Muscat, Oman" },
   ],
   socialLinks: [
-    { label: "LinkedIn", href: "#" },
+    { label: "LinkedIn", href: "https://om.linkedin.com/in/alya-al-siyabi-904861206" },
     { label: "GitHub", href: "#" },
   ],
 }
