@@ -17,7 +17,8 @@ export default function HeroSphere({ showSphere = true }: HeroSphereProps) {
     // ── Scene setup ──────────────────────────────────────────
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(50, container.clientWidth / container.clientHeight, 0.1, 1000);
-    camera.position.z = 7;
+    camera.position.set(0, 1.8, 6.5);
+    camera.lookAt(0, 0, 0);
 
     const renderer = new THREE.WebGLRenderer({
       antialias: true,
@@ -31,21 +32,32 @@ export default function HeroSphere({ showSphere = true }: HeroSphereProps) {
 
     const isLightMode = () => document.documentElement.classList.contains('light');
 
-    // ── Constellation Nodes & Connections Network ─────────────
-    const nodeCount = 75;
-    const nodesGroup = new THREE.Group();
-    scene.add(nodesGroup);
+    const gridGroup = new THREE.Group();
+    scene.add(gridGroup);
 
+    // ── 1. Cyber Synapse Grid Plane ────────────────────────────
+    const gridHex = isLightMode() ? 0xb8860b : 0xd4af37;
+    const gridCenterHex = isLightMode() ? 0x9a7516 : 0xffd700;
+
+    const gridHelper = new THREE.GridHelper(16, 28, gridCenterHex, gridHex);
+    gridHelper.position.y = -1.8;
+    gridHelper.material.transparent = true;
+    gridHelper.material.opacity = isLightMode() ? 0.15 : 0.25;
+    gridGroup.add(gridHelper);
+
+    // ── 2. Floating Cyber Synapse Nodes ────────────────────────
+    const nodeCount = 60;
+    const nodeGeo = new THREE.BufferGeometry();
     const positions = new Float32Array(nodeCount * 3);
     const velocities: { x: number; y: number; z: number }[] = [];
 
-    const boundsX = 6.5;
-    const boundsY = 4.5;
-    const boundsZ = 3.0;
+    const boundsX = 7.0;
+    const boundsY = 4.0;
+    const boundsZ = 3.5;
 
     for (let i = 0; i < nodeCount; i++) {
       const x = (Math.random() - 0.5) * boundsX * 2;
-      const y = (Math.random() - 0.5) * boundsY * 2;
+      const y = (Math.random() - 0.5) * boundsY * 2 - 0.5;
       const z = (Math.random() - 0.5) * boundsZ * 2;
 
       positions[i * 3] = x;
@@ -53,26 +65,25 @@ export default function HeroSphere({ showSphere = true }: HeroSphereProps) {
       positions[i * 3 + 2] = z;
 
       velocities.push({
-        x: (Math.random() - 0.5) * 0.004,
-        y: (Math.random() - 0.5) * 0.004,
+        x: (Math.random() - 0.5) * 0.003,
+        y: (Math.random() - 0.5) * 0.003,
         z: (Math.random() - 0.5) * 0.002,
       });
     }
 
-    const nodeGeo = new THREE.BufferGeometry();
     nodeGeo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
 
     const nodeMat = new THREE.PointsMaterial({
-      size: isLightMode() ? 0.06 : 0.07,
+      size: isLightMode() ? 0.05 : 0.065,
       color: isLightMode() ? 0x855c00 : 0xffd700,
       transparent: true,
-      opacity: isLightMode() ? 0.6 : 0.8,
+      opacity: isLightMode() ? 0.5 : 0.75,
     });
 
     const nodePoints = new THREE.Points(nodeGeo, nodeMat);
-    nodesGroup.add(nodePoints);
+    gridGroup.add(nodePoints);
 
-    // Dynamic Line Connections Geometry & Material
+    // Synapse Connecting Lines
     const maxConnections = (nodeCount * (nodeCount - 1)) / 2;
     const linePositions = new Float32Array(maxConnections * 6);
     const lineGeo = new THREE.BufferGeometry();
@@ -81,11 +92,11 @@ export default function HeroSphere({ showSphere = true }: HeroSphereProps) {
     const lineMat = new THREE.LineBasicMaterial({
       color: isLightMode() ? 0xb8860b : 0xd4af37,
       transparent: true,
-      opacity: isLightMode() ? 0.18 : 0.25,
+      opacity: isLightMode() ? 0.15 : 0.22,
     });
 
     const lineSegments = new THREE.LineSegments(lineGeo, lineMat);
-    nodesGroup.add(lineSegments);
+    gridGroup.add(lineSegments);
 
     // ── Mouse Interaction ─────────────────────────────────────
     let mouseX = 0;
@@ -110,13 +121,14 @@ export default function HeroSphere({ showSphere = true }: HeroSphereProps) {
 
     window.addEventListener('resize', handleResize);
 
-    // ── MutationObserver for Theme Toggle ────────────────────
+    // ── Theme Observer ────────────────────────────────────────
     const observer = new MutationObserver(() => {
       const light = isLightMode();
       nodeMat.color.setHex(light ? 0x855c00 : 0xffd700);
-      nodeMat.opacity = light ? 0.6 : 0.8;
+      nodeMat.opacity = light ? 0.5 : 0.75;
       lineMat.color.setHex(light ? 0xb8860b : 0xd4af37);
-      lineMat.opacity = light ? 0.18 : 0.25;
+      lineMat.opacity = light ? 0.15 : 0.22;
+      gridHelper.material.opacity = light ? 0.15 : 0.25;
     });
 
     observer.observe(document.documentElement, {
@@ -128,12 +140,12 @@ export default function HeroSphere({ showSphere = true }: HeroSphereProps) {
     const animate = () => {
       frameRef.current = requestAnimationFrame(animate);
 
-      // Mouse Parallax Lerp
-      targetX += (mouseX * 0.3 - targetX) * 0.04;
-      targetY += (-mouseY * 0.3 - targetY) * 0.04;
+      // Smooth camera/grid parallax lerp
+      targetX += (mouseX * 0.25 - targetX) * 0.04;
+      targetY += (-mouseY * 0.25 - targetY) * 0.04;
 
-      nodesGroup.rotation.y = targetX;
-      nodesGroup.rotation.x = targetY;
+      gridGroup.rotation.y = targetX;
+      gridGroup.rotation.x = targetY * 0.5;
 
       // Update Node Positions
       const posAttr = nodeGeo.getAttribute('position') as THREE.BufferAttribute;
@@ -144,16 +156,15 @@ export default function HeroSphere({ showSphere = true }: HeroSphereProps) {
         posArray[i * 3 + 1] += velocities[i].y;
         posArray[i * 3 + 2] += velocities[i].z;
 
-        // Bounce off bounds
         if (Math.abs(posArray[i * 3]) > boundsX) velocities[i].x *= -1;
-        if (Math.abs(posArray[i * 3 + 1]) > boundsY) velocities[i].y *= -1;
+        if (Math.abs(posArray[i * 3 + 1] + 0.5) > boundsY) velocities[i].y *= -1;
         if (Math.abs(posArray[i * 3 + 2]) > boundsZ) velocities[i].z *= -1;
       }
       posAttr.needsUpdate = true;
 
-      // Update Line Connections (Connect nearby nodes)
+      // Update Line Connections
       let lineIndex = 0;
-      const connectionDistSq = 2.2 * 2.2;
+      const connectionDistSq = 2.0 * 2.0;
 
       for (let i = 0; i < nodeCount; i++) {
         const x1 = posArray[i * 3];

@@ -13,10 +13,18 @@ export default function HeroOrbitCore() {
     const container = containerRef.current;
     if (!container) return;
 
-    // ── Scene & Camera ─────────────────────────────────────────
+    // ── Responsive Camera Z ────────────────────────────────────
+    const getCameraZ = (width: number) => {
+      if (width < 480) return 8.2;
+      if (width < 768) return 7.0;
+      if (width < 1024) return 6.5;
+      return 5.8;
+    };
+
+    // ── Scene & Camera Setup ───────────────────────────────────
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 1000);
-    camera.position.z = 6.2;
+    camera.position.z = getCameraZ(container.clientWidth);
 
     const renderer = new THREE.WebGLRenderer({
       antialias: true,
@@ -31,140 +39,127 @@ export default function HeroOrbitCore() {
     const mainGroup = new THREE.Group();
     scene.add(mainGroup);
 
-    // ── Colors based on Theme ──────────────────────────────────
-    const goldColor = isLight ? 0x9a7516 : 0xffd700;
-    const accentColor = isLight ? 0xb8860b : 0xe0bd6b;
-    const wireColor = isLight ? 0x855c00 : 0xd4b75a;
+    // ── Theme-Aware Palette ────────────────────────────────────
+    const goldHex = isLight ? 0x9a7516 : 0xffd700;
+    const accentHex = isLight ? 0xb8860b : 0xe0bd6b;
+    const lineHex = isLight ? 0x855c00 : 0xd4b75a;
 
-    // ── Lighting ───────────────────────────────────────────────
-    const ambientLight = new THREE.AmbientLight(0xffffff, isLight ? 1.2 : 0.8);
+    // ── Lighting Setup ─────────────────────────────────────────
+    const ambientLight = new THREE.AmbientLight(0xffffff, isLight ? 1.4 : 0.9);
     scene.add(ambientLight);
 
-    const pointLight = new THREE.PointLight(goldColor, isLight ? 3 : 4, 15);
-    pointLight.position.set(0, 0, 0);
-    scene.add(pointLight);
+    const coreLight = new THREE.PointLight(goldHex, isLight ? 3.5 : 4.5, 12);
+    coreLight.position.set(0, 0, 0);
+    scene.add(coreLight);
 
     const dirLight1 = new THREE.DirectionalLight(0xfffae6, isLight ? 1.5 : 2.5);
     dirLight1.position.set(5, 8, 5);
     scene.add(dirLight1);
 
-    const dirLight2 = new THREE.DirectionalLight(accentColor, isLight ? 1.0 : 1.5);
-    dirLight2.position.set(-5, -5, -2);
-    scene.add(dirLight2);
+    // ── 1. Enterprise Network Node Geodesic Globe ──────────────
+    const sphereRadius = 1.8;
+    const geo = new THREE.IcosahedronGeometry(sphereRadius, 2);
+    const posAttr = geo.getAttribute('position') as THREE.BufferAttribute;
 
-    // ── 1. Inner Crystalline Nucleus ───────────────────────────
-    const coreGeo = new THREE.IcosahedronGeometry(1.0, 1);
-    const coreMat = new THREE.MeshPhysicalMaterial({
-      color: goldColor,
+    // Unique vertex positions for server nodes
+    const nodePositions: THREE.Vector3[] = [];
+    const posMap = new Map<string, THREE.Vector3>();
+
+    for (let i = 0; i < posAttr.count; i++) {
+      const x = Math.round(posAttr.getX(i) * 100) / 100;
+      const y = Math.round(posAttr.getY(i) * 100) / 100;
+      const z = Math.round(posAttr.getZ(i) * 100) / 100;
+      const key = `${x},${y},${z}`;
+
+      if (!posMap.has(key)) {
+        const v = new THREE.Vector3(x, y, z);
+        posMap.set(key, v);
+        nodePositions.push(v);
+      }
+    }
+
+    // Node Mesh Instances (Server Node Spheres)
+    const nodeGroup = new THREE.Group();
+    const nodeSphereGeo = new THREE.SphereGeometry(0.06, 12, 12);
+    const nodeSphereMat = new THREE.MeshStandardMaterial({
+      color: goldHex,
+      emissive: goldHex,
+      emissiveIntensity: isLight ? 0.4 : 0.8,
       metalness: 0.9,
-      roughness: 0.15,
-      clearcoat: 1.0,
-      clearcoatRoughness: 0.1,
-      emissive: goldColor,
-      emissiveIntensity: isLight ? 0.15 : 0.4,
-      wireframe: false,
+      roughness: 0.1,
     });
-    const coreMesh = new THREE.Mesh(coreGeo, coreMat);
-    mainGroup.add(coreMesh);
 
-    // Inner wireframe shell
-    const innerWireGeo = new THREE.IcosahedronGeometry(1.15, 1);
-    const innerWireMat = new THREE.MeshBasicMaterial({
-      color: wireColor,
+    nodePositions.forEach((pos) => {
+      const nodeMesh = new THREE.Mesh(nodeSphereGeo, nodeSphereMat);
+      nodeMesh.position.copy(pos);
+      nodeGroup.add(nodeMesh);
+    });
+    mainGroup.add(nodeGroup);
+
+    // Network Connection Lines
+    const wireGeo = new THREE.WireframeGeometry(geo);
+    const wireMat = new THREE.LineBasicMaterial({
+      color: lineHex,
+      transparent: true,
+      opacity: isLight ? 0.35 : 0.55,
+    });
+    const wireMesh = new THREE.LineSegments(wireGeo, wireMat);
+    mainGroup.add(wireMesh);
+
+    // ── 2. Inner Glowing Core Orb ─────────────────────────────
+    const innerCoreGeo = new THREE.IcosahedronGeometry(0.9, 1);
+    const innerCoreMat = new THREE.MeshPhysicalMaterial({
+      color: goldHex,
+      emissive: goldHex,
+      emissiveIntensity: isLight ? 0.2 : 0.5,
+      metalness: 0.8,
+      roughness: 0.2,
       wireframe: true,
+    });
+    const innerCoreMesh = new THREE.Mesh(innerCoreGeo, innerCoreMat);
+    mainGroup.add(innerCoreMesh);
+
+    // ── 3. Pulsing Data Packets Traveling Along Nodes ──────────
+    const pulseCount = 12;
+    const pulseGeo = new THREE.SphereGeometry(0.045, 8, 8);
+    const pulseMat = new THREE.MeshBasicMaterial({
+      color: isLight ? 0xffffff : 0xffffff,
+    });
+    const pulses: { mesh: THREE.Mesh; startNode: THREE.Vector3; endNode: THREE.Vector3; progress: number; speed: number }[] = [];
+
+    for (let i = 0; i < pulseCount; i++) {
+      const pMesh = new THREE.Mesh(pulseGeo, pulseMat);
+      const startIdx = Math.floor(Math.random() * nodePositions.length);
+      let endIdx = Math.floor(Math.random() * nodePositions.length);
+      while (endIdx === startIdx) endIdx = Math.floor(Math.random() * nodePositions.length);
+
+      const startNode = nodePositions[startIdx];
+      const endNode = nodePositions[endIdx];
+
+      pMesh.position.copy(startNode);
+      mainGroup.add(pMesh);
+
+      pulses.push({
+        mesh: pMesh,
+        startNode,
+        endNode,
+        progress: Math.random(),
+        speed: 0.008 + Math.random() * 0.012,
+      });
+    }
+
+    // ── 4. Outer Orbital Satellites (Cloud, API, DB, AI) ──────
+    const orbitRingGeo = new THREE.TorusGeometry(2.5, 0.012, 16, 100);
+    const orbitRingMat = new THREE.MeshBasicMaterial({
+      color: accentHex,
       transparent: true,
       opacity: isLight ? 0.4 : 0.6,
     });
-    const innerWireMesh = new THREE.Mesh(innerWireGeo, innerWireMat);
-    mainGroup.add(innerWireMesh);
+    const orbitRing = new THREE.Mesh(orbitRingGeo, orbitRingMat);
+    orbitRing.rotation.x = Math.PI / 3;
+    mainGroup.add(orbitRing);
 
-    // ── 2. Astrolabe Metallic Rings ────────────────────────────
-    // Ring 1 (Equatorial)
-    const ring1Geo = new THREE.TorusGeometry(1.75, 0.025, 16, 100);
-    const ring1Mat = new THREE.MeshStandardMaterial({
-      color: goldColor,
-      metalness: 0.95,
-      roughness: 0.1,
-      emissive: goldColor,
-      emissiveIntensity: 0.2,
-    });
-    const ring1Mesh = new THREE.Mesh(ring1Geo, ring1Mat);
-    ring1Mesh.rotation.x = Math.PI / 3;
-    mainGroup.add(ring1Mesh);
-
-    // Ring 2 (Polar)
-    const ring2Geo = new THREE.TorusGeometry(2.1, 0.02, 16, 100);
-    const ring2Mat = new THREE.MeshStandardMaterial({
-      color: accentColor,
-      metalness: 0.9,
-      roughness: 0.15,
-    });
-    const ring2Mesh = new THREE.Mesh(ring2Geo, ring2Mat);
-    ring2Mesh.rotation.y = Math.PI / 4;
-    mainGroup.add(ring2Mesh);
-
-    // Ring 3 (Diagonal)
-    const ring3Geo = new THREE.TorusGeometry(2.45, 0.015, 16, 100);
-    const ring3Mat = new THREE.MeshBasicMaterial({
-      color: wireColor,
-      wireframe: true,
-      transparent: true,
-      opacity: isLight ? 0.6 : 0.8,
-    });
-    const ring3Mesh = new THREE.Mesh(ring3Geo, ring3Mat);
-    ring3Mesh.rotation.x = -Math.PI / 4;
-    ring3Mesh.rotation.y = Math.PI / 6;
-    mainGroup.add(ring3Mesh);
-
-    // ── 3. Orbiting Data Node Spheres ─────────────────────────
-    const nodeGroup = new THREE.Group();
-    const nodeGeo = new THREE.SphereGeometry(0.06, 12, 12);
-    const nodeMat = new THREE.MeshStandardMaterial({
-      color: goldColor,
-      emissive: goldColor,
-      emissiveIntensity: 0.8,
-      metalness: 0.8,
-    });
-
-    const nodeCount = 8;
-    for (let i = 0; i < nodeCount; i++) {
-      const angle = (i / nodeCount) * Math.PI * 2;
-      const radius = 2.1;
-      const node = new THREE.Mesh(nodeGeo, nodeMat);
-      node.position.set(Math.cos(angle) * radius, Math.sin(angle) * radius, (Math.sin(angle * 2) * 0.3));
-      nodeGroup.add(node);
-    }
-    mainGroup.add(nodeGroup);
-
-    // ── 4. Particle Dust Field ─────────────────────────────────
-    const particleCount = 200;
-    const particleGeo = new THREE.BufferGeometry();
-    const posArray = new Float32Array(particleCount * 3);
-
-    for (let i = 0; i < particleCount * 3; i += 3) {
-      const u = Math.random();
-      const v = Math.random();
-      const theta = u * 2.0 * Math.PI;
-      const phi = Math.acos(2.0 * v - 1.0);
-      const r = 2.2 + Math.random() * 1.2;
-
-      posArray[i] = r * Math.sin(phi) * Math.cos(theta);
-      posArray[i + 1] = r * Math.sin(phi) * Math.sin(theta);
-      posArray[i + 2] = r * Math.cos(phi);
-    }
-
-    particleGeo.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
-    const particleMat = new THREE.PointsMaterial({
-      size: isLight ? 0.035 : 0.045,
-      color: goldColor,
-      transparent: true,
-      opacity: isLight ? 0.5 : 0.75,
-      blending: isLight ? THREE.NormalBlending : THREE.AdditiveBlending,
-    });
-    const particles = new THREE.Points(particleGeo, particleMat);
-    mainGroup.add(particles);
-
-    // ── Mouse Interaction (Parallax) ───────────────────────────
+    // ── Ultra-Smooth Mouse Parallax ────────────────────────────
     let mouseX = 0;
     let mouseY = 0;
     let targetX = 0;
@@ -178,10 +173,11 @@ export default function HeroOrbitCore() {
 
     window.addEventListener('mousemove', handleMouseMove);
 
-    // ── Resize Handler ─────────────────────────────────────────
+    // ── Responsive Resize Handler ──────────────────────────────
     const handleResize = () => {
       if (!container || !rendererRef.current) return;
       camera.aspect = container.clientWidth / container.clientHeight;
+      camera.position.z = getCameraZ(container.clientWidth);
       camera.updateProjectionMatrix();
       rendererRef.current.setSize(container.clientWidth, container.clientHeight);
     };
@@ -195,24 +191,32 @@ export default function HeroOrbitCore() {
       frameRef.current = requestAnimationFrame(animate);
       const elapsedTime = clock.getElapsedTime();
 
-      // Smooth Mouse Parallax Lerp
-      targetX += (mouseX * 0.4 - targetX) * 0.05;
-      targetY += (mouseY * 0.4 - targetY) * 0.05;
+      // Smooth mouse lerp
+      targetX += (mouseX * 0.35 - targetX) * 0.03;
+      targetY += (mouseY * 0.35 - targetY) * 0.03;
 
       mainGroup.rotation.y = targetX + elapsedTime * 0.15;
-      mainGroup.rotation.x = targetY + Math.sin(elapsedTime * 0.2) * 0.1;
+      mainGroup.rotation.x = targetY + Math.sin(elapsedTime * 0.2) * 0.08;
 
-      // Independent Ring Rotations
-      coreMesh.rotation.y = -elapsedTime * 0.3;
-      coreMesh.rotation.x = elapsedTime * 0.2;
-      innerWireMesh.rotation.y = elapsedTime * 0.4;
+      innerCoreMesh.rotation.y = -elapsedTime * 0.3;
+      innerCoreMesh.rotation.x = elapsedTime * 0.2;
 
-      ring1Mesh.rotation.z = elapsedTime * 0.25;
-      ring2Mesh.rotation.x = elapsedTime * 0.3;
-      ring3Mesh.rotation.y = -elapsedTime * 0.35;
+      orbitRing.rotation.z = elapsedTime * 0.12;
 
-      nodeGroup.rotation.z = elapsedTime * 0.2;
-      particles.rotation.y = -elapsedTime * 0.08;
+      // Animate Data Packet Pulses
+      pulses.forEach((p) => {
+        p.progress += p.speed;
+        if (p.progress >= 1.0) {
+          p.progress = 0;
+          const startIdx = Math.floor(Math.random() * nodePositions.length);
+          let endIdx = Math.floor(Math.random() * nodePositions.length);
+          while (endIdx === startIdx) endIdx = Math.floor(Math.random() * nodePositions.length);
+          p.startNode = nodePositions[startIdx];
+          p.endNode = nodePositions[endIdx];
+        }
+
+        p.mesh.position.lerpVectors(p.startNode, p.endNode, p.progress);
+      });
 
       renderer.render(scene, camera);
     };
@@ -224,21 +228,17 @@ export default function HeroOrbitCore() {
       window.removeEventListener('mousemove', handleMouseMove);
       window.removeEventListener('resize', handleResize);
 
-      // Cleanup
-      coreGeo.dispose();
-      coreMat.dispose();
-      innerWireGeo.dispose();
-      innerWireMat.dispose();
-      ring1Geo.dispose();
-      ring1Mat.dispose();
-      ring2Geo.dispose();
-      ring2Mat.dispose();
-      ring3Geo.dispose();
-      ring3Mat.dispose();
-      nodeGeo.dispose();
-      nodeMat.dispose();
-      particleGeo.dispose();
-      particleMat.dispose();
+      geo.dispose();
+      nodeSphereGeo.dispose();
+      nodeSphereMat.dispose();
+      wireGeo.dispose();
+      wireMat.dispose();
+      innerCoreGeo.dispose();
+      innerCoreMat.dispose();
+      pulseGeo.dispose();
+      pulseMat.dispose();
+      orbitRingGeo.dispose();
+      orbitRingMat.dispose();
 
       if (rendererRef.current && rendererRef.current.domElement) {
         container.removeChild(rendererRef.current.domElement);
@@ -250,7 +250,7 @@ export default function HeroOrbitCore() {
   return (
     <div
       ref={containerRef}
-      className="w-full h-full min-h-[360px] sm:min-h-[440px] relative flex items-center justify-center cursor-grab active:cursor-grabbing"
+      className="w-full h-full min-h-[300px] sm:min-h-[380px] lg:min-h-[460px] relative flex items-center justify-center cursor-grab active:cursor-grabbing transition-all duration-300"
     />
   );
 }

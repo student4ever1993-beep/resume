@@ -331,7 +331,7 @@ export default function Hero() {
                 <Award size={14} />
               </div>
               <span className="text-xs font-semibold tracking-wide text-[var(--text-heading)] whitespace-nowrap">
-                {isRtl ? 'خبرة +8 سنوات' : '8+ Years Experience'}
+                {isRtl ? 'خبرة 5+ سنوات' : '5+ Years Experience'}
               </span>
             </div>
           </div>
