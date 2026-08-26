@@ -46,11 +46,12 @@ function StarsBackground() {
 
     const animate = () => {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-      ctx.fillStyle = '#c9a84c';
+      const isLightMode = document.documentElement.classList.contains('light');
+      ctx.fillStyle = isLightMode ? '#b8860b' : '#c9a84c';
 
       stars.forEach((star) => {
         ctx.save();
-        ctx.globalAlpha = star.opacity;
+        ctx.globalAlpha = isLightMode ? star.opacity * 0.8 : star.opacity;
         ctx.beginPath();
         // Golden color for stars
         ctx.arc(star.x, star.y, star.size, 0, Math.PI * 2);
@@ -150,7 +151,7 @@ export default function Experience() {
       id="experience"
       ref={sectionRef}
       style={{
-        backgroundColor: '#050508',
+        backgroundColor: 'transparent',
         position: 'relative',
         zIndex: 2,
         overflow: 'hidden',
@@ -186,7 +187,7 @@ export default function Experience() {
               fontFamily: isRtl ? 'Cairo, system-ui, sans-serif' : 'Inter, system-ui, sans-serif',
               fontSize: '11px',
               fontWeight: 600,
-              color: '#c9a84c',
+              color: 'var(--accent-gold)',
               letterSpacing: isRtl ? '0' : '3px',
               textTransform: 'uppercase',
               marginBottom: '16px',
@@ -199,7 +200,7 @@ export default function Experience() {
               fontFamily: isRtl ? 'Cairo, system-ui, sans-serif' : '"Space Grotesk", system-ui, sans-serif',
               fontSize: 'clamp(34px, 4.5vw, 52px)',
               fontWeight: 500,
-              color: '#f5f5f0',
+              color: 'var(--text-heading)',
               letterSpacing: isRtl ? '0' : '-0.01em',
             }}
           >
@@ -234,8 +235,8 @@ export default function Experience() {
               style={{
                 borderRadius: '12px',
                 padding: '24px 32px',
-                border: '1px solid rgba(201, 168, 76, 0.3)',
-                boxShadow: '0 12px 40px rgba(0, 0, 0, 0.6), inset 0 0 25px rgba(201, 168, 76, 0.08)',
+                border: '1px solid var(--border-highlight)',
+                boxShadow: 'var(--glass-shadow)',
                 textAlign: 'center',
               }}
             >
@@ -249,8 +250,8 @@ export default function Experience() {
                   width: '8px',
                   height: '8px',
                   borderRadius: '50%',
-                  backgroundColor: '#c9a84c',
-                  boxShadow: '0 0 12px #c9a84c, 0 0 24px #c9a84c',
+                  backgroundColor: 'var(--accent-gold)',
+                  boxShadow: '0 0 12px var(--accent-gold), 0 0 24px var(--accent-gold)',
                 }}
               />
 
@@ -281,7 +282,7 @@ export default function Experience() {
                       fontFamily: isRtl ? 'Cairo, system-ui, sans-serif' : '"Space Grotesk", system-ui, sans-serif',
                       fontSize: 'clamp(20px, 3.5vw, 28px)',
                       fontWeight: 600,
-                      color: '#f5f5f0',
+                      color: 'var(--text-heading)',
                       marginBottom: '6px',
                       lineHeight: 1.2,
                     }}
@@ -293,7 +294,7 @@ export default function Experience() {
                       fontFamily: isRtl ? 'Cairo, system-ui, sans-serif' : 'Inter, system-ui, sans-serif',
                       fontSize: 'clamp(15px, 2.5vw, 18px)',
                       fontWeight: 500,
-                      color: '#c9a84c',
+                      color: 'var(--accent-gold)',
                       lineHeight: 1.4,
                       margin: 0,
                     }}

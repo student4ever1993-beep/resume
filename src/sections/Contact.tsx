@@ -89,7 +89,7 @@ export default function Contact() {
       id="contact"
       ref={sectionRef}
       style={{
-        backgroundColor: '#050508',
+        backgroundColor: 'transparent',
         position: 'relative',
         zIndex: 2,
       }}
@@ -107,7 +107,7 @@ export default function Contact() {
             fontFamily: isRtl ? 'Cairo, system-ui, sans-serif' : 'Inter, system-ui, sans-serif',
             fontSize: '11px',
             fontWeight: 600,
-            color: '#c9a84c',
+            color: 'var(--accent-gold)',
             letterSpacing: isRtl ? '0' : '3px',
             textTransform: 'uppercase',
             marginBottom: '24px',
@@ -122,7 +122,7 @@ export default function Contact() {
             fontFamily: isRtl ? 'Cairo, system-ui, sans-serif' : '"Space Grotesk", system-ui, sans-serif',
             fontSize: 'clamp(32px, 4vw, 52px)',
             fontWeight: 500,
-            color: '#f5f5f0',
+            color: 'var(--text-heading)',
             marginBottom: '24px',
             lineHeight: 1.25,
             letterSpacing: isRtl ? '0' : '-0.01em',
@@ -136,7 +136,7 @@ export default function Contact() {
             fontFamily: isRtl ? 'Cairo, system-ui, sans-serif' : 'Inter, system-ui, sans-serif',
             fontSize: '16px',
             fontWeight: 400,
-            color: '#8b8b9a',
+            color: 'var(--text-muted)',
             maxWidth: '560px',
             margin: '0 auto 48px',
             lineHeight: 1.65,
@@ -168,13 +168,13 @@ export default function Contact() {
                 gap: '12px',
               }}
             >
-              <span style={{ color: '#c9a84c' }}>{iconMap[item.icon] || null}</span>
+              <span style={{ color: 'var(--accent-gold)' }}>{iconMap[item.icon] || null}</span>
               <span
                 style={{
                   fontFamily: 'Inter, system-ui, sans-serif',
                   fontSize: '14px',
                   fontWeight: 400,
-                  color: '#e0e0e8',
+                  color: 'var(--text-primary)',
                 }}
               >
                 {item.value}
@@ -202,17 +202,17 @@ export default function Contact() {
                 fontFamily: isRtl ? 'Cairo, system-ui, sans-serif' : 'Inter, system-ui, sans-serif',
                 fontSize: '12px',
                 fontWeight: 600,
-                color: '#8b8b9a',
+                color: 'var(--text-muted)',
                 letterSpacing: isRtl ? '0' : '1px',
                 textTransform: 'uppercase',
                 textDecoration: 'none',
                 transition: 'color 0.3s ease',
               }}
               onMouseEnter={(e) => {
-                (e.target as HTMLAnchorElement).style.color = '#c9a84c';
+                (e.target as HTMLAnchorElement).style.color = 'var(--accent-gold)';
               }}
               onMouseLeave={(e) => {
-                (e.target as HTMLAnchorElement).style.color = '#8b8b9a';
+                (e.target as HTMLAnchorElement).style.color = 'var(--text-muted)';
               }}
             >
               {link.label}

@@ -72,7 +72,7 @@ export default function Education() {
       id="education"
       ref={sectionRef}
       style={{
-        backgroundColor: '#050508',
+        backgroundColor: 'transparent',
         position: 'relative',
         zIndex: 2,
       }}
@@ -92,7 +92,7 @@ export default function Education() {
                 fontFamily: isRtl ? 'Cairo, system-ui, sans-serif' : 'Inter, system-ui, sans-serif',
                 fontSize: '11px',
                 fontWeight: 600,
-                color: '#c9a84c',
+                color: 'var(--accent-gold)',
                 letterSpacing: isRtl ? '0' : '3px',
                 textTransform: 'uppercase',
                 marginBottom: '20px',
@@ -105,7 +105,7 @@ export default function Education() {
                 fontFamily: isRtl ? 'Cairo, system-ui, sans-serif' : '"Space Grotesk", system-ui, sans-serif',
                 fontSize: 'clamp(32px, 4vw, 48px)',
                 fontWeight: 500,
-                color: '#e0e0e8',
+                color: 'var(--text-heading)',
                 letterSpacing: isRtl ? '0' : '-0.01em',
               }}
             >
@@ -126,8 +126,8 @@ export default function Education() {
                 key={entry.institution}
                 ref={(el) => { cardRefs.current[i] = el; }}
                 style={{
-                  background: 'rgba(201, 168, 76, 0.03)',
-                  border: '1px solid rgba(201, 168, 76, 0.1)',
+                  background: 'var(--glass-bg)',
+                  border: '1px solid var(--border-primary)',
                   borderRadius: '4px',
                   padding: '36px 32px',
                   position: 'relative',
@@ -136,10 +136,10 @@ export default function Education() {
                   textAlign: isRtl ? 'right' : 'left',
                 }}
                 onMouseEnter={(e) => {
-                  (e.currentTarget as HTMLDivElement).style.borderColor = 'rgba(201, 168, 76, 0.25)';
+                  (e.currentTarget as HTMLDivElement).style.borderColor = 'var(--border-highlight)';
                 }}
                 onMouseLeave={(e) => {
-                  (e.currentTarget as HTMLDivElement).style.borderColor = 'rgba(201, 168, 76, 0.1)';
+                  (e.currentTarget as HTMLDivElement).style.borderColor = 'var(--border-primary)';
                 }}
               >
                 {/* Accent bar */}
@@ -150,7 +150,7 @@ export default function Education() {
                     left: 0,
                     right: 0,
                     height: '3px',
-                    background: 'linear-gradient(90deg, #c9a84c, rgba(201, 168, 76, 0.2))',
+                    background: 'linear-gradient(90deg, var(--accent-gold), rgba(201, 168, 76, 0.2))',
                   }}
                 />
 
@@ -168,7 +168,7 @@ export default function Education() {
                       fontFamily: '"JetBrains Mono", monospace',
                       fontSize: '11px',
                       fontWeight: 400,
-                      color: '#c9a84c',
+                      color: 'var(--accent-gold)',
                       letterSpacing: '1px',
                     }}
                   >
@@ -181,7 +181,7 @@ export default function Education() {
                         fontSize: '10px',
                         fontWeight: 600,
                         color: '#050508',
-                        background: '#c9a84c',
+                        background: 'var(--accent-gold)',
                         padding: '3px 10px',
                         borderRadius: '100px',
                         letterSpacing: isRtl ? '0' : '0.5px',
@@ -198,7 +198,7 @@ export default function Education() {
                     fontFamily: isRtl ? 'Cairo, system-ui, sans-serif' : '"Space Grotesk", system-ui, sans-serif',
                     fontSize: '18px',
                     fontWeight: 500,
-                    color: '#f5f5f0',
+                    color: 'var(--text-heading)',
                     marginBottom: '10px',
                     lineHeight: 1.3,
                   }}
@@ -210,7 +210,7 @@ export default function Education() {
                     fontFamily: isRtl ? 'Cairo, system-ui, sans-serif' : 'Inter, system-ui, sans-serif',
                     fontSize: '13px',
                     fontWeight: 400,
-                    color: '#8b8b9a',
+                    color: 'var(--text-muted)',
                     lineHeight: 1.5,
                   }}
                 >
@@ -229,7 +229,7 @@ export default function Education() {
                 fontFamily: isRtl ? 'Cairo, system-ui, sans-serif' : 'Inter, system-ui, sans-serif',
                 fontSize: '11px',
                 fontWeight: 600,
-                color: '#c9a84c',
+                color: 'var(--accent-gold)',
                 letterSpacing: isRtl ? '0' : '3px',
                 textTransform: 'uppercase',
                 marginBottom: '20px',
@@ -242,7 +242,7 @@ export default function Education() {
                 fontFamily: isRtl ? 'Cairo, system-ui, sans-serif' : '"Space Grotesk", system-ui, sans-serif',
                 fontSize: 'clamp(24px, 3vw, 36px)',
                 fontWeight: 500,
-                color: '#e0e0e8',
+                color: 'var(--text-heading)',
                 letterSpacing: isRtl ? '0' : '-0.01em',
               }}
             >
@@ -269,9 +269,9 @@ export default function Education() {
                   fontFamily: isRtl ? 'Cairo, system-ui, sans-serif' : 'Inter, system-ui, sans-serif',
                   fontSize: '12px',
                   fontWeight: 500,
-                  color: '#e0e0e8',
-                  background: 'rgba(201, 168, 76, 0.06)',
-                  border: '1px solid rgba(201, 168, 76, 0.12)',
+                  color: 'var(--text-primary)',
+                  background: 'var(--glass-bg)',
+                  border: '1px solid var(--border-primary)',
                   padding: '10px 18px',
                   borderRadius: '100px',
                   transition: 'background 0.3s ease, border-color 0.3s ease, color 0.3s ease',
@@ -279,15 +279,13 @@ export default function Education() {
                 }}
                 onMouseEnter={(e) => {
                   const el = e.currentTarget as HTMLSpanElement;
-                  el.style.background = 'rgba(201, 168, 76, 0.12)';
-                  el.style.borderColor = 'rgba(201, 168, 76, 0.3)';
-                  el.style.color = '#c9a84c';
+                  el.style.borderColor = 'var(--border-highlight)';
+                  el.style.color = 'var(--accent-gold)';
                 }}
                 onMouseLeave={(e) => {
                   const el = e.currentTarget as HTMLSpanElement;
-                  el.style.background = 'rgba(201, 168, 76, 0.06)';
-                  el.style.borderColor = 'rgba(201, 168, 76, 0.12)';
-                  el.style.color = '#e0e0e8';
+                  el.style.borderColor = 'var(--border-primary)';
+                  el.style.color = 'var(--text-primary)';
                 }}
               >
                 {item}
