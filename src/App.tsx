@@ -11,6 +11,9 @@ import Contact from './sections/Contact';
 import Footer from './sections/Footer';
 import ParchmentUnroll from './effects/ParchmentUnroll';
 import { siteConfig } from './config';
+import { ThemeProvider } from './context/ThemeContext';
+
+import HeroSphere from './effects/HeroSphere';
 
 function App() {
   useLenis();
@@ -29,7 +32,10 @@ function App() {
   }, []);
 
   return (
-    <>
+    <ThemeProvider>
+      <div style={{ position: 'fixed', inset: 0, zIndex: -1, pointerEvents: 'none', backgroundColor: 'var(--bg-primary)', transition: 'background-color 0.4s ease' }}>
+        <HeroSphere showSphere={false} />
+      </div>
       <Navigation />
       <ParchmentUnroll />
       <main>
@@ -42,7 +48,7 @@ function App() {
         <Contact />
         <Footer />
       </main>
-    </>
+    </ThemeProvider>
   );
 }
 

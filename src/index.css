@@ -13,7 +13,23 @@
 }
 
 @layer base {
-  :root {
+  :root, .dark {
+    --bg-primary: #050508;
+    --bg-secondary: #0a0a0f;
+    --bg-card: rgba(10, 10, 15, 0.7);
+    --bg-card-hover: rgba(201, 168, 76, 0.08);
+    --border-primary: rgba(201, 168, 76, 0.15);
+    --border-highlight: rgba(201, 168, 76, 0.5);
+    --text-primary: #e0e0e8;
+    --text-heading: #fff9dc;
+    --text-muted: #8b8b9a;
+    --accent-gold: #c9a84c;
+    --accent-gold-hover: #e0bd5a;
+    --glass-bg: rgba(10, 10, 15, 0.75);
+    --glass-border: rgba(201, 168, 76, 0.25);
+    --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+    --hero-glow: rgba(201, 168, 76, 0.15);
+
     --background: 240 33% 2%;
     --foreground: 240 10% 90%;
     --card: 240 25% 4%;
@@ -44,12 +60,52 @@
     --sidebar-ring: 43 55% 50%;
   }
 
+  .light {
+    --bg-primary: #f4f5f8;
+    --bg-secondary: #ffffff;
+    --bg-card: rgba(255, 255, 255, 0.88);
+    --bg-card-hover: rgba(184, 134, 11, 0.08);
+    --border-primary: rgba(184, 134, 11, 0.25);
+    --border-highlight: rgba(184, 134, 11, 0.6);
+    --text-primary: #1e293b;
+    --text-heading: #0f172a;
+    --text-muted: #64748b;
+    --accent-gold: #b8860b;
+    --accent-gold-hover: #d4af37;
+    --glass-bg: rgba(255, 255, 255, 0.82);
+    --glass-border: rgba(184, 134, 11, 0.35);
+    --glass-shadow: 0 10px 30px rgba(0, 0, 0, 0.08), inset 0 1px 1px rgba(255, 255, 255, 0.9);
+    --hero-glow: rgba(184, 134, 11, 0.2);
+
+    --background: 220 20% 97%;
+    --foreground: 222 47% 11%;
+    --card: 0 0% 100%;
+    --card-foreground: 222 47% 11%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 47% 11%;
+    --primary: 43 75% 38%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 215 16% 47%;
+    --secondary-foreground: 222 47% 11%;
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+    --accent: 43 75% 38%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 43 75% 38%;
+  }
+
   body {
-    @apply bg-void text-platinum;
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
     font-family: 'Inter', system-ui, sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     overflow-wrap: break-word;
+    transition: background-color 0.4s ease, color 0.4s ease;
   }
 
   h1, h2, h3, h4, h5, h6 {
@@ -80,14 +136,14 @@
 
 @layer components {
   .liquid-glass {
-    background: rgba(10, 10, 15, 0.01);
-    background-blend-mode: luminosity;
-    backdrop-filter: blur(8px) saturate(150%);
-    -webkit-backdrop-filter: blur(8px) saturate(150%);
-    border: none;
-    box-shadow: inset 0 1px 1px rgba(201, 168, 76, 0.06), 0 8px 32px rgba(0, 0, 0, 0.4);
+    background: var(--glass-bg);
+    backdrop-filter: blur(12px) saturate(150%);
+    -webkit-backdrop-filter: blur(12px) saturate(150%);
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--glass-shadow);
     position: relative;
     overflow: hidden;
+    transition: background-color 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease;
   }
 
   .liquid-glass::before {
@@ -113,6 +169,12 @@
     background: radial-gradient(ellipse 90% 40% at 50% 0%, rgba(201, 168, 76, 0.12) 0%, transparent 55%), radial-gradient(ellipse 60% 35% at 65% 10%, rgba(201, 168, 76, 0.05) 0%, transparent 50%);
     mix-blend-mode: overlay;
     pointer-events: none;
+  }
+
+  .light .liquid-glass {
+    background: rgba(255, 255, 255, 0.85);
+    border: 1px solid rgba(184, 134, 11, 0.3);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06), inset 0 1px 1px rgba(255, 255, 255, 0.9);
   }
 }
 

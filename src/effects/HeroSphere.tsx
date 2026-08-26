@@ -18,7 +18,6 @@ export default function HeroSphere({ showSphere = true }: HeroSphereProps) {
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 1000);
 
-    // Responsive: push camera back on smaller screens so sphere isn't overwhelming
     const getCameraZ = (width: number) => {
       if (width < 480) return 8.5;   // phone
       if (width < 768) return 7.5;   // small tablet
@@ -50,12 +49,13 @@ export default function HeroSphere({ showSphere = true }: HeroSphereProps) {
     let nodes: THREE.Points | null = null;
     let streak: THREE.Mesh | null = null;
 
+    const isLightMode = () => document.documentElement.classList.contains('light');
+
     if (showSphere) {
       // ── Geodesic sphere (icosahedron) ────────────────────────
       const detail = 3;
       geometry = new THREE.IcosahedronGeometry(1.6, detail);
 
-      // Displace vertices for organic look
       const posAttr = geometry.getAttribute('position');
       const vertex = new THREE.Vector3();
       for (let i = 0; i < posAttr.count; i++) {
@@ -66,22 +66,20 @@ export default function HeroSphere({ showSphere = true }: HeroSphereProps) {
       }
       geometry.computeVertexNormals();
 
-      // Dark faces with gold metallic tint
       faceMaterial = new THREE.MeshPhysicalMaterial({
-        color: 0x1a1408,
+        color: isLightMode() ? 0xd4af37 : 0x1a1408,
         metalness: 0.9,
         roughness: 0.2,
         transparent: true,
-        opacity: 0.75,
+        opacity: isLightMode() ? 0.45 : 0.75,
         side: THREE.DoubleSide,
         envMapIntensity: 1.0,
-        emissive: 0x1a1005,
+        emissive: isLightMode() ? 0x9a7516 : 0x1a1005,
         emissiveIntensity: 0.3,
       });
       faceMesh = new THREE.Mesh(geometry, faceMaterial);
       scene.add(faceMesh);
 
-      // Gold wireframe overlay
       wireGeometry = new THREE.IcosahedronGeometry(1.6, detail);
       const wirePos = wireGeometry.getAttribute('position');
       for (let i = 0; i < wirePos.count; i++) {
@@ -90,15 +88,15 @@ export default function HeroSphere({ showSphere = true }: HeroSphereProps) {
       wireGeometry.computeVertexNormals();
 
       wireMaterial = new THREE.MeshBasicMaterial({
-        color: 0xd4b75a,
+        color: isLightMode() ? 0xb8860b : 0xd4b75a,
         wireframe: true,
         transparent: true,
-        opacity: 0.55,
+        opacity: isLightMode() ? 0.75 : 0.55,
       });
       wireMesh = new THREE.Mesh(wireGeometry, wireMaterial);
       scene.add(wireMesh);
 
-      // ── Glowing nodes at vertices ────────────────────────────
+      // ── Glowing nodes ────────────────────────────
       const nodePositions: number[] = [];
       const usedIndices = new Set<string>();
       for (let i = 0; i < posAttr.count; i++) {
@@ -117,7 +115,7 @@ export default function HeroSphere({ showSphere = true }: HeroSphereProps) {
       nodeGeometry = new THREE.BufferGeometry();
       nodeGeometry.setAttribute('position', new THREE.Float32BufferAttribute(nodePositions, 3));
       nodeMaterial = new THREE.PointsMaterial({
-        color: 0xf0d06a,
+        color: isLightMode() ? 0x9a7516 : 0xf0d06a,
         size: 0.06,
         transparent: true,
         opacity: 1.0,
@@ -147,7 +145,7 @@ export default function HeroSphere({ showSphere = true }: HeroSphereProps) {
 
       streakGeometry = new THREE.PlaneGeometry(8, 0.008);
       streakMaterial = new THREE.MeshBasicMaterial({
-        color: 0xd4b75a,
+        color: isLightMode() ? 0xb8860b : 0xd4b75a,
         transparent: true,
         opacity: 0.25,
         side: THREE.DoubleSide,
@@ -181,14 +179,39 @@ export default function HeroSphere({ showSphere = true }: HeroSphereProps) {
     const particleGeometry = new THREE.BufferGeometry();
     particleGeometry.setAttribute('position', new THREE.Float32BufferAttribute(particlePositions, 3));
     const particleMaterial = new THREE.PointsMaterial({
-      color: 0xe0c060,
-      size: showSphere ? 0.025 : 0.02,
+      color: isLightMode() ? 0x8a6308 : 0xe0c060,
+      size: showSphere ? 0.025 : 0.022,
       transparent: true,
-      opacity: showSphere ? 0.7 : 0.55,
+      opacity: isLightMode() ? 0.8 : (showSphere ? 0.7 : 0.55),
       sizeAttenuation: true,
     });
     const particles = new THREE.Points(particleGeometry, particleMaterial);
     scene.add(particles);
+
+    // Dynamic theme updater
+    const updateThemeColors = () => {
+      const light = isLightMode();
+      particleMaterial.color.setHex(light ? 0x8a6308 : 0xe0c060);
+      particleMaterial.opacity = light ? 0.8 : (showSphere ? 0.7 : 0.55);
+
+      if (wireMaterial) wireMaterial.color.setHex(light ? 0xb8860b : 0xd4b75a);
+      if (nodeMaterial) nodeMaterial.color.setHex(light ? 0x9a7516 : 0xf0d06a);
+      if (faceMaterial) {
+        faceMaterial.color.setHex(light ? 0xd4af37 : 0x1a1408);
+        faceMaterial.opacity = light ? 0.45 : 0.75;
+      }
+      if (streakMaterial) streakMaterial.color.setHex(light ? 0xb8860b : 0xd4b75a);
+    };
+
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        if (mutation.attributeName === 'class') {
+          updateThemeColors();
+        }
+      });
+    });
+
+    observer.observe(document.documentElement, { attributes: true });
 
     // ── Animation loop ───────────────────────────────────────
     const clock = new THREE.Clock();
@@ -197,7 +220,6 @@ export default function HeroSphere({ showSphere = true }: HeroSphereProps) {
       frameRef.current = requestAnimationFrame(animate);
       const elapsed = clock.getElapsedTime();
 
-      // Slow rotation
       if (faceMesh && wireMesh && nodes) {
         faceMesh.rotation.y = elapsed * 0.12;
         faceMesh.rotation.x = elapsed * 0.05;
@@ -207,7 +229,6 @@ export default function HeroSphere({ showSphere = true }: HeroSphereProps) {
         nodes.rotation.x = elapsed * 0.05;
       }
 
-      // Particles drift
       const pPos = particleGeometry.getAttribute('position') as THREE.BufferAttribute;
       for (let i = 0; i < particleCount; i++) {
         const ix = i * 3;
@@ -218,7 +239,7 @@ export default function HeroSphere({ showSphere = true }: HeroSphereProps) {
       pPos.needsUpdate = true;
 
       if (wireMaterial) {
-        wireMaterial.opacity = 0.5 + Math.sin(elapsed * 0.8) * 0.1;
+        wireMaterial.opacity = (isLightMode() ? 0.65 : 0.5) + Math.sin(elapsed * 0.8) * 0.1;
       }
 
       if (streakMaterial) {
@@ -245,6 +266,7 @@ export default function HeroSphere({ showSphere = true }: HeroSphereProps) {
 
     // ── Cleanup ──────────────────────────────────────────────
     return () => {
+      observer.disconnect();
       window.removeEventListener('resize', handleResize);
       cancelAnimationFrame(frameRef.current);
       renderer.dispose();

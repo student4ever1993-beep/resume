@@ -41,7 +41,7 @@ export default function Footer() {
     <footer
       id="footer"
       style={{
-        backgroundColor: '#050508',
+        backgroundColor: 'transparent',
         position: 'relative',
         zIndex: 2,
         padding: '80px 24px 40px',
@@ -61,7 +61,7 @@ export default function Footer() {
               fontFamily: '"Space Grotesk", system-ui, sans-serif',
               fontSize: '24px',
               fontWeight: 500,
-              color: '#e0e0e8',
+              color: 'var(--text-heading)',
               letterSpacing: '3px',
               textTransform: 'uppercase',
             }}
@@ -75,7 +75,7 @@ export default function Footer() {
                 fontFamily: isRtl ? 'Cairo, system-ui, sans-serif' : 'Inter, system-ui, sans-serif',
                 fontSize: '13px',
                 fontWeight: 400,
-                color: '#8b8b9a',
+                color: 'var(--text-muted)',
                 marginTop: '4px',
               }}
             >
@@ -101,7 +101,7 @@ export default function Footer() {
                   fontFamily: isRtl ? 'Cairo, system-ui, sans-serif' : 'Inter, system-ui, sans-serif',
                   fontSize: '11px',
                   fontWeight: 600,
-                  color: '#c9a84c',
+                  color: 'var(--accent-gold)',
                   letterSpacing: isRtl ? '0' : '2px',
                   textTransform: 'uppercase',
                   marginBottom: '20px',
@@ -119,16 +119,16 @@ export default function Footer() {
                         fontFamily: isRtl ? 'Cairo, system-ui, sans-serif' : 'Inter, system-ui, sans-serif',
                         fontSize: '13px',
                         fontWeight: 400,
-                        color: '#8b8b9a',
+                        color: 'var(--text-muted)',
                         textDecoration: 'none',
                         lineHeight: 2.2,
                         transition: 'color 0.3s ease',
                       }}
                       onMouseEnter={(e) => {
-                        (e.target as HTMLAnchorElement).style.color = '#e0e0e8';
+                        (e.target as HTMLAnchorElement).style.color = 'var(--text-heading)';
                       }}
                       onMouseLeave={(e) => {
-                        (e.target as HTMLAnchorElement).style.color = '#8b8b9a';
+                        (e.target as HTMLAnchorElement).style.color = 'var(--text-muted)';
                       }}
                     >
                       {link.label}
@@ -145,7 +145,7 @@ export default function Footer() {
           style={{
             marginTop: '60px',
             paddingTop: '24px',
-            borderTop: '1px solid rgba(201, 168, 76, 0.06)',
+            borderTop: '1px solid var(--border-primary)',
             textAlign: isRtl ? 'center' : 'left',
           }}
         >
@@ -154,7 +154,7 @@ export default function Footer() {
               fontFamily: isRtl ? 'Cairo, system-ui, sans-serif' : 'Inter, system-ui, sans-serif',
               fontSize: '12px',
               fontWeight: 400,
-              color: '#4a4a5a',
+              color: 'var(--text-muted)',
             }}
           >
             {t('footer.copyright')}

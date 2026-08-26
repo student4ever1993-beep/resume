@@ -43,6 +43,7 @@ function MinimalStars() {
 
     const animate = () => {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
+      const isLightMode = document.documentElement.classList.contains('light');
       
       stars.forEach((star) => {
         star.opacity += star.twinkleSpeed;
@@ -51,8 +52,8 @@ function MinimalStars() {
         }
         
         ctx.save();
-        ctx.globalAlpha = Math.max(0, Math.min(1, star.opacity));
-        ctx.fillStyle = '#c9a84c';
+        ctx.globalAlpha = Math.max(0, Math.min(1, isLightMode ? star.opacity * 0.8 : star.opacity));
+        ctx.fillStyle = isLightMode ? '#b8860b' : '#c9a84c';
         ctx.beginPath();
         ctx.arc(star.x, star.y, star.size, 0, Math.PI * 2);
         ctx.fill();
@@ -144,7 +145,7 @@ export default function Anatomy() {
     <section
       id="skills"
       style={{
-        backgroundColor: '#050508', // Dark premium background
+        backgroundColor: 'transparent', // Dark premium background
         position: 'relative',
         zIndex: 2,
         minHeight: '100vh',
@@ -162,7 +163,7 @@ export default function Anatomy() {
               fontFamily: isRtl ? 'Cairo, system-ui, sans-serif' : 'Inter, system-ui, sans-serif',
               fontSize: '12px',
               fontWeight: 600,
-              color: '#c9a84c',
+              color: 'var(--accent-gold)',
               letterSpacing: isRtl ? '0' : '4px',
               textTransform: 'uppercase',
               marginBottom: '16px',
@@ -175,7 +176,7 @@ export default function Anatomy() {
               fontFamily: isRtl ? 'Cairo, system-ui, sans-serif' : '"Space Grotesk", system-ui, sans-serif',
               fontSize: 'clamp(32px, 4vw, 48px)',
               fontWeight: 500,
-              color: '#f5f5f0',
+              color: 'var(--text-heading)',
             }}
           >
             Technical Skills
@@ -223,9 +224,9 @@ export default function Anatomy() {
               <div className="absolute inset-28 lg:inset-36 rounded-full border border-[rgba(201,168,76,0.3)] bg-[rgba(201,168,76,0.05)]" />
               
               {/* Central Pivot Hub */}
-              <div className="absolute w-16 h-16 lg:w-20 lg:h-20 rounded-full bg-[#121218] border border-[rgba(201,168,76,0.6)] shadow-[0_0_25px_rgba(201,168,76,0.3)] flex justify-center items-center z-20">
+              <div className="absolute w-16 h-16 lg:w-20 lg:h-20 rounded-full bg-[var(--bg-card)] border border-[rgba(201,168,76,0.6)] shadow-[0_0_25px_rgba(201,168,76,0.3)] flex justify-center items-center z-20">
                 <div className="w-6 h-6 lg:w-8 lg:h-8 rounded-full bg-[#c9a84c] shadow-[0_0_15px_#c9a84c,inset_0_0_10px_rgba(0,0,0,0.5)] flex justify-center items-center">
-                  <div className="w-2 h-2 rounded-full bg-[#121218]" />
+                  <div className="w-2 h-2 rounded-full bg-[var(--bg-card)]" />
                 </div>
               </div>
 
@@ -239,7 +240,7 @@ export default function Anatomy() {
                     className="absolute top-1/2 left-1/2 flex justify-end items-center pointer-events-none"
                     style={{
                       width: '100%',
-                      transform: `translate(-50%, -50%) rotate(${angle}deg)`,
+                      transform: `translate(-50%, -55%) rotate(${angle}deg)`,
                     }}
                   >
                      <motion.button
@@ -249,13 +250,12 @@ export default function Anatomy() {
                         transition={{ type: 'spring', damping: 25, stiffness: 60 }}
                         className={`pointer-events-auto relative flex justify-center items-center w-14 h-14 lg:w-16 lg:h-16 rounded-full cursor-pointer transition-all duration-300 translate-x-1/2 z-30 shadow-xl
                           ${activeTab === i 
-                            ? 'bg-[#c9a84c] text-[#050508] shadow-[0_0_30px_rgba(201,168,76,0.8)] scale-110 border-2 border-[#f5f5f0]' 
-                            : 'bg-[#1a1a24] text-[#c9a84c] border-2 border-[rgba(201,168,76,0.5)] hover:bg-[rgba(201,168,76,0.15)] hover:scale-110'
+                            ? 'bg-[#c9a84c] text-[#050508] shadow-[0_0_30px_rgba(201,168,76,0.8)] scale-110 border-2 border-[var(--text-heading)]' 
+                            : 'bg-[var(--bg-card)] text-[#c9a84c] border-2 border-[rgba(201,168,76,0.5)] hover:bg-[rgba(201,168,76,0.15)] hover:scale-110'
                           }
                         `}
                       >
                         {getIconForIndex(i)}
-                        {/* Optional label underneath the button could go here, but counter rotation handles the icon perfectly */}
                       </motion.button>
                   </div>
                 );
@@ -275,29 +275,27 @@ export default function Anatomy() {
                   className="w-full"
                 >
                   <div 
-                    className="liquid-glass p-8 lg:p-14 rounded-3xl border border-[rgba(201,168,76,0.25)] shadow-[0_20px_60px_rgba(0,0,0,0.5),inset_0_0_30px_rgba(201,168,76,0.05)]"
+                    className="liquid-glass p-8 lg:p-14 rounded-3xl border border-[rgba(201,168,76,0.25)] shadow-[var(--glass-shadow)]"
                     style={{ 
-                      background: 'linear-gradient(135deg, rgba(20,20,25,0.6) 0%, rgba(10,10,15,0.8) 100%)',
-                      backdropFilter: 'blur(16px)',
                       textAlign: isRtl ? 'right' : 'left' 
                     }}
                   >
                     <span 
-                      className="inline-block px-5 py-2 mb-6 rounded-full text-[11px] lg:text-xs font-bold tracking-[0.15em] bg-[rgba(201,168,76,0.1)] text-[#c9a84c] border border-[rgba(201,168,76,0.3)] uppercase"
+                      className="inline-block px-5 py-2 mb-6 rounded-full text-[11px] lg:text-xs font-bold tracking-[0.15em] bg-[rgba(201,168,76,0.1)] text-[var(--accent-gold)] border border-[rgba(201,168,76,0.3)] uppercase"
                       style={{ fontFamily: isRtl ? 'Cairo' : 'Inter' }}
                     >
                       {activePillar.label}
                     </span>
                     
                     <h3
-                      className="text-3xl lg:text-5xl font-semibold mb-6 text-[#f5f5f0] tracking-tight"
+                      className="text-3xl lg:text-5xl font-semibold mb-6 text-[var(--text-heading)] tracking-tight"
                       style={{ fontFamily: isRtl ? 'Cairo' : '"Space Grotesk"' }}
                     >
                       {activePillar.title}
                     </h3>
                     
                     <p
-                      className="text-[#8b8b9a] text-base lg:text-lg leading-relaxed font-light"
+                      className="text-[var(--text-muted)] text-base lg:text-lg leading-relaxed font-light"
                       style={{ fontFamily: isRtl ? 'Cairo' : 'Inter' }}
                     >
                       {activePillar.body}

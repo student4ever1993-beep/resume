@@ -140,7 +140,7 @@ export default function Manifesto() {
     <section
       id="manifesto"
       style={{
-        backgroundColor: '#050508',
+        backgroundColor: 'transparent',
         position: 'relative',
         zIndex: 2,
         overflow: 'hidden',
@@ -182,7 +182,7 @@ export default function Manifesto() {
                 fontFamily: isRtl ? 'Cairo, system-ui, sans-serif' : 'Inter, system-ui, sans-serif',
                 fontSize: '11px',
                 fontWeight: 600,
-                color: '#c9a84c',
+                color: 'var(--accent-gold)',
                 letterSpacing: isRtl ? '0' : '3px',
                 textTransform: 'uppercase',
                 marginBottom: '20px',
@@ -198,10 +198,10 @@ export default function Manifesto() {
                 fontSize: 'clamp(22px, 3vw, 30px)',
                 fontWeight: 500,
                 lineHeight: 1.4,
-                color: '#f5f5f0',
+                color: 'var(--text-heading)',
                 marginBottom: '24px',
-                borderLeft: isRtl ? 'none' : '3px solid #c9a84c',
-                borderRight: isRtl ? '3px solid #c9a84c' : 'none',
+                borderLeft: isRtl ? 'none' : '3px solid var(--accent-gold)',
+                borderRight: isRtl ? '3px solid var(--accent-gold)' : 'none',
                 paddingLeft: isRtl ? '0' : '20px',
                 paddingRight: isRtl ? '20px' : '0',
               }}
@@ -218,7 +218,7 @@ export default function Manifesto() {
                 fontSize: 'clamp(14px, 2vw, 15px)',
                 fontWeight: 400,
                 lineHeight: 1.75,
-                color: '#8b8b9a',
+                color: 'var(--text-muted)',
                 marginBottom: '40px',
               }}
             >
@@ -237,8 +237,8 @@ export default function Manifesto() {
               {/* Stat 1: Experience */}
               <div
                 style={{
-                  background: 'rgba(201, 168, 76, 0.02)',
-                  border: '1px solid rgba(201, 168, 76, 0.12)',
+                  background: 'var(--glass-bg)',
+                  border: '1px solid var(--border-primary)',
                   borderRadius: '6px',
                   padding: '20px 24px',
                   display: 'flex',
@@ -249,12 +249,10 @@ export default function Manifesto() {
                   textAlign: isRtl ? 'right' : 'left',
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.borderColor = 'rgba(201, 168, 76, 0.35)';
-                  e.currentTarget.style.background = 'rgba(201, 168, 76, 0.05)';
+                  e.currentTarget.style.borderColor = 'var(--border-highlight)';
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.borderColor = 'rgba(201, 168, 76, 0.12)';
-                  e.currentTarget.style.background = 'rgba(201, 168, 76, 0.02)';
+                  e.currentTarget.style.borderColor = 'var(--border-primary)';
                 }}
               >
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexDirection: isRtl ? 'row-reverse' : 'row' }}>
@@ -263,18 +261,18 @@ export default function Manifesto() {
                       fontFamily: isRtl ? 'Cairo, system-ui, sans-serif' : '"Space Grotesk", system-ui, sans-serif',
                       fontSize: 'clamp(18px, 2.5vw, 22px)',
                       fontWeight: 600,
-                      color: '#f5f5f0',
+                      color: 'var(--text-heading)',
                     }}
                   >
                     {stats?.experience?.value}
                   </span>
-                  <Briefcase size={18} color="#c9a84c" />
+                  <Briefcase size={18} color="var(--accent-gold)" />
                 </div>
                 <span
                   style={{
                     fontFamily: isRtl ? 'Cairo, system-ui, sans-serif' : 'Inter, system-ui, sans-serif',
                     fontSize: '12px',
-                    color: '#8b8b9a',
+                    color: 'var(--text-muted)',
                     lineHeight: 1.4,
                   }}
                 >
@@ -285,8 +283,8 @@ export default function Manifesto() {
               {/* Stat 2: Masters */}
               <div
                 style={{
-                  background: 'rgba(201, 168, 76, 0.02)',
-                  border: '1px solid rgba(201, 168, 76, 0.12)',
+                  background: 'var(--glass-bg)',
+                  border: '1px solid var(--border-primary)',
                   borderRadius: '6px',
                   padding: '20px 24px',
                   display: 'flex',
@@ -297,12 +295,10 @@ export default function Manifesto() {
                   textAlign: isRtl ? 'right' : 'left',
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.borderColor = 'rgba(201, 168, 76, 0.35)';
-                  e.currentTarget.style.background = 'rgba(201, 168, 76, 0.05)';
+                  e.currentTarget.style.borderColor = 'var(--border-highlight)';
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.borderColor = 'rgba(201, 168, 76, 0.12)';
-                  e.currentTarget.style.background = 'rgba(201, 168, 76, 0.02)';
+                  e.currentTarget.style.borderColor = 'var(--border-primary)';
                 }}
               >
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexDirection: isRtl ? 'row-reverse' : 'row' }}>
@@ -311,18 +307,18 @@ export default function Manifesto() {
                       fontFamily: isRtl ? 'Cairo, system-ui, sans-serif' : '"Space Grotesk", system-ui, sans-serif',
                       fontSize: 'clamp(18px, 2.5vw, 22px)',
                       fontWeight: 600,
-                      color: '#f5f5f0',
+                      color: 'var(--text-heading)',
                     }}
                   >
                     {stats?.masters?.value}
                   </span>
-                  <GraduationCap size={18} color="#c9a84c" />
+                  <GraduationCap size={18} color="var(--accent-gold)" />
                 </div>
                 <span
                   style={{
                     fontFamily: isRtl ? 'Cairo, system-ui, sans-serif' : 'Inter, system-ui, sans-serif',
                     fontSize: '12px',
-                    color: '#8b8b9a',
+                    color: 'var(--text-muted)',
                     lineHeight: 1.4,
                   }}
                 >
@@ -333,8 +329,8 @@ export default function Manifesto() {
               {/* Stat 3: Bachelors */}
               <div
                 style={{
-                  background: 'rgba(201, 168, 76, 0.02)',
-                  border: '1px solid rgba(201, 168, 76, 0.12)',
+                  background: 'var(--glass-bg)',
+                  border: '1px solid var(--border-primary)',
                   borderRadius: '6px',
                   padding: '20px 24px',
                   display: 'flex',
@@ -345,12 +341,10 @@ export default function Manifesto() {
                   textAlign: isRtl ? 'right' : 'left',
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.borderColor = 'rgba(201, 168, 76, 0.35)';
-                  e.currentTarget.style.background = 'rgba(201, 168, 76, 0.05)';
+                  e.currentTarget.style.borderColor = 'var(--border-highlight)';
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.borderColor = 'rgba(201, 168, 76, 0.12)';
-                  e.currentTarget.style.background = 'rgba(201, 168, 76, 0.02)';
+                  e.currentTarget.style.borderColor = 'var(--border-primary)';
                 }}
               >
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexDirection: isRtl ? 'row-reverse' : 'row' }}>
@@ -359,18 +353,18 @@ export default function Manifesto() {
                       fontFamily: isRtl ? 'Cairo, system-ui, sans-serif' : '"Space Grotesk", system-ui, sans-serif',
                       fontSize: 'clamp(18px, 2.5vw, 22px)',
                       fontWeight: 600,
-                      color: '#f5f5f0',
+                      color: 'var(--text-heading)',
                     }}
                   >
                     {stats?.bachelors?.value}
                   </span>
-                  <Settings size={18} color="#c9a84c" />
+                  <Settings size={18} color="var(--accent-gold)" />
                 </div>
                 <span
                   style={{
                     fontFamily: isRtl ? 'Cairo, system-ui, sans-serif' : 'Inter, system-ui, sans-serif',
                     fontSize: '12px',
-                    color: '#8b8b9a',
+                    color: 'var(--text-muted)',
                     lineHeight: 1.4,
                   }}
                 >
@@ -381,8 +375,8 @@ export default function Manifesto() {
               {/* Stat 4: Projects */}
               <div
                 style={{
-                  background: 'rgba(201, 168, 76, 0.02)',
-                  border: '1px solid rgba(201, 168, 76, 0.12)',
+                  background: 'var(--glass-bg)',
+                  border: '1px solid var(--border-primary)',
                   borderRadius: '6px',
                   padding: '20px 24px',
                   display: 'flex',
@@ -393,12 +387,10 @@ export default function Manifesto() {
                   textAlign: isRtl ? 'right' : 'left',
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.borderColor = 'rgba(201, 168, 76, 0.35)';
-                  e.currentTarget.style.background = 'rgba(201, 168, 76, 0.05)';
+                  e.currentTarget.style.borderColor = 'var(--border-highlight)';
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.borderColor = 'rgba(201, 168, 76, 0.12)';
-                  e.currentTarget.style.background = 'rgba(201, 168, 76, 0.02)';
+                  e.currentTarget.style.borderColor = 'var(--border-primary)';
                 }}
               >
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexDirection: isRtl ? 'row-reverse' : 'row' }}>
@@ -407,18 +399,18 @@ export default function Manifesto() {
                       fontFamily: isRtl ? 'Cairo, system-ui, sans-serif' : '"Space Grotesk", system-ui, sans-serif',
                       fontSize: 'clamp(18px, 2.5vw, 22px)',
                       fontWeight: 600,
-                      color: '#f5f5f0',
+                      color: 'var(--text-heading)',
                     }}
                   >
                     {stats?.projects?.value}
                   </span>
-                  <Award size={18} color="#c9a84c" />
+                  <Award size={18} color="var(--accent-gold)" />
                 </div>
                 <span
                   style={{
                     fontFamily: isRtl ? 'Cairo, system-ui, sans-serif' : 'Inter, system-ui, sans-serif',
                     fontSize: '12px',
-                    color: '#8b8b9a',
+                    color: 'var(--text-muted)',
                     lineHeight: 1.4,
                   }}
                 >

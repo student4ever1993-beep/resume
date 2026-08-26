@@ -1,16 +1,20 @@
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { getLenis } from '../hooks/useLenis';
+import ThemeToggle from '../components/ThemeToggle';
+import { useTheme } from '../context/ThemeContext';
 //import { navigationConfig } from '../config';
 
 export default function Navigation() {
   const { t, i18n } = useTranslation();
+  const { theme } = useTheme();
   const [scrolled, setScrolled] = useState(false);
   const [isLightSection, setIsLightSection] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const navRef = useRef<HTMLElement>(null);
 
   const isRtl = i18n.language === 'ar';
+  const isLight = theme === 'light';
 
   useEffect(() => {
     const handleScroll = () => {
@@ -56,8 +60,8 @@ export default function Navigation() {
     return () => { document.body.style.overflow = ''; };
   }, [menuOpen]);
 
-  const baseTextColor = isLightSection && !menuOpen ? '#050508' : '#e0e0e8';
-  const hoverTextColor = '#c9a84c';
+  const baseTextColor = isLight ? '#1e293b' : (isLightSection && !menuOpen ? '#050508' : '#e0e0e8');
+  const hoverTextColor = isLight ? '#b8860b' : '#c9a84c';
 
   const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, targetId: string) => {
     e.preventDefault();
@@ -134,12 +138,12 @@ export default function Navigation() {
             />
           </a>
 
-          {/* Desktop Links & Language Switcher */}
+          {/* Desktop Links & Controls */}
           <div
             className="nav-desktop-links"
             style={{
               display: 'flex',
-              gap: '30px',
+              gap: '24px',
               alignItems: 'center',
               flexDirection: isRtl ? 'row-reverse' : 'row',
             }}
@@ -181,40 +185,45 @@ export default function Navigation() {
                 fontFamily: isRtl ? 'Inter, system-ui, sans-serif' : 'Cairo, system-ui, sans-serif',
                 fontSize: '12px',
                 fontWeight: 700,
-                color: '#c9a84c',
-                backgroundColor: 'rgba(201, 168, 76, 0.08)',
-                border: '1px solid rgba(201, 168, 76, 0.3)',
+                color: isLight ? '#b8860b' : '#c9a84c',
+                backgroundColor: isLight ? 'rgba(184, 134, 11, 0.08)' : 'rgba(201, 168, 76, 0.08)',
+                border: `1px solid ${isLight ? 'rgba(184, 134, 11, 0.3)' : 'rgba(201, 168, 76, 0.3)'}`,
                 borderRadius: '4px',
                 padding: '6px 12px',
                 cursor: 'pointer',
                 transition: 'background 0.3s ease, color 0.3s ease',
-                marginLeft: isRtl ? '0' : '10px',
-                marginRight: isRtl ? '10px' : '0',
+                marginLeft: isRtl ? '0' : '4px',
+                marginRight: isRtl ? '4px' : '0',
               }}
               onMouseEnter={(e) => {
                 const el = e.currentTarget as HTMLButtonElement;
-                el.style.backgroundColor = 'rgba(201, 168, 76, 0.16)';
+                el.style.backgroundColor = isLight ? 'rgba(184, 134, 11, 0.16)' : 'rgba(201, 168, 76, 0.16)';
               }}
               onMouseLeave={(e) => {
                 const el = e.currentTarget as HTMLButtonElement;
-                el.style.backgroundColor = 'rgba(201, 168, 76, 0.08)';
+                el.style.backgroundColor = isLight ? 'rgba(184, 134, 11, 0.08)' : 'rgba(201, 168, 76, 0.08)';
               }}
             >
               {i18n.language === 'en' ? 'عربي' : 'EN'}
             </button>
+
+            {/* Theme Toggle Button */}
+            <ThemeToggle size="sm" />
           </div>
 
-          {/* Mobile Hamburger & Lang Switcher */}
+          {/* Mobile Hamburger & Controls */}
           <div style={{ display: 'none', alignItems: 'center', gap: '10px', flexDirection: isRtl ? 'row-reverse' : 'row' }} className="nav-mobile-toggle">
+            <ThemeToggle size="sm" />
+
             <button
               onClick={toggleLanguage}
               style={{
                 fontFamily: isRtl ? 'Inter, system-ui, sans-serif' : 'Cairo, system-ui, sans-serif',
                 fontSize: '11px',
                 fontWeight: 700,
-                color: '#c9a84c',
-                backgroundColor: 'rgba(201, 168, 76, 0.08)',
-                border: '1px solid rgba(201, 168, 76, 0.3)',
+                color: isLight ? '#b8860b' : '#c9a84c',
+                backgroundColor: isLight ? 'rgba(184, 134, 11, 0.08)' : 'rgba(201, 168, 76, 0.08)',
+                border: `1px solid ${isLight ? 'rgba(184, 134, 11, 0.3)' : 'rgba(201, 168, 76, 0.3)'}`,
                 borderRadius: '4px',
                 padding: '4px 10px',
                 cursor: 'pointer',
@@ -280,16 +289,16 @@ export default function Navigation() {
           position: 'fixed',
           inset: 0,
           zIndex: 99,
-          background: 'rgba(5, 5, 8, 0.97)',
+          background: isLight ? 'rgba(244, 245, 248, 0.97)' : 'rgba(5, 5, 8, 0.97)',
           backdropFilter: 'blur(20px)',
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
           justifyContent: 'center',
-          gap: '32px',
+          gap: '28px',
           opacity: menuOpen ? 1 : 0,
           pointerEvents: menuOpen ? 'auto' : 'none',
-          transition: 'opacity 0.4s ease',
+          transition: 'opacity 0.4s ease, background-color 0.4s ease',
         }}
       >
         {links.map((item) => (
@@ -301,22 +310,26 @@ export default function Navigation() {
               fontFamily: isRtl ? 'Cairo, system-ui, sans-serif' : '"Space Grotesk", system-ui, sans-serif',
               fontSize: '24px',
               fontWeight: 500,
-              color: '#e0e0e8',
+              color: isLight ? '#0f172a' : '#e0e0e8',
               letterSpacing: isRtl ? '0' : '3px',
               textDecoration: 'none',
               textTransform: 'uppercase',
               transition: 'color 0.3s ease',
             }}
             onMouseEnter={(e) => {
-              (e.target as HTMLAnchorElement).style.color = '#c9a84c';
+              (e.target as HTMLAnchorElement).style.color = hoverTextColor;
             }}
             onMouseLeave={(e) => {
-              (e.target as HTMLAnchorElement).style.color = '#e0e0e8';
+              (e.target as HTMLAnchorElement).style.color = isLight ? '#0f172a' : '#e0e0e8';
             }}
           >
             {item.label}
           </a>
         ))}
+
+        <div style={{ marginTop: '16px' }}>
+          <ThemeToggle size="lg" />
+        </div>
       </div>
     </>
   );

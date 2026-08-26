@@ -103,7 +103,7 @@ export default function Projects() {
       id="projects"
       ref={sectionRef}
       style={{
-        backgroundColor: '#0a0a0f',
+        backgroundColor: 'transparent',
         position: 'relative',
         zIndex: 2,
         overflow: 'hidden',
@@ -140,10 +140,10 @@ export default function Projects() {
           left: 0;
           width: 100%;
           height: 100%;
-          background: #111118;
+          background: var(--bg-card);
           border-radius: 16px;
           overflow: hidden;
-          transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+          transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.6s cubic-bezier(0.25, 1, 0.5, 1), background 0.4s ease;
           display: flex;
           flex-direction: column;
           transform: translateX(calc(var(--offset) * var(--tx-percent) * var(--dir)))
@@ -151,15 +151,15 @@ export default function Projects() {
                      rotateY(calc(var(--offset) * var(--rot-deg) * var(--dir)));
         }
         .proj-card--active {
-          border: 1px solid rgba(201, 168, 76, 0.35);
-          box-shadow: 0px 20px 50px rgba(0, 0, 0, 0.5), 0 0 40px rgba(201, 168, 76, 0.05);
+          border: 1px solid var(--border-highlight);
+          box-shadow: var(--glass-shadow);
           opacity: 1;
           z-index: 10;
           pointer-events: auto;
         }
         .proj-card--side {
-          border: 1px solid rgba(255, 255, 255, 0.03);
-          box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.3);
+          border: 1px solid var(--border-primary);
+          box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.15);
           opacity: 0.35;
           pointer-events: none;
         }
@@ -182,8 +182,9 @@ export default function Projects() {
           font-family: 'JetBrains Mono', monospace;
           font-size: 11px;
           font-weight: 600;
-          color: #c9a84c;
-          background: rgba(255, 255, 255, 0.05);
+          color: var(--accent-gold);
+          background: var(--glass-bg);
+          border: 1px solid var(--border-primary);
           padding: 6px 14px;
           border-radius: 20px;
           white-space: nowrap;
@@ -192,8 +193,9 @@ export default function Projects() {
           font-family: 'JetBrains Mono', monospace;
           font-size: 11px;
           font-weight: 600;
-          color: #c9a84c;
-          background: rgba(255, 255, 255, 0.05);
+          color: var(--accent-gold);
+          background: var(--glass-bg);
+          border: 1px solid var(--border-primary);
           padding: 6px 14px;
           border-radius: 20px;
           white-space: nowrap;
@@ -205,12 +207,13 @@ export default function Projects() {
         }
         .proj-contribution-box {
           flex: 1;
-          background: rgba(255, 255, 255, 0.04);
+          background: var(--glass-bg);
+          border: 1px solid var(--border-primary);
           border-radius: 10px;
           padding: 16px 18px;
           font-family: Inter, sans-serif;
           font-size: 13px;
-          color: #9a9aaf;
+          color: var(--text-muted);
           line-height: 1.6;
         }
         .proj-tags-box {
@@ -218,7 +221,7 @@ export default function Projects() {
           flex-direction: column;
           gap: 10px;
           justify-content: center;
-          border: 1px solid rgba(201, 168, 76, 0.35);
+          border: 1px solid var(--border-highlight);
           border-radius: 10px;
           padding: 14px 16px;
           min-width: 140px;
@@ -227,9 +230,10 @@ export default function Projects() {
           font-family: 'JetBrains Mono', monospace;
           font-size: 11px;
           font-weight: 600;
-          color: #e0bd6b;
+          color: var(--accent-gold);
           white-space: nowrap;
-          background: rgba(201, 168, 76, 0.16);
+          background: var(--glass-bg);
+          border: 1px solid var(--border-primary);
           padding: 8px 14px;
           border-radius: 8px;
         }
@@ -335,7 +339,7 @@ export default function Projects() {
               fontFamily: isRtl ? 'Cairo, system-ui, sans-serif' : 'Inter, system-ui, sans-serif',
               fontSize: '11px',
               fontWeight: 600,
-              color: '#c9a84c',
+              color: 'var(--accent-gold)',
               letterSpacing: isRtl ? '0' : '3px',
               textTransform: 'uppercase',
               marginBottom: '20px',
@@ -348,7 +352,7 @@ export default function Projects() {
               fontFamily: isRtl ? 'Cairo, system-ui, sans-serif' : '"Space Grotesk", system-ui, sans-serif',
               fontSize: 'clamp(32px, 4vw, 48px)',
               fontWeight: 500,
-              color: '#e0e0e8',
+              color: 'var(--text-heading)',
               letterSpacing: isRtl ? '0' : '-0.01em',
             }}
           >
