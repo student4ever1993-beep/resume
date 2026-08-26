@@ -8,11 +8,10 @@ import Anatomy from './sections/Anatomy';
 import Education from './sections/Education';
 import Projects from './sections/Projects';
 import Contact from './sections/Contact';
-import Footer from './sections/Footer';
+import ChatWidget from './components/ChatWidget';
 import ParchmentUnroll from './effects/ParchmentUnroll';
 import { siteConfig } from './config';
 import { ThemeProvider } from './context/ThemeContext';
-
 import HeroSphere from './effects/HeroSphere';
 
 function App() {
@@ -46,8 +45,8 @@ function App() {
         <Education />
         <Projects />
         <Contact />
-        <Footer />
       </main>
+      <ChatWidget />
     </ThemeProvider>
   );
 }
