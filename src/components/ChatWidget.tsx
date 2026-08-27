@@ -62,10 +62,15 @@ export default function ChatWidget() {
 Alya Al-Siyabi is a Senior Systems Analyst & Software Engineer at AMAN Business Consulting in Muscat, Oman, with over 5+ years of enterprise experience in Digital Transformation, Systems Architecture, React, Three.js 3D WebGL, Cloud Solutions, and Data Security.
 Your goal is to MARKET Alya's skills persuasively to clients, partners, and employers. Be enthusiastic, confident, and professional. Keep answers under 3 concise, impactful sentences. Answer in ${isRtl ? 'Arabic' : 'English'}.`;
 
-  // 1. Groq API Call (allam-2-7b / gpt-oss-20b)
-  const callGroqAPI = async (userMsg: string, modelId: string = 'allam-2-7b'): Promise<string | null> => {
+  // 1. Groq API Call (llama-3.1-8b-instant / llama-3.3-70b-versatile)
+  const callGroqAPI = async (userMsg: string, modelId: string = 'llama-3.1-8b-instant'): Promise<string | null> => {
     try {
       const apiKey = import.meta.env.VITE_GROQ_API_KEY || '';
+      if (!apiKey || apiKey.trim() === '') {
+        console.warn('VITE_GROQ_API_KEY is not configured in Vercel environment variables. Using Smart Fallback AI Engine.');
+        return null;
+      }
+
       const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
         method: 'POST',
         headers: {
@@ -79,7 +84,7 @@ Your goal is to MARKET Alya's skills persuasively to clients, partners, and empl
             { role: 'user', content: userMsg },
           ],
           temperature: 0.6,
-          max_tokens: 220,
+          max_tokens: 250,
         }),
       });
 
@@ -123,7 +128,7 @@ Your goal is to MARKET Alya's skills persuasively to clients, partners, and empl
     }
   };
 
-  // 3. Marketing Smart Fallback Engine
+  // 3. Marketing Smart Fallback Engine (Guarantees responses on Vercel)
   const getMarketingFallback = (userMsg: string): string => {
     const lower = userMsg.toLowerCase();
 
@@ -135,7 +140,7 @@ Your goal is to MARKET Alya's skills persuasively to clients, partners, and empl
 
     if (lower.includes('experience') || lower.includes('خبرة') || lower.includes('خبرات') || lower.includes('aman') || lower.includes('أمان')) {
       return isRtl
-        ? 'مع أكثر من 5 سنوات من التميز في شركة أمان للاستشارات وتطوير الأعمال بمحافظة مسقط، قادت علياء تحليل وتصميم البنى التحتية البرمجية المعقدة للمؤسسات. يمكنك تحميل سريتها الذاتية فوراً من الصفحة الرئيسية!'
+        ? 'مع أكثر من 5 سنوات من التميز في شركة أمان للاستشارات وتطوير الأعمال بمحافظة مسقط، قادت علياء تحليل وتصميم البنى التحتية البرمجية المعقدة للمؤسسات. يمكنك تحميل سيرتها الذاتية فوراً من قسم Hero!'
         : 'With over 5+ years of excellence at AMAN Business Consulting in Muscat, Oman, Alya has spearheaded enterprise systems analysis and cloud solution architectures. Download her CV from the Hero section to learn more!';
     }
 
@@ -145,9 +150,15 @@ Your goal is to MARKET Alya's skills persuasively to clients, partners, and empl
         : 'Alya combines cutting-edge engineering (React, Three.js WebGL) with strategic systems architecture and data security to deliver high-performance solutions. Shall we connect you with her?';
     }
 
+    if (lower.includes('contact') || lower.includes('hire') || lower.includes('email') || lower.includes('تواصل') || lower.includes('توظيف') || lower.includes('بريد')) {
+      return isRtl
+        ? `علياء مستعدة لقيادة نجاح مشروعك القادم! يمكنك التواصل معها مباشرة عبر البريد الإلكتروني: ${contactConfig.items.find(i => i.icon === 'Mail')?.value || 'aman@example.com'}`
+        : `Alya is ready to bring strategic technology leadership to your team! You can email her directly at ${contactConfig.items.find(i => i.icon === 'Mail')?.value || 'aman@example.com'} or request her full portfolio.`;
+    }
+
     return isRtl
-      ? `علياء مستعدة لقيادة نجاح مشروعك القادم! يمكنك التواصل معها مباشرة عبر البريد الإلكتروني: ${contactConfig.items.find(i => i.icon === 'Mail')?.value || 'aman@example.com'}`
-      : `Alya is ready to bring strategic technology leadership to your team! You can email her directly at ${contactConfig.items.find(i => i.icon === 'Mail')?.value || 'aman@example.com'} or request her full portfolio.`;
+      ? 'علياء السيابية مهندسة ومحللة نظم خبيرة بمسقط تتمتع بخبرة 5+ سنوات في التحول الرقمي وتطوير الحلول السحابية. يمكنك طرح أي سؤال عن مشاريعها أو حجز استشارة تقنية!'
+      : 'Alya Al-Siyabi is a Senior Systems Analyst & Engineer based in Muscat, Oman with 5+ years experience in Digital Transformation and Cloud Architecture. Feel free to ask about her projects or request a technical consultation!';
   };
 
   const handleSend = async (textToSend?: string) => {
@@ -167,9 +178,9 @@ Your goal is to MARKET Alya's skills persuasively to clients, partners, and empl
     let reply: string | null = null;
 
     if (selectedModel === 'groq') {
-      reply = await callGroqAPI(query, 'allam-2-7b');
+      reply = await callGroqAPI(query, 'llama-3.1-8b-instant');
     } else if (selectedModel === 'gpt20b') {
-      reply = await callGroqAPI(query, 'openai/gpt-oss-20b');
+      reply = await callGroqAPI(query, 'llama-3.3-70b-versatile');
     } else if (selectedModel === 'ollama') {
       reply = await callOllamaAPI(query);
     }
@@ -189,8 +200,8 @@ Your goal is to MARKET Alya's skills persuasively to clients, partners, and empl
   };
 
   const modelLabels: Record<ModelProvider, string> = {
-    groq: 'ALLaM 2.0 (Arabic & English 0.1s)',
-    gpt20b: 'GPT-OSS 20B (Groq LPU)',
+    groq: 'Llama 3.1 8B (Groq Fast LPU)',
+    gpt20b: 'Llama 3.3 70B (Groq Enterprise)',
     ollama: 'Ollama Unlimited Local',
     smart: 'Smart Marketing AI Engine',
   };
