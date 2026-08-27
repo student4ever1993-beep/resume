@@ -9,7 +9,7 @@ interface Message {
   text: string;
 }
 
-type ModelProvider = 'groq' | 'gpt20b' | 'ollama' | 'smart';
+type ModelProvider = 'groq' | 'gpt20b' | 'gemini';
 
 export default function ChatWidget() {
   const { i18n } = useTranslation();
@@ -94,34 +94,37 @@ Your goal is to MARKET Alya's skills persuasively to clients, partners, and empl
     }
   };
 
-  // 2. Ollama API Call
-  const callOllamaAPI = async (userMsg: string): Promise<string | null> => {
+  // 2. Google Gemini API Call via Vercel Serverless Function (/api/gemini)
+  const callGeminiAPI = async (userMsg: string): Promise<string | null> => {
     try {
-      const ollamaUrl = import.meta.env.VITE_OLLAMA_URL || 'http://localhost:11434/api/chat';
-      const model = import.meta.env.VITE_OLLAMA_MODEL || 'llama3';
-
-      const res = await fetch(ollamaUrl, {
+      const res = await fetch('/api/gemini', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+        },
         body: JSON.stringify({
-          model: model,
+          model: 'gemini-2.0-flash',
           messages: [
             { role: 'system', content: marketingSystemPrompt },
             { role: 'user', content: userMsg },
           ],
-          stream: false,
         }),
       });
 
-      if (!res.ok) return null;
+      if (!res.ok) {
+        const err = await res.text();
+        console.error('Gemini API Error via /api/gemini:', res.status, err);
+        return null;
+      }
       const data = await res.json();
-      return data.message?.content || null;
-    } catch {
+      return data.choices?.[0]?.message?.content || null;
+    } catch (err) {
+      console.error('Gemini Fetch Exception:', err);
       return null;
     }
   };
 
-  // 3. Marketing Smart Fallback Engine (Guarantees responses on Vercel)
+  // 3. Marketing Smart Fallback Engine (General Error Fallback)
   const getMarketingFallback = (userMsg: string): string => {
     const lower = userMsg.toLowerCase();
 
@@ -174,11 +177,11 @@ Your goal is to MARKET Alya's skills persuasively to clients, partners, and empl
       reply = await callGroqAPI(query, 'llama-3.1-8b-instant');
     } else if (selectedModel === 'gpt20b') {
       reply = await callGroqAPI(query, 'llama-3.3-70b-versatile');
-    } else if (selectedModel === 'ollama') {
-      reply = await callOllamaAPI(query);
+    } else if (selectedModel === 'gemini') {
+      reply = await callGeminiAPI(query);
     }
 
-    // Fallback if selected API failed or if smart model selected
+    // Fallback if selected API failed or returned error
     if (!reply) {
       reply = getMarketingFallback(query);
     }
@@ -195,8 +198,7 @@ Your goal is to MARKET Alya's skills persuasively to clients, partners, and empl
   const modelLabels: Record<ModelProvider, string> = {
     groq: 'Llama 3.1 8B (Groq Fast LPU)',
     gpt20b: 'Llama 3.3 70B (Groq Enterprise)',
-    ollama: 'Ollama Unlimited Local',
-    smart: 'Smart Marketing AI Engine',
+    gemini: 'Google Gemini 2.0 Flash',
   };
 
   return (
@@ -255,7 +257,7 @@ Your goal is to MARKET Alya's skills persuasively to clients, partners, and empl
                   {/* Dropdown Menu */}
                   {showModelMenu && (
                     <div className="absolute top-6 left-0 z-50 w-56 py-1 rounded-xl border border-[var(--border-highlight)] bg-[var(--bg-primary)] shadow-2xl backdrop-blur-md">
-                      {(['groq', 'gpt20b', 'ollama', 'smart'] as ModelProvider[]).map((prov) => (
+                      {(['groq', 'gpt20b', 'gemini'] as ModelProvider[]).map((prov) => (
                         <button
                           key={prov}
                           onClick={() => {
