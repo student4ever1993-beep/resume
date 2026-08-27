@@ -184,6 +184,10 @@
     box-shadow: 0 10px 35px rgba(184, 134, 11, 0.5) !important;
   }
 
+  .light nav .header-island img {
+    filter: brightness(0) invert(1) !important;
+  }
+
   .light nav .header-island .nav-link-item {
     color: #ffffff !important;
     opacity: 0.95 !important;
