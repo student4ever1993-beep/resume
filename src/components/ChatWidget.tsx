@@ -62,19 +62,12 @@ export default function ChatWidget() {
 Alya Al-Siyabi is a Senior Systems Analyst & Software Engineer at AMAN Business Consulting in Muscat, Oman, with over 5+ years of enterprise experience in Digital Transformation, Systems Architecture, React, Three.js 3D WebGL, Cloud Solutions, and Data Security.
 Your goal is to MARKET Alya's skills persuasively to clients, partners, and employers. Be enthusiastic, confident, and professional. Keep answers under 3 concise, impactful sentences. Answer in ${isRtl ? 'Arabic' : 'English'}.`;
 
-  // 1. Groq API Call (llama-3.1-8b-instant / llama-3.3-70b-versatile)
+  // 1. Groq API Call via Vercel Serverless Function (/api/groq)
   const callGroqAPI = async (userMsg: string, modelId: string = 'llama-3.1-8b-instant'): Promise<string | null> => {
     try {
-      const apiKey = import.meta.env.VITE_GROQ_API_KEY || '';
-      if (!apiKey || apiKey.trim() === '') {
-        console.warn('VITE_GROQ_API_KEY is not configured in Vercel environment variables. Using Smart Fallback AI Engine.');
-        return null;
-      }
-
-      const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+      const res = await fetch('/api/groq', {
         method: 'POST',
         headers: {
-          Authorization: `Bearer ${apiKey.trim()}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
@@ -90,7 +83,7 @@ Your goal is to MARKET Alya's skills persuasively to clients, partners, and empl
 
       if (!res.ok) {
         const err = await res.text();
-        console.error('Groq API Error:', res.status, err);
+        console.error('Groq API Error via /api/groq:', res.status, err);
         return null;
       }
       const data = await res.json();
