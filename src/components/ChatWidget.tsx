@@ -199,10 +199,10 @@ Your goal is to MARKET Alya's skills persuasively to clients, partners, and empl
 
   return (
     <>
-      {/* Floating 3D Phoenix Trigger Button */}
+      {/* Floating 3D Phoenix Trigger Button (Gold Background & White Phoenix) */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className={`fixed bottom-6 z-50 p-2.5 rounded-full bg-gradient-to-tr from-[#800000] via-[#ff3300] to-[#ffaa00] text-white shadow-[0_0_30px_rgba(255,85,0,0.65)] border border-[#ffaa00]/40 hover:scale-110 hover:shadow-[0_0_40px_rgba(255,140,0,0.85)] transition-all duration-300 flex items-center justify-center ${
+        className={`fixed bottom-6 z-50 p-2.5 rounded-full bg-gradient-to-tr from-[#9a7516] via-[#d4af37] to-[#ffd700] text-white shadow-[0_0_35px_rgba(212,175,55,0.75)] border border-[#ffe082]/60 hover:scale-110 hover:shadow-[0_0_45px_rgba(255,215,0,0.9)] transition-all duration-300 flex items-center justify-center ${
           isRtl ? 'left-6' : 'right-6'
         }`}
         aria-label="Open Phoenix AI Assistant"
@@ -215,8 +215,8 @@ Your goal is to MARKET Alya's skills persuasively to clients, partners, and empl
           <Phoenix3D size={52} interactive={true} />
         )}
         <span className="absolute -top-1 -right-1 flex h-3.5 w-3.5 pointer-events-none">
-          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
-          <span className="relative inline-flex rounded-full h-3.5 w-3.5 bg-orange-500"></span>
+          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-200 opacity-75"></span>
+          <span className="relative inline-flex rounded-full h-3.5 w-3.5 bg-amber-400"></span>
         </span>
       </button>
 
@@ -231,9 +231,9 @@ Your goal is to MARKET Alya's skills persuasively to clients, partners, and empl
           }}
         >
           {/* Header */}
-          <div className="flex items-center justify-between px-4 py-3 border-b border-[var(--border-primary)] bg-gradient-to-r from-[rgba(255,69,0,0.15)] via-[rgba(255,140,0,0.08)] to-transparent">
+          <div className="flex items-center justify-between px-4 py-3 border-b border-[var(--border-primary)] bg-gradient-to-r from-[rgba(212,175,55,0.18)] via-[rgba(201,168,76,0.1)] to-transparent">
             <div className="flex items-center gap-2.5">
-              <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-[#990000] via-[#ff3300] to-[#ffaa00] p-0.5 shadow-[0_0_12px_rgba(255,69,0,0.5)] flex items-center justify-center">
+              <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-[#9a7516] via-[#d4af37] to-[#ffd700] p-0.5 shadow-[0_0_12px_rgba(212,175,55,0.5)] flex items-center justify-center">
                 <Phoenix3D size={38} interactive={false} />
               </div>
               <div>
@@ -293,7 +293,7 @@ Your goal is to MARKET Alya's skills persuasively to clients, partners, and empl
                 className={`flex gap-2.5 ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}
               >
                 {msg.sender === 'bot' && (
-                  <div className="w-7 h-7 rounded-full bg-gradient-to-tr from-[#990000] to-[#ff6600] border border-[#ffaa00]/40 flex items-center justify-center shrink-0 mt-0.5 shadow-[0_0_8px_rgba(255,69,0,0.4)]">
+                  <div className="w-7 h-7 rounded-full bg-gradient-to-tr from-[#9a7516] to-[#d4af37] border border-[#ffd700]/50 flex items-center justify-center shrink-0 mt-0.5 shadow-[0_0_8px_rgba(212,175,55,0.4)]">
                     <PhoenixIcon size={16} />
                   </div>
                 )}

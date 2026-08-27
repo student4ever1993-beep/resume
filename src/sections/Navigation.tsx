@@ -98,7 +98,7 @@ export default function Navigation() {
       >
         {/* Floating Cyber Glass Island Header */}
         <div
-          className={`w-full max-w-6xl px-5 sm:px-7 py-2.5 rounded-2xl sm:rounded-full transition-all duration-500 flex items-center justify-between border backdrop-blur-2xl ${
+          className={`header-island w-full max-w-6xl px-5 sm:px-7 py-2.5 rounded-2xl sm:rounded-full transition-all duration-500 flex items-center justify-between border backdrop-blur-2xl ${
             scrolled
               ? 'bg-[var(--glass-bg)] border-[var(--border-highlight)] shadow-[0_12px_40px_rgba(0,0,0,0.45)] sm:py-2.5'
               : 'bg-[rgba(10,10,15,0.65)] border-[var(--border-primary)] shadow-[0_8px_30px_rgba(0,0,0,0.3)]'
@@ -124,7 +124,7 @@ export default function Navigation() {
 
           {/* Desktop Links Container */}
           <div
-            className={`hidden md:flex items-center gap-1 lg:gap-2 px-3 py-1.5 rounded-full bg-[rgba(201,168,76,0.04)] border border-[rgba(201,168,76,0.12)] ${
+            className={`nav-links-container hidden md:flex items-center gap-1 lg:gap-2 px-3 py-1.5 rounded-full bg-[rgba(201,168,76,0.04)] border border-[rgba(201,168,76,0.12)] ${
               isRtl ? 'flex-row-reverse' : 'flex-row'
             }`}
           >
@@ -135,7 +135,7 @@ export default function Navigation() {
                   key={`${item.label}-${item.target}`}
                   href={item.target}
                   onClick={(e) => handleNavClick(e, item.target)}
-                  className={`relative px-4 py-1.5 rounded-full text-xs font-semibold tracking-wider uppercase transition-all duration-300 ${
+                  className={`nav-link-item ${isActive ? 'nav-link-active' : ''} relative px-4 py-1.5 rounded-full text-xs font-semibold tracking-wider uppercase transition-all duration-300 ${
                     isActive
                       ? 'text-[var(--text-heading)] bg-[rgba(201,168,76,0.18)] shadow-[0_2px_12px_rgba(201,168,76,0.25)] border border-[rgba(201,168,76,0.3)]'
                       : 'text-[var(--text-primary)] opacity-80 hover:opacity-100 hover:text-[var(--accent-gold)] hover:bg-[rgba(201,168,76,0.08)]'
@@ -158,7 +158,7 @@ export default function Navigation() {
             {/* Glass Language Switcher Button */}
             <button
               onClick={toggleLanguage}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-[rgba(201,168,76,0.35)] bg-[rgba(201,168,76,0.08)] text-[var(--accent-gold)] text-xs font-bold hover:bg-[rgba(201,168,76,0.18)] hover:scale-105 transition-all duration-300 shadow-sm"
+              className="lang-btn flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-[rgba(201,168,76,0.35)] bg-[rgba(201,168,76,0.08)] text-[var(--accent-gold)] text-xs font-bold hover:bg-[rgba(201,168,76,0.18)] hover:scale-105 transition-all duration-300 shadow-sm"
               style={{
                 fontFamily: isRtl ? 'Inter, system-ui, sans-serif' : 'Cairo, system-ui, sans-serif',
               }}

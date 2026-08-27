@@ -176,6 +176,48 @@
     border: 1px solid rgba(184, 134, 11, 0.3);
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06), inset 0 1px 1px rgba(255, 255, 255, 0.9);
   }
+
+  /* Light Mode Header Custom Styling (Gold Header & White Text) */
+  .light nav .header-island {
+    background: linear-gradient(135deg, #b8860b 0%, #d4af37 50%, #9a7516 100%) !important;
+    border-color: rgba(255, 255, 255, 0.4) !important;
+    box-shadow: 0 10px 35px rgba(184, 134, 11, 0.5) !important;
+  }
+
+  .light nav .header-island .nav-link-item {
+    color: #ffffff !important;
+    opacity: 0.95 !important;
+  }
+
+  .light nav .header-island .nav-link-item:hover {
+    color: #ffffff !important;
+    background: rgba(255, 255, 255, 0.22) !important;
+  }
+
+  .light nav .header-island .nav-link-active {
+    background: rgba(255, 255, 255, 0.28) !important;
+    border-color: rgba(255, 255, 255, 0.6) !important;
+    color: #ffffff !important;
+    box-shadow: 0 2px 12px rgba(255, 255, 255, 0.4) !important;
+  }
+
+  .light nav .header-island .nav-link-active span {
+    background-color: #ffffff !important;
+    box-shadow: 0 0 8px #ffffff !important;
+  }
+
+  .light nav .header-island .lang-btn {
+    background: rgba(255, 255, 255, 0.22) !important;
+    border-color: rgba(255, 255, 255, 0.45) !important;
+    color: #ffffff !important;
+  }
+
+  .light nav .header-island .theme-toggle-btn,
+  .light nav .header-island .theme-toggle-btn * {
+    background: rgba(255, 255, 255, 0.22) !important;
+    border-color: rgba(255, 255, 255, 0.45) !important;
+    color: #ffffff !important;
+  }
 }
 
 /* Responsive: Mobile Navigation */
