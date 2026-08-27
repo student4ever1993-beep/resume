@@ -1,7 +1,9 @@
 import { useState, useRef, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Bot, X, Send, Sparkles, User, Loader2 } from 'lucide-react';
+import { X, Send, User, Loader2 } from 'lucide-react';
 import { contactConfig } from '../config';
+import Phoenix3D from '../effects/Phoenix3D';
+import PhoenixIcon from './PhoenixIcon';
 
 interface Message {
   id: string;
@@ -23,8 +25,8 @@ export default function ChatWidget() {
       id: '1',
       sender: 'bot',
       text: isRtl
-        ? 'مرحباً! أنا المساعد الذكي الخاص بعلياء السيابية. كيف يمكنني مساعدتك اليوم في استكشاف خبراتها في تحليل النظم والتحول الرقمي؟'
-        : "Hello! I am Alya's AI Assistant. How can I help you explore her systems analysis experience, technical skills, or projects today?",
+        ? 'مرحباً! أنا مساعد العنقاء الذكي (Phoenix AI) الخاص بعلياء السيابية. كيف يمكنني مساعدتك اليوم في استكشاف خبراتها في تحليل النظم والتحول الرقمي؟'
+        : "Hello! I am Alya's Phoenix AI Assistant. How can I help you explore her systems analysis experience, technical skills, or projects today?",
     },
   ]);
 
@@ -53,7 +55,7 @@ export default function ChatWidget() {
       ];
 
   // System Prompt for LLM (Ollama / HuggingFace)
-  const systemPrompt = `You are Alya Al-Siyabi's Portfolio AI Assistant.
+  const systemPrompt = `You are Alya Al-Siyabi's Portfolio Phoenix AI Assistant.
 Alya Al-Siyabi is a Systems Analyst & Software Developer at AMAN Business Consulting in Muscat, Oman, with over 8+ years of experience in Enterprise Digital Transformation, Systems Architecture, React, Three.js, and Cloud Solutions.
 Be professional, concise, polite, and answer questions accurately. Language: ${isRtl ? 'Arabic' : 'English'}.`;
 
@@ -183,18 +185,24 @@ Be professional, concise, polite, and answer questions accurately. Language: ${i
 
   return (
     <>
-      {/* Floating Chat Trigger Button */}
+      {/* Floating 3D Phoenix Trigger Button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className={`fixed bottom-6 z-50 p-4 rounded-full bg-gradient-to-r from-[var(--accent-gold)] to-[#b8860b] text-[#050508] shadow-[0_10px_30px_rgba(201,168,76,0.45)] hover:scale-110 transition-all duration-300 flex items-center justify-center ${
+        className={`fixed bottom-6 z-50 p-2.5 rounded-full bg-gradient-to-tr from-[#800000] via-[#ff3300] to-[#ffaa00] text-white shadow-[0_0_30px_rgba(255,85,0,0.65)] border border-[#ffaa00]/40 hover:scale-110 hover:shadow-[0_0_40px_rgba(255,140,0,0.85)] transition-all duration-300 flex items-center justify-center ${
           isRtl ? 'left-6' : 'right-6'
         }`}
-        aria-label="Open AI Assistant Chat"
+        aria-label="Open Phoenix AI Assistant"
       >
-        {isOpen ? <X size={24} /> : <Bot size={24} className="animate-pulse" />}
-        <span className="absolute -top-1 -right-1 flex h-3.5 w-3.5">
-          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-          <span className="relative inline-flex rounded-full h-3.5 w-3.5 bg-emerald-500"></span>
+        {isOpen ? (
+          <div className="w-10 h-10 flex items-center justify-center text-white">
+            <X size={24} />
+          </div>
+        ) : (
+          <Phoenix3D size={52} interactive={true} />
+        )}
+        <span className="absolute -top-1 -right-1 flex h-3.5 w-3.5 pointer-events-none">
+          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+          <span className="relative inline-flex rounded-full h-3.5 w-3.5 bg-orange-500"></span>
         </span>
       </button>
 
@@ -209,18 +217,18 @@ Be professional, concise, polite, and answer questions accurately. Language: ${i
           }}
         >
           {/* Header */}
-          <div className="flex items-center justify-between px-5 py-3.5 border-b border-[var(--border-primary)] bg-[rgba(201,168,76,0.08)]">
+          <div className="flex items-center justify-between px-5 py-3 border-b border-[var(--border-primary)] bg-gradient-to-r from-[rgba(255,69,0,0.15)] via-[rgba(255,140,0,0.08)] to-transparent">
             <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-full bg-gradient-to-r from-[var(--accent-gold)] to-[#b8860b] flex items-center justify-center text-[#050508] font-bold">
-                <Sparkles size={18} />
+              <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-[#990000] via-[#ff3300] to-[#ffaa00] p-0.5 shadow-[0_0_12px_rgba(255,69,0,0.5)] flex items-center justify-center">
+                <Phoenix3D size={38} interactive={false} />
               </div>
               <div>
-                <h3 className="text-sm font-bold text-[var(--text-heading)]">
-                  {isRtl ? 'مساعد علياء الذكي' : 'Alya AI Assistant'}
+                <h3 className="text-sm font-bold text-[var(--text-heading)] flex items-center gap-1.5">
+                  {isRtl ? 'مساعد العنقاء الذكي' : 'Phoenix AI Assistant'}
                 </h3>
-                <span className="text-[10px] text-emerald-500 font-semibold flex items-center gap-1">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block animate-pulse"></span>
-                  {activeProvider === 'ollama' ? 'Ollama LLM' : activeProvider === 'huggingface' ? 'HuggingFace AI' : 'Smart Engine'}
+                <span className="text-[10px] text-amber-500 font-semibold flex items-center gap-1">
+                  <span className="w-1.5 h-1.5 rounded-full bg-amber-500 inline-block animate-pulse"></span>
+                  {activeProvider === 'ollama' ? 'Ollama LLM' : activeProvider === 'huggingface' ? 'HuggingFace AI' : 'Smart Phoenix Engine'}
                 </span>
               </div>
             </div>
@@ -240,8 +248,8 @@ Be professional, concise, polite, and answer questions accurately. Language: ${i
                 className={`flex gap-2.5 ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}
               >
                 {msg.sender === 'bot' && (
-                  <div className="w-7 h-7 rounded-full bg-[var(--accent-gold)] text-[#050508] flex items-center justify-center shrink-0 mt-0.5">
-                    <Bot size={14} />
+                  <div className="w-7 h-7 rounded-full bg-gradient-to-tr from-[#990000] to-[#ff6600] border border-[#ffaa00]/40 flex items-center justify-center shrink-0 mt-0.5 shadow-[0_0_8px_rgba(255,69,0,0.4)]">
+                    <PhoenixIcon size={16} />
                   </div>
                 )}
                 <div
@@ -262,9 +270,9 @@ Be professional, concise, polite, and answer questions accurately. Language: ${i
             ))}
 
             {isLoading && (
-              <div className="flex items-center gap-2 text-xs text-[var(--accent-gold)] font-medium p-2">
-                <Loader2 size={15} className="animate-spin" />
-                <span>{isRtl ? 'جاري التفكير...' : 'AI is thinking...'}</span>
+              <div className="flex items-center gap-2 text-xs text-amber-500 font-medium p-2">
+                <Loader2 size={15} className="animate-spin text-orange-500" />
+                <span>{isRtl ? 'العنقاء يفكر...' : 'Phoenix is thinking...'}</span>
               </div>
             )}
             <div ref={messagesEndRef} />
@@ -276,7 +284,7 @@ Be professional, concise, polite, and answer questions accurately. Language: ${i
               <button
                 key={q.query}
                 onClick={() => handleSend(q.query)}
-                className="px-2.5 py-1 rounded-full border border-[var(--border-primary)] bg-[var(--glass-bg)] text-[10px] font-medium text-[var(--accent-gold)] hover:border-[var(--accent-gold)] transition-colors"
+                className="px-2.5 py-1 rounded-full border border-orange-500/30 bg-[var(--glass-bg)] text-[10px] font-medium text-amber-400 hover:border-amber-400 hover:bg-orange-500/10 transition-colors"
               >
                 {q.label}
               </button>
@@ -296,12 +304,12 @@ Be professional, concise, polite, and answer questions accurately. Language: ${i
               value={input}
               onChange={(e) => setInput(e.target.value)}
               placeholder={isRtl ? 'اكتب سؤالك هنا...' : 'Ask a question...'}
-              className="flex-1 px-3.5 py-2 rounded-xl border border-[var(--border-primary)] bg-[var(--glass-bg)] text-xs text-[var(--text-heading)] focus:outline-none focus:border-[var(--accent-gold)]"
+              className="flex-1 px-3.5 py-2 rounded-xl border border-[var(--border-primary)] bg-[var(--glass-bg)] text-xs text-[var(--text-heading)] focus:outline-none focus:border-amber-500"
             />
             <button
               type="submit"
               disabled={isLoading}
-              className="p-2 rounded-xl bg-gradient-to-r from-[var(--accent-gold)] to-[#b8860b] text-[#050508] hover:scale-105 transition-transform disabled:opacity-50"
+              className="p-2 rounded-xl bg-gradient-to-r from-[#ff4500] to-[#ffaa00] text-[#050508] font-bold hover:scale-105 transition-transform disabled:opacity-50 shadow-[0_0_10px_rgba(255,69,0,0.4)]"
             >
               <Send size={15} />
             </button>
@@ -311,3 +319,4 @@ Be professional, concise, polite, and answer questions accurately. Language: ${i
     </>
   );
 }
+
