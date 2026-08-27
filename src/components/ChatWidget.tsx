@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { X, Send, User, Loader2 } from 'lucide-react';
+import { X, Send, User, Loader2, Cpu, ChevronDown } from 'lucide-react';
 import { contactConfig } from '../config';
 import Phoenix3D from '../effects/Phoenix3D';
 import PhoenixIcon from './PhoenixIcon';
@@ -11,6 +11,8 @@ interface Message {
   text: string;
 }
 
+type ModelProvider = 'groq' | 'gpt20b' | 'ollama' | 'smart';
+
 export default function ChatWidget() {
   const { i18n } = useTranslation();
   const isRtl = i18n.language === 'ar';
@@ -18,7 +20,8 @@ export default function ChatWidget() {
   const [isOpen, setIsOpen] = useState(false);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [activeProvider, setActiveProvider] = useState<'smart' | 'ollama' | 'huggingface'>('smart');
+  const [selectedModel, setSelectedModel] = useState<ModelProvider>('groq');
+  const [showModelMenu, setShowModelMenu] = useState(false);
 
   const [messages, setMessages] = useState<Message[]>([
     {
@@ -44,22 +47,58 @@ export default function ChatWidget() {
 
   const quickQuestions = isRtl
     ? [
-        { label: '💼 خبرات علياء في أمان', query: 'خبرات' },
-        { label: '⚡ المهارات والتحول الرقمي', query: 'مهارات' },
-        { label: '✉️ البريد والسيرة الذاتية', query: 'تواصل' },
+        { label: '🚀 كيف تقود علياء التحول الرقمي؟', query: 'كيف تقود علياء التحول الرقمي في المؤسسات؟' },
+        { label: '💼 خبرتها في شركة أمان بمسقط', query: 'حدثني عن خبرة علياء البالغة 5 سنوات في شركة أمان بمسقط' },
+        { label: '⚡ تقنيات React & Three.js', query: 'ما هي المهارات والتقنيات البرمجية التي تبرع فيها علياء؟' },
+        { label: '✉️ التواصل وحجز استشارة', query: 'كيف يمكنني التواصل مع علياء أو طلب سيرتها الذاتية؟' },
       ]
     : [
-        { label: '💼 Alya\'s Experience at AMAN', query: 'experience' },
-        { label: '⚡ Skills & Tech Stack', query: 'skills' },
-        { label: '✉️ Contact Info & CV', query: 'contact' },
+        { label: '🚀 Digital Transformation Leadership', query: 'How does Alya drive enterprise digital transformation?' },
+        { label: '💼 5+ Yrs Experience at AMAN', query: 'Tell me about Alya\'s 5+ years experience as Systems Analyst at AMAN in Muscat.' },
+        { label: '⚡ React & 3D WebGL Capabilities', query: 'What technical skills and architecture frameworks does Alya master?' },
+        { label: '✉️ Hire Alya / Contact CV', query: 'How can I contact Alya or download her CV for a job opportunity?' },
       ];
 
-  // System Prompt for LLM (Ollama / HuggingFace)
-  const systemPrompt = `You are Alya Al-Siyabi's Portfolio Phoenix AI Assistant.
-Alya Al-Siyabi is a Systems Analyst & Software Developer at AMAN Business Consulting in Muscat, Oman, with over 8+ years of experience in Enterprise Digital Transformation, Systems Architecture, React, Three.js, and Cloud Solutions.
-Be professional, concise, polite, and answer questions accurately. Language: ${isRtl ? 'Arabic' : 'English'}.`;
+  // High-Impact Marketing System Prompt
+  const marketingSystemPrompt = `You are Alya Al-Siyabi's Career Marketing & Technical Phoenix AI Ambassador.
+Alya Al-Siyabi is a Senior Systems Analyst & Software Engineer at AMAN Business Consulting in Muscat, Oman, with over 5+ years of enterprise experience in Digital Transformation, Systems Architecture, React, Three.js 3D WebGL, Cloud Solutions, and Data Security.
+Your goal is to MARKET Alya's skills persuasively to clients, partners, and employers. Be enthusiastic, confident, and professional. Keep answers under 3 concise, impactful sentences. Answer in ${isRtl ? 'Arabic' : 'English'}.`;
 
-  // 1. Ollama Integration (Local Server)
+  // 1. Groq API Call (allam-2-7b / gpt-oss-20b)
+  const callGroqAPI = async (userMsg: string, modelId: string = 'allam-2-7b'): Promise<string | null> => {
+    try {
+      const apiKey = import.meta.env.VITE_GROQ_API_KEY || '';
+      const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${apiKey.trim()}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          model: modelId,
+          messages: [
+            { role: 'system', content: marketingSystemPrompt },
+            { role: 'user', content: userMsg },
+          ],
+          temperature: 0.6,
+          max_tokens: 220,
+        }),
+      });
+
+      if (!res.ok) {
+        const err = await res.text();
+        console.error('Groq API Error:', res.status, err);
+        return null;
+      }
+      const data = await res.json();
+      return data.choices?.[0]?.message?.content || null;
+    } catch (err) {
+      console.error('Groq Fetch Exception:', err);
+      return null;
+    }
+  };
+
+  // 2. Ollama API Call
   const callOllamaAPI = async (userMsg: string): Promise<string | null> => {
     try {
       const ollamaUrl = import.meta.env.VITE_OLLAMA_URL || 'http://localhost:11434/api/chat';
@@ -71,7 +110,7 @@ Be professional, concise, polite, and answer questions accurately. Language: ${i
         body: JSON.stringify({
           model: model,
           messages: [
-            { role: 'system', content: systemPrompt },
+            { role: 'system', content: marketingSystemPrompt },
             { role: 'user', content: userMsg },
           ],
           stream: false,
@@ -86,62 +125,31 @@ Be professional, concise, polite, and answer questions accurately. Language: ${i
     }
   };
 
-  // 2. Hugging Face Inference API Integration
-  const callHuggingFaceAPI = async (userMsg: string): Promise<string | null> => {
-    try {
-      const hfToken = import.meta.env.VITE_HF_API_KEY;
-      if (!hfToken) return null;
-
-      const model = import.meta.env.VITE_HF_MODEL || 'Qwen/Qwen2.5-Coder-7B-Instruct';
-      const res = await fetch(`https://api-inference.huggingface.co/models/${model}`, {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${hfToken}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          inputs: `<|system|>\n${systemPrompt}\n<|user|>\n${userMsg}\n<|assistant|>`,
-          parameters: { max_new_tokens: 250, temperature: 0.7 },
-        }),
-      });
-
-      if (!res.ok) return null;
-      const data = await res.json();
-      if (Array.isArray(data) && data[0]?.generated_text) {
-        const text = data[0].generated_text;
-        return text.split('<|assistant|>').pop()?.trim() || text;
-      }
-      return null;
-    } catch {
-      return null;
-    }
-  };
-
-  // 3. Built-in Smart Fallback Engine
-  const getFallbackResponse = (userMsg: string): string => {
+  // 3. Marketing Smart Fallback Engine
+  const getMarketingFallback = (userMsg: string): string => {
     const lower = userMsg.toLowerCase();
+
+    if (lower.includes('digital') || lower.includes('transformation') || lower.includes('تحول') || lower.includes('رقمي')) {
+      return isRtl
+        ? 'تتميز علياء بالقدرة على إحداث تحول رقمي متكامل للمؤسسات، حيث تحول العمليات اليدوية المعقدة إلى نظم رقمية عالية الكفاءة مع خفض تكاليف التشغيل. هل ترغب في الاطلاع على نتائج مشاريعها السابقة؟'
+        : "Alya excels at driving complete digital transformation—converting complex manual workflows into high-efficiency automated systems that reduce IT operational costs. Would you like to review her case studies?";
+    }
 
     if (lower.includes('experience') || lower.includes('خبرة') || lower.includes('خبرات') || lower.includes('aman') || lower.includes('أمان')) {
       return isRtl
-        ? 'تمتلك علياء السيابية أكثر من 5 سنوات من الخبرة الشاملة كمحللة نظم ومطورة برمجيات في شركة أمان للاستشارات وتطوير الأعمال بمحافظة مسقط، سلطنة عمان.'
-        : 'Alya Al-Siyabi has over 8+ years of comprehensive experience as a Systems Analyst and Software Developer at AMAN Business Consulting in Muscat, Oman.';
+        ? 'مع أكثر من 5 سنوات من التميز في شركة أمان للاستشارات وتطوير الأعمال بمحافظة مسقط، قادت علياء تحليل وتصميم البنى التحتية البرمجية المعقدة للمؤسسات. يمكنك تحميل سريتها الذاتية فوراً من الصفحة الرئيسية!'
+        : 'With over 5+ years of excellence at AMAN Business Consulting in Muscat, Oman, Alya has spearheaded enterprise systems analysis and cloud solution architectures. Download her CV from the Hero section to learn more!';
     }
 
-    if (lower.includes('skill') || lower.includes('مهار') || lower.includes('تقني') || lower.includes('tech')) {
+    if (lower.includes('skill') || lower.includes('مهار') || lower.includes('تقني') || lower.includes('react') || lower.includes('three')) {
       return isRtl
-        ? 'تتخصص علياء في قيادة التحول الرقمي، تحليل وإدارة نظم المشاريع، React، Three.js، قواعد البيانات المؤسسية، والأمن السيبراني.'
-        : 'Alya specializes in Digital Transformation Leadership, Enterprise Systems Analysis, React, Three.js, Cloud Integration, and Data Security.';
-    }
-
-    if (lower.includes('contact') || lower.includes('تواصل') || lower.includes('email') || lower.includes('إيميل') || lower.includes('cv') || lower.includes('سيرة')) {
-      return isRtl
-        ? `يمكنك التواصل مع علياء مباشرة عبر البريد الإلكتروني: ${contactConfig.items.find(i => i.icon === 'Mail')?.value || 'aman@example.com'} أو تحميل سريتها الذاتية من الصفحة الرئيسية.`
-        : `You can reach Alya via email at ${contactConfig.items.find(i => i.icon === 'Mail')?.value || 'aman@example.com'} or download her CV directly from the Hero section.`;
+        ? 'تجمع علياء بين البرمجة المتقدمة (React، Three.js WebGL) والتخطيط الاستراتيجي للنظم وتحليل البيانات لتوفير تجارب متطورة. هل ترغب في التواصل معها لمناقشة مشروعك؟'
+        : 'Alya combines cutting-edge engineering (React, Three.js WebGL) with strategic systems architecture and data security to deliver high-performance solutions. Shall we connect you with her?';
     }
 
     return isRtl
-      ? 'شكراً لتواصلك! يمكنك استكشاف أقسام الموقع لمعرفة المزيد عن مشاريع علياء وخبراتها المهنية.'
-      : "Thank you for asking! Feel free to explore the portfolio sections or use the quick buttons below to learn more about Alya's career.";
+      ? `علياء مستعدة لقيادة نجاح مشروعك القادم! يمكنك التواصل معها مباشرة عبر البريد الإلكتروني: ${contactConfig.items.find(i => i.icon === 'Mail')?.value || 'aman@example.com'}`
+      : `Alya is ready to bring strategic technology leadership to your team! You can email her directly at ${contactConfig.items.find(i => i.icon === 'Mail')?.value || 'aman@example.com'} or request her full portfolio.`;
   };
 
   const handleSend = async (textToSend?: string) => {
@@ -158,20 +166,19 @@ Be professional, concise, polite, and answer questions accurately. Language: ${i
     if (!textToSend) setInput('');
     setIsLoading(true);
 
-    // Try Ollama first
-    let reply = await callOllamaAPI(query);
-    if (reply) {
-      setActiveProvider('ollama');
-    } else {
-      // Try HuggingFace next
-      reply = await callHuggingFaceAPI(query);
-      if (reply) {
-        setActiveProvider('huggingface');
-      } else {
-        // Fallback to built-in smart engine
-        reply = getFallbackResponse(query);
-        setActiveProvider('smart');
-      }
+    let reply: string | null = null;
+
+    if (selectedModel === 'groq') {
+      reply = await callGroqAPI(query, 'allam-2-7b');
+    } else if (selectedModel === 'gpt20b') {
+      reply = await callGroqAPI(query, 'openai/gpt-oss-20b');
+    } else if (selectedModel === 'ollama') {
+      reply = await callOllamaAPI(query);
+    }
+
+    // Fallback if selected API failed or if smart model selected
+    if (!reply) {
+      reply = getMarketingFallback(query);
     }
 
     setIsLoading(false);
@@ -181,6 +188,13 @@ Be professional, concise, polite, and answer questions accurately. Language: ${i
       text: reply,
     };
     setMessages((prev) => [...prev, botReply]);
+  };
+
+  const modelLabels: Record<ModelProvider, string> = {
+    groq: 'ALLaM 2.0 (Arabic & English 0.1s)',
+    gpt20b: 'GPT-OSS 20B (Groq LPU)',
+    ollama: 'Ollama Unlimited Local',
+    smart: 'Smart Marketing AI Engine',
   };
 
   return (
@@ -209,7 +223,7 @@ Be professional, concise, polite, and answer questions accurately. Language: ${i
       {/* Glassmorphic Chat Drawer */}
       {isOpen && (
         <div
-          className={`fixed bottom-24 z-50 w-[90vw] sm:w-[390px] h-[530px] rounded-3xl border border-[var(--border-highlight)] bg-[var(--glass-bg)] backdrop-blur-xl shadow-2xl flex flex-col overflow-hidden transition-all duration-300 animate-in fade-in slide-in-from-bottom-5 ${
+          className={`fixed bottom-24 z-50 w-[90vw] sm:w-[410px] h-[550px] rounded-3xl border border-[var(--border-highlight)] bg-[var(--glass-bg)] backdrop-blur-xl shadow-2xl flex flex-col overflow-hidden transition-all duration-300 animate-in fade-in slide-in-from-bottom-5 ${
             isRtl ? 'left-6' : 'right-6'
           }`}
           style={{
@@ -217,26 +231,57 @@ Be professional, concise, polite, and answer questions accurately. Language: ${i
           }}
         >
           {/* Header */}
-          <div className="flex items-center justify-between px-5 py-3 border-b border-[var(--border-primary)] bg-gradient-to-r from-[rgba(255,69,0,0.15)] via-[rgba(255,140,0,0.08)] to-transparent">
-            <div className="flex items-center gap-3">
+          <div className="flex items-center justify-between px-4 py-3 border-b border-[var(--border-primary)] bg-gradient-to-r from-[rgba(255,69,0,0.15)] via-[rgba(255,140,0,0.08)] to-transparent">
+            <div className="flex items-center gap-2.5">
               <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-[#990000] via-[#ff3300] to-[#ffaa00] p-0.5 shadow-[0_0_12px_rgba(255,69,0,0.5)] flex items-center justify-center">
                 <Phoenix3D size={38} interactive={false} />
               </div>
               <div>
-                <h3 className="text-sm font-bold text-[var(--text-heading)] flex items-center gap-1.5">
+                <h3 className="text-xs font-bold text-[var(--text-heading)] flex items-center gap-1.5">
                   {isRtl ? 'مساعد العنقاء الذكي' : 'Phoenix AI Assistant'}
                 </h3>
-                <span className="text-[10px] text-amber-500 font-semibold flex items-center gap-1">
-                  <span className="w-1.5 h-1.5 rounded-full bg-amber-500 inline-block animate-pulse"></span>
-                  {activeProvider === 'ollama' ? 'Ollama LLM' : activeProvider === 'huggingface' ? 'HuggingFace AI' : 'Smart Phoenix Engine'}
-                </span>
+
+                {/* Model Selector Dropdown Badge */}
+                <div className="relative inline-block">
+                  <button
+                    onClick={() => setShowModelMenu(!showModelMenu)}
+                    className="text-[10px] text-amber-500 font-medium flex items-center gap-1 hover:underline focus:outline-none"
+                  >
+                    <Cpu size={11} />
+                    <span>{modelLabels[selectedModel]}</span>
+                    <ChevronDown size={11} />
+                  </button>
+
+                  {/* Dropdown Menu */}
+                  {showModelMenu && (
+                    <div className="absolute top-6 left-0 z-50 w-56 py-1 rounded-xl border border-[var(--border-highlight)] bg-[var(--bg-primary)] shadow-2xl backdrop-blur-md">
+                      {(['groq', 'gpt20b', 'ollama', 'smart'] as ModelProvider[]).map((prov) => (
+                        <button
+                          key={prov}
+                          onClick={() => {
+                            setSelectedModel(prov);
+                            setShowModelMenu(false);
+                          }}
+                          className={`w-full text-left px-3 py-1.5 text-[11px] font-medium transition-colors flex items-center justify-between ${
+                            selectedModel === prov
+                              ? 'text-amber-400 bg-[rgba(255,140,0,0.12)]'
+                              : 'text-[var(--text-primary)] hover:bg-[var(--glass-bg)]'
+                          }`}
+                        >
+                          <span>{modelLabels[prov]}</span>
+                          {selectedModel === prov && <span className="w-1.5 h-1.5 rounded-full bg-amber-400"></span>}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
             <button
               onClick={() => setIsOpen(false)}
               className="p-1.5 rounded-full text-[var(--text-muted)] hover:text-[var(--text-heading)] hover:bg-[var(--glass-bg)] transition-colors"
             >
-              <X size={18} />
+              <X size={15} />
             </button>
           </div>
 
@@ -253,9 +298,9 @@ Be professional, concise, polite, and answer questions accurately. Language: ${i
                   </div>
                 )}
                 <div
-                  className={`max-w-[80%] px-4 py-2.5 rounded-2xl text-xs leading-relaxed ${
+                  className={`max-w-[82%] px-4 py-2.5 rounded-2xl text-xs leading-relaxed ${
                     msg.sender === 'user'
-                      ? 'bg-gradient-to-r from-[var(--accent-gold)] to-[#b8860b] text-[#050508] font-medium rounded-br-none'
+                      ? 'bg-gradient-to-r from-[var(--accent-gold)] to-[#b5560b] text-[#050505] font-medium rounded-br-none'
                       : 'border border-[var(--border-primary)] bg-[var(--glass-bg)] text-[var(--text-heading)] rounded-bl-none shadow-sm'
                   }`}
                 >
@@ -278,13 +323,13 @@ Be professional, concise, polite, and answer questions accurately. Language: ${i
             <div ref={messagesEndRef} />
           </div>
 
-          {/* Quick Suggestions Chips */}
+          {/* Marketing Quick Suggestions Chips */}
           <div className="px-3 py-2 border-t border-[var(--border-primary)] flex flex-wrap gap-1.5 bg-[rgba(0,0,0,0.1)]">
             {quickQuestions.map((q) => (
               <button
-                key={q.query}
+                key={q.label}
                 onClick={() => handleSend(q.query)}
-                className="px-2.5 py-1 rounded-full border border-orange-500/30 bg-[var(--glass-bg)] text-[10px] font-medium text-amber-400 hover:border-amber-400 hover:bg-orange-500/10 transition-colors"
+                className="px-2.5 py-1 rounded-full border border-orange-500/30 bg-[var(--glass-bg)] text-[10px] font-semibold text-amber-400 hover:border-amber-400 hover:bg-orange-500/10 transition-colors"
               >
                 {q.label}
               </button>
@@ -303,7 +348,7 @@ Be professional, concise, polite, and answer questions accurately. Language: ${i
               type="text"
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              placeholder={isRtl ? 'اكتب سؤالك هنا...' : 'Ask a question...'}
+              placeholder={isRtl ? 'اسأل عن حلول تحول النظم والخبرات...' : 'Ask about systems transformation & hiring...'}
               className="flex-1 px-3.5 py-2 rounded-xl border border-[var(--border-primary)] bg-[var(--glass-bg)] text-xs text-[var(--text-heading)] focus:outline-none focus:border-amber-500"
             />
             <button
@@ -319,4 +364,3 @@ Be professional, concise, polite, and answer questions accurately. Language: ${i
     </>
   );
 }
-
