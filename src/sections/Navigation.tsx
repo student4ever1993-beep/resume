@@ -168,9 +168,7 @@ export default function Navigation() {
             </button>
 
             {/* Theme Toggle Button */}
-            <div className="p-0.5 rounded-full border border-[rgba(201,168,76,0.2)] bg-[rgba(201,168,76,0.05)]">
-              <ThemeToggle size="sm" />
-            </div>
+            <ThemeToggle size="sm" />
           </div>
 
           {/* Mobile Hamburger & Controls */}
