@@ -1,9 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { X, Send, User, Loader2, Cpu, ChevronDown } from 'lucide-react';
+import { X, Send, User, Loader2, Cpu, ChevronDown, Bot } from 'lucide-react';
 import { contactConfig } from '../config';
-import Phoenix3D from '../effects/Phoenix3D';
-import PhoenixIcon from './PhoenixIcon';
 
 interface Message {
   id: string;
@@ -28,8 +26,8 @@ export default function ChatWidget() {
       id: '1',
       sender: 'bot',
       text: isRtl
-        ? 'مرحباً! أنا مساعد العنقاء الذكي (Phoenix AI) الخاص بعلياء السيابية. كيف يمكنني مساعدتك اليوم في استكشاف خبراتها في تحليل النظم والتحول الرقمي؟'
-        : "Hello! I am Alya's Phoenix AI Assistant. How can I help you explore her systems analysis experience, technical skills, or projects today?",
+        ? 'مرحباً! أنا مساعد علياء الذكي للاستشارات والتطوير. كيف يمكنني مساعدتك اليوم في استكشاف خبراتها في تحليل النظم والتحول الرقمي؟'
+        : "Hello! I am Alya's AI Strategy Assistant. How can I help you explore her systems analysis experience, technical skills, or project portfolio today?",
     },
   ]);
 
@@ -60,7 +58,7 @@ export default function ChatWidget() {
       ];
 
   // High-Impact Marketing System Prompt
-  const marketingSystemPrompt = `You are Alya Al-Siyabi's Career Marketing & Technical Phoenix AI Ambassador.
+  const marketingSystemPrompt = `You are Alya Al-Siyabi's Career Marketing & Technical AI Assistant.
 Alya Al-Siyabi is a Senior Systems Analyst & Software Engineer at AMAN Business Consulting in Muscat, Oman, with over 5+ years of enterprise experience in Digital Transformation, Systems Architecture, React, Three.js 3D WebGL, Cloud Solutions, and Data Security.
 Your goal is to MARKET Alya's skills persuasively to clients, partners, and employers. Be enthusiastic, confident, and professional. Keep answers under 3 concise, impactful sentences. Answer in ${isRtl ? 'Arabic' : 'English'}.`;
 
@@ -199,20 +197,18 @@ Your goal is to MARKET Alya's skills persuasively to clients, partners, and empl
 
   return (
     <>
-      {/* Floating 3D Phoenix Trigger Button (Gold Background & White Phoenix) */}
+      {/* Floating Gold Robot Trigger Button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className={`fixed bottom-6 z-50 p-2.5 rounded-full bg-gradient-to-tr from-[#9a7516] via-[#d4af37] to-[#ffd700] text-white shadow-[0_0_35px_rgba(212,175,55,0.75)] border border-[#ffe082]/60 hover:scale-110 hover:shadow-[0_0_45px_rgba(255,215,0,0.9)] transition-all duration-300 flex items-center justify-center ${
+        className={`fixed bottom-6 z-50 p-3.5 rounded-full bg-gradient-to-tr from-[#9a7516] via-[#d4af37] to-[#ffd700] text-[#050508] shadow-[0_0_30px_rgba(212,175,55,0.7)] border border-[#ffe082]/60 hover:scale-110 hover:shadow-[0_0_40px_rgba(255,215,0,0.9)] transition-all duration-300 flex items-center justify-center ${
           isRtl ? 'left-6' : 'right-6'
         }`}
-        aria-label="Open Phoenix AI Assistant"
+        aria-label="Open AI Assistant"
       >
         {isOpen ? (
-          <div className="w-10 h-10 flex items-center justify-center text-white">
-            <X size={24} />
-          </div>
+          <X size={26} className="text-[#050508]" />
         ) : (
-          <Phoenix3D size={52} interactive={true} />
+          <Bot size={28} className="text-[#050508] animate-bounce-short" />
         )}
         <span className="absolute -top-1 -right-1 flex h-3.5 w-3.5 pointer-events-none">
           <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-200 opacity-75"></span>
@@ -233,12 +229,12 @@ Your goal is to MARKET Alya's skills persuasively to clients, partners, and empl
           {/* Header */}
           <div className="flex items-center justify-between px-4 py-3 border-b border-[var(--border-primary)] bg-gradient-to-r from-[rgba(212,175,55,0.18)] via-[rgba(201,168,76,0.1)] to-transparent">
             <div className="flex items-center gap-2.5">
-              <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-[#9a7516] via-[#d4af37] to-[#ffd700] p-0.5 shadow-[0_0_12px_rgba(212,175,55,0.5)] flex items-center justify-center">
-                <Phoenix3D size={38} interactive={false} />
+              <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-[#9a7516] via-[#d4af37] to-[#ffd700] p-2 shadow-[0_0_12px_rgba(212,175,55,0.5)] flex items-center justify-center text-[#050508]">
+                <Bot size={22} />
               </div>
               <div>
                 <h3 className="text-xs font-bold text-[var(--text-heading)] flex items-center gap-1.5">
-                  {isRtl ? 'مساعد العنقاء الذكي' : 'Phoenix AI Assistant'}
+                  {isRtl ? 'مساعد علياء الذكي' : 'Alya AI Assistant'}
                 </h3>
 
                 {/* Model Selector Dropdown Badge */}
@@ -293,8 +289,8 @@ Your goal is to MARKET Alya's skills persuasively to clients, partners, and empl
                 className={`flex gap-2.5 ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}
               >
                 {msg.sender === 'bot' && (
-                  <div className="w-7 h-7 rounded-full bg-gradient-to-tr from-[#9a7516] to-[#d4af37] border border-[#ffd700]/50 flex items-center justify-center shrink-0 mt-0.5 shadow-[0_0_8px_rgba(212,175,55,0.4)]">
-                    <PhoenixIcon size={16} />
+                  <div className="w-7 h-7 rounded-full bg-gradient-to-tr from-[#9a7516] to-[#d4af37] border border-[#ffd700]/50 flex items-center justify-center shrink-0 mt-0.5 shadow-[0_0_8px_rgba(212,175,55,0.4)] text-[#050508]">
+                    <Bot size={15} />
                   </div>
                 )}
                 <div
@@ -316,8 +312,8 @@ Your goal is to MARKET Alya's skills persuasively to clients, partners, and empl
 
             {isLoading && (
               <div className="flex items-center gap-2 text-xs text-amber-500 font-medium p-2">
-                <Loader2 size={15} className="animate-spin text-orange-500" />
-                <span>{isRtl ? 'العنقاء يفكر...' : 'Phoenix is thinking...'}</span>
+                <Loader2 size={15} className="animate-spin text-amber-500" />
+                <span>{isRtl ? 'المساعد الذكي يفكر...' : 'AI Assistant is thinking...'}</span>
               </div>
             )}
             <div ref={messagesEndRef} />
@@ -329,7 +325,7 @@ Your goal is to MARKET Alya's skills persuasively to clients, partners, and empl
               <button
                 key={q.label}
                 onClick={() => handleSend(q.query)}
-                className="px-2.5 py-1 rounded-full border border-orange-500/30 bg-[var(--glass-bg)] text-[10px] font-semibold text-amber-400 hover:border-amber-400 hover:bg-orange-500/10 transition-colors"
+                className="px-2.5 py-1 rounded-full border border-amber-500/30 bg-[var(--glass-bg)] text-[10px] font-semibold text-amber-400 hover:border-amber-400 hover:bg-amber-500/10 transition-colors"
               >
                 {q.label}
               </button>
@@ -354,7 +350,7 @@ Your goal is to MARKET Alya's skills persuasively to clients, partners, and empl
             <button
               type="submit"
               disabled={isLoading}
-              className="p-2 rounded-xl bg-gradient-to-r from-[#ff4500] to-[#ffaa00] text-[#050508] font-bold hover:scale-105 transition-transform disabled:opacity-50 shadow-[0_0_10px_rgba(255,69,0,0.4)]"
+              className="p-2.5 rounded-xl bg-gradient-to-r from-[#d4af37] to-[#b8860b] text-[#050508] font-bold hover:scale-105 transition-transform disabled:opacity-50 shadow-[0_0_10px_rgba(212,175,55,0.4)]"
             >
               <Send size={15} />
             </button>
