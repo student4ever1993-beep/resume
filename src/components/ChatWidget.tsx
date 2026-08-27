@@ -9,7 +9,7 @@ interface Message {
   text: string;
 }
 
-type ModelProvider = 'groq' | 'gpt20b' | 'gemini';
+type ModelProvider = 'groq' | 'gpt20b';
 
 export default function ChatWidget() {
   const { i18n } = useTranslation();
@@ -62,8 +62,8 @@ export default function ChatWidget() {
 Alya Al-Siyabi is a Senior Systems Analyst & Software Engineer at AMAN Business Consulting in Muscat, Oman, with over 5+ years of enterprise experience in Digital Transformation, Systems Architecture, React, Three.js 3D WebGL, Cloud Solutions, and Data Security.
 Your goal is to MARKET Alya's skills persuasively to clients, partners, and employers. Be enthusiastic, confident, and professional. Keep answers under 3 concise, impactful sentences. Answer in ${isRtl ? 'Arabic' : 'English'}.`;
 
-  // 1. Groq API Call via Vercel Serverless Function (/api/groq)
-  const callGroqAPI = async (userMsg: string, modelId: string = 'llama-3.1-8b-instant'): Promise<string | null> => {
+  // 1. Groq API Call via Vercel / Dev Server Function (/api/groq)
+  const callGroqAPI = async (userMsg: string, modelId: string = 'allam-2-7b'): Promise<string | null> => {
     try {
       const res = await fetch('/api/groq', {
         method: 'POST',
@@ -81,50 +81,23 @@ Your goal is to MARKET Alya's skills persuasively to clients, partners, and empl
         }),
       });
 
-      if (!res.ok) {
+      const contentType = res.headers.get('content-type') || '';
+      if (!res.ok || !contentType.includes('application/json')) {
         const err = await res.text();
         console.error('Groq API Error via /api/groq:', res.status, err);
         return null;
       }
+
       const data = await res.json();
-      return data.choices?.[0]?.message?.content || null;
+      const content = data.choices?.[0]?.message?.content || data.choices?.[0]?.message?.reasoning;
+      return content || null;
     } catch (err) {
       console.error('Groq Fetch Exception:', err);
       return null;
     }
   };
 
-  // 2. Google Gemini API Call via Vercel Serverless Function (/api/gemini)
-  const callGeminiAPI = async (userMsg: string): Promise<string | null> => {
-    try {
-      const res = await fetch('/api/gemini', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          model: 'gemini-2.0-flash',
-          messages: [
-            { role: 'system', content: marketingSystemPrompt },
-            { role: 'user', content: userMsg },
-          ],
-        }),
-      });
-
-      if (!res.ok) {
-        const err = await res.text();
-        console.error('Gemini API Error via /api/gemini:', res.status, err);
-        return null;
-      }
-      const data = await res.json();
-      return data.choices?.[0]?.message?.content || null;
-    } catch (err) {
-      console.error('Gemini Fetch Exception:', err);
-      return null;
-    }
-  };
-
-  // 3. Marketing Smart Fallback Engine (General Error Fallback)
+  // 2. Marketing Smart Fallback Engine (General Error Fallback)
   const getMarketingFallback = (userMsg: string): string => {
     const lower = userMsg.toLowerCase();
 
@@ -174,14 +147,12 @@ Your goal is to MARKET Alya's skills persuasively to clients, partners, and empl
     let reply: string | null = null;
 
     if (selectedModel === 'groq') {
-      reply = await callGroqAPI(query, 'llama-3.1-8b-instant');
+      reply = await callGroqAPI(query, 'allam-2-7b');
     } else if (selectedModel === 'gpt20b') {
-      reply = await callGroqAPI(query, 'llama-3.3-70b-versatile');
-    } else if (selectedModel === 'gemini') {
-      reply = await callGeminiAPI(query);
+      reply = await callGroqAPI(query, 'openai/gpt-oss-20b');
     }
 
-    // Fallback if selected API failed or returned error
+    // Fallback if API returned null
     if (!reply) {
       reply = getMarketingFallback(query);
     }
@@ -196,9 +167,8 @@ Your goal is to MARKET Alya's skills persuasively to clients, partners, and empl
   };
 
   const modelLabels: Record<ModelProvider, string> = {
-    groq: 'Llama 3.1 8B (Groq Fast LPU)',
-    gpt20b: 'Llama 3.3 70B (Groq Enterprise)',
-    gemini: 'Google Gemini 2.0 Flash',
+    groq: 'ALLaM 2.0 (Arabic & English 0.1s)',
+    gpt20b: 'GPT-OSS 20B (Groq LPU)',
   };
 
   return (
@@ -257,7 +227,7 @@ Your goal is to MARKET Alya's skills persuasively to clients, partners, and empl
                   {/* Dropdown Menu */}
                   {showModelMenu && (
                     <div className="absolute top-6 left-0 z-50 w-56 py-1 rounded-xl border border-[var(--border-highlight)] bg-[var(--bg-primary)] shadow-2xl backdrop-blur-md">
-                      {(['groq', 'gpt20b', 'gemini'] as ModelProvider[]).map((prov) => (
+                      {(['groq', 'gpt20b'] as ModelProvider[]).map((prov) => (
                         <button
                           key={prov}
                           onClick={() => {

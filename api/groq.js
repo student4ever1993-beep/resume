@@ -36,7 +36,7 @@ export default async function handler(req, res) {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: model || 'llama-3.1-8b-instant',
+        model: model || 'allam-2-7b',
         messages,
         temperature: temperature ?? 0.6,
         max_tokens: max_tokens ?? 250,
