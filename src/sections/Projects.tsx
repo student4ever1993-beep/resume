@@ -6,10 +6,8 @@ import { projectsConfig } from '../config';
 
 gsap.registerPlugin(ScrollTrigger);
 
-// `tags` comes from projectsConfig.projects[idx].tags (matched by index, like `image`).
-// `category` is expected to come from your translation files instead
-// (e.g. projects.list[].category in en.json / ar.json), since it's not
-// present in the projectsConfig.projects data.
+// `image`/`tags` come from projectsConfig.projects[idx] (matched by array index);
+// everything else comes from the translation files (projects.list[] in en.json / ar.json).
 interface LocalizedProject {
   name: string;
   role: string;
@@ -28,12 +26,13 @@ export default function Projects() {
   const touchStartX = useRef<number | null>(null);
 
   const isRtl = i18n.language === 'ar';
+  const sansFont = isRtl ? 'Cairo, system-ui, sans-serif' : 'Inter, system-ui, sans-serif';
+  const displayFont = isRtl ? 'Cairo, system-ui, sans-serif' : '"Space Grotesk", system-ui, sans-serif';
   const localizedList = t('projects.list', { returnObjects: true }) as LocalizedProject[];
 
   const projects: LocalizedProject[] = Array.isArray(localizedList) ? localizedList.map((project, idx) => ({
     ...project,
     image: projectsConfig.projects[idx]?.image,
-    category: project.category,
     tags: projectsConfig.projects[idx]?.tags,
   })) : [];
 
@@ -97,6 +96,28 @@ export default function Projects() {
   }, [i18n.language]);
 
   if (projects.length === 0) return null;
+
+  const isAtStart = activeIndex === 0;
+  const isAtEnd = activeIndex === projects.length - 1;
+
+  const renderNavButton = (opts: { onClick: () => void; disabled: boolean; arrow: string; label: string; arrowFirst: boolean }) => (
+    <button
+      onClick={opts.onClick}
+      disabled={opts.disabled}
+      className="proj-nav-btn"
+      style={{
+        color: opts.disabled ? 'var(--text-muted)' : 'var(--accent-gold)',
+        opacity: opts.disabled ? 0.35 : 1,
+        cursor: opts.disabled ? 'not-allowed' : 'pointer',
+      }}
+    >
+      {opts.arrowFirst ? (
+        <>{opts.arrow} <span className="proj-nav-label">{opts.label}</span></>
+      ) : (
+        <><span className="proj-nav-label">{opts.label}</span> {opts.arrow}</>
+      )}
+    </button>
+  );
 
   return (
     <section
@@ -178,18 +199,7 @@ export default function Projects() {
           gap: 12px;
           margin-bottom: 16px;
         }
-        .proj-badge-role {
-          font-family: 'JetBrains Mono', monospace;
-          font-size: 11px;
-          font-weight: 600;
-          color: var(--accent-gold);
-          background: var(--glass-bg);
-          border: 1px solid var(--border-primary);
-          padding: 6px 14px;
-          border-radius: 20px;
-          white-space: nowrap;
-        }
-        .proj-badge-category {
+        .proj-badge {
           font-family: 'JetBrains Mono', monospace;
           font-size: 11px;
           font-weight: 600;
@@ -211,7 +221,6 @@ export default function Projects() {
           border: 1px solid var(--border-primary);
           border-radius: 10px;
           padding: 16px 18px;
-          font-family: Inter, sans-serif;
           font-size: 13px;
           color: var(--text-muted);
           line-height: 1.6;
@@ -336,7 +345,7 @@ export default function Projects() {
         <div style={{ marginBottom: '64px', textAlign: 'center' }}>
           <p
             style={{
-              fontFamily: isRtl ? 'Cairo, system-ui, sans-serif' : 'Inter, system-ui, sans-serif',
+              fontFamily: sansFont,
               fontSize: '11px',
               fontWeight: 600,
               color: 'var(--accent-gold)',
@@ -349,7 +358,7 @@ export default function Projects() {
           </p>
           <h2
             style={{
-              fontFamily: isRtl ? 'Cairo, system-ui, sans-serif' : '"Space Grotesk", system-ui, sans-serif',
+              fontFamily: displayFont,
               fontSize: 'clamp(32px, 4vw, 48px)',
               fontWeight: 500,
               color: 'var(--text-heading)',
@@ -411,22 +420,22 @@ export default function Projects() {
                   <div className="proj-card-body">
                     <div>
                       <div className="proj-badges-row">
-                        <span className="proj-badge-role">
+                        <span className="proj-badge">
                           {project.role}
                         </span>
                         {project.category && (
-                          <span className="proj-badge-category">
+                          <span className="proj-badge">
                             {project.category}
                           </span>
                         )}
                       </div>
 
-                      <h3 style={{ fontFamily: isRtl ? 'Cairo, sans-serif' : '"Space Grotesk", sans-serif', fontSize: '24px', fontWeight: 500, color: '#f5f5f0', marginBottom: '16px' }}>
+                      <h3 style={{ fontFamily: displayFont, fontSize: '24px', fontWeight: 500, color: 'var(--text-heading)', marginBottom: '16px' }}>
                         {project.name}
                       </h3>
 
                       <div className="proj-details-row">
-                        <p className="proj-contribution-box" style={{ margin: 0 }}>
+                        <p className="proj-contribution-box" style={{ margin: 0, fontFamily: sansFont }}>
                           {project.contribution}
                         </p>
                         {project.tags && project.tags.length > 0 && (
@@ -441,8 +450,8 @@ export default function Projects() {
 
                     <div style={{ borderTop: '1px solid rgba(255, 255, 255, 0.05)', paddingTop: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
                       <span style={{ fontSize: '14px', opacity: 0.5 }}>📍</span>
-                      <p style={{ fontFamily: isRtl ? 'Cairo, sans-serif' : 'Inter, sans-serif', fontSize: '12px', color: '#8b8b9a', fontWeight: 500, margin: 0 }}>
-                        <span style={{ color: '#5a5a6e' }}>{t('projects.clientLabel')}: </span>
+                      <p style={{ fontFamily: sansFont, fontSize: '12px', color: 'var(--text-muted)', fontWeight: 500, margin: 0 }}>
+                        <span style={{ opacity: 0.7 }}>{t('projects.clientLabel')}: </span>
                         {project.client}
                       </p>
                     </div>
@@ -456,21 +465,13 @@ export default function Projects() {
         {/* Carousel Controllers */}
         <div className="proj-controls">
           <div className="proj-nav-row">
-            <button
-              onClick={isRtl ? handleNext : handlePrev}
-              disabled={isRtl ? activeIndex === projects.length - 1 : activeIndex === 0}
-              className="proj-nav-btn"
-              style={{
-                color: (isRtl ? activeIndex === projects.length - 1 : activeIndex === 0) ? '#333344' : '#c9a84c',
-                cursor: (isRtl ? activeIndex === projects.length - 1 : activeIndex === 0) ? 'not-allowed' : 'pointer',
-              }}
-            >
-              {isRtl ? (
-                <><span className="proj-nav-label">NEXT</span> →</>
-              ) : (
-                <>← <span className="proj-nav-label">PREV</span></>
-              )}
-            </button>
+            {renderNavButton({
+              onClick: isRtl ? handleNext : handlePrev,
+              disabled: isRtl ? isAtEnd : isAtStart,
+              arrow: isRtl ? '→' : '←',
+              label: isRtl ? 'NEXT' : 'PREV',
+              arrowFirst: !isRtl,
+            })}
 
             {/* Slider Progress Bar */}
             <div className="proj-progress-track">
@@ -482,28 +483,20 @@ export default function Projects() {
                   right: isRtl ? 0 : 'auto',
                   height: '100%',
                   width: `${((activeIndex + 1) / projects.length) * 100}%`,
-                  backgroundColor: '#c9a84c',
+                  backgroundColor: 'var(--accent-gold)',
                   transition: 'width 0.4s cubic-bezier(0.25, 1, 0.5, 1)',
-                  borderRadius: '2px'
+                  borderRadius: '2px',
                 }}
               />
             </div>
 
-            <button
-              onClick={isRtl ? handlePrev : handleNext}
-              disabled={isRtl ? activeIndex === 0 : activeIndex === projects.length - 1}
-              className="proj-nav-btn"
-              style={{
-                color: (isRtl ? activeIndex === 0 : activeIndex === projects.length - 1) ? '#333344' : '#c9a84c',
-                cursor: (isRtl ? activeIndex === 0 : activeIndex === projects.length - 1) ? 'not-allowed' : 'pointer',
-              }}
-            >
-              {isRtl ? (
-                <>← <span className="proj-nav-label">PREV</span></>
-              ) : (
-                <><span className="proj-nav-label">NEXT</span> →</>
-              )}
-            </button>
+            {renderNavButton({
+              onClick: isRtl ? handlePrev : handleNext,
+              disabled: isRtl ? isAtStart : isAtEnd,
+              arrow: isRtl ? '←' : '→',
+              label: isRtl ? 'PREV' : 'NEXT',
+              arrowFirst: isRtl,
+            })}
           </div>
 
           {/* Pagination Dots */}
@@ -516,7 +509,7 @@ export default function Projects() {
                 style={{
                   width: idx === activeIndex ? '24px' : '8px',
                   height: '8px',
-                  backgroundColor: idx === activeIndex ? '#c9a84c' : 'rgba(255,255,255,0.15)',
+                  backgroundColor: idx === activeIndex ? 'var(--accent-gold)' : 'var(--border-primary)',
                 }}
               />
             ))}
