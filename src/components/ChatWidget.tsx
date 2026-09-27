@@ -1,363 +1,488 @@
-import { useState, useRef, useEffect } from 'react';
-import { useTranslation } from 'react-i18next';
-import { X, Send, User, Loader2, Cpu, ChevronDown, Bot } from 'lucide-react';
-import { contactConfig } from '../config';
+import { lazy, Suspense, useCallback, useEffect, useId, useRef, useState } from 'react';
+import { Bot, ChevronDown, Cpu, Mic, MicOff, ScrollText, Send, Square, Volume2, VolumeX, X } from 'lucide-react';
+import { useAssistantChat, type ModelProvider } from '../assistant/useAssistantChat';
+import { SpeechOutput } from '../avatar/speech';
+import { useSpeechRecognition } from '../avatar/useSpeechRecognition';
+import type { AvatarDriver, AvatarState } from '../avatar/types';
 
-interface Message {
-  id: string;
-  sender: 'bot' | 'user';
-  text: string;
-}
+// 3D avatar front-end for the AI assistant. Conversation logic is in useAssistantChat;
+// this component handles presentation, voice (TTS + mic) and the avatar's state.
 
-type ModelProvider = 'groq' | 'gpt20b';
+const AvatarCanvas = lazy(() => import('../avatar/AvatarCanvas'));
+
+const MUTE_KEY = 'alya-assistant-muted';
+const readMuted = () => {
+  try {
+    return localStorage.getItem(MUTE_KEY) === '1';
+  } catch {
+    return false;
+  }
+};
+
+const STATE_DOT: Record<AvatarState, string> = {
+  idle: 'bg-amber-400',
+  listening: 'bg-teal-400',
+  thinking: 'bg-violet-400',
+  speaking: 'bg-amber-300',
+};
+
+type VoiceState = 'idle' | 'preparing' | 'speaking';
+
+// Speak in the language of the reply itself (the model may answer in either language).
+const detectLang = (text: string): 'en' | 'ar' => (/[\u0600-\u06FF]/.test(text) ? 'ar' : 'en');
 
 export default function ChatWidget() {
-  const { i18n } = useTranslation();
-  const isRtl = i18n.language === 'ar';
+  const { isRtl, messages, isLoading, selectedModel, setSelectedModel, modelLabels, quickQuestions, handleSend } =
+    useAssistantChat();
 
   const [isOpen, setIsOpen] = useState(false);
   const [input, setInput] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  const [selectedModel, setSelectedModel] = useState<ModelProvider>('groq');
+  const [inputActive, setInputActive] = useState(false);
+  const [muted, setMuted] = useState(readMuted);
+  const [voiceState, setVoiceState] = useState<VoiceState>('idle');
+  const [showTranscript, setShowTranscript] = useState(false);
   const [showModelMenu, setShowModelMenu] = useState(false);
-  const [avatarVideoFailed, setAvatarVideoFailed] = useState(false);
+  const [loadAvatar, setLoadAvatar] = useState(false);
+  const [avatarFailed, setAvatarFailed] = useState(false);
 
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      id: '1',
-      sender: 'bot',
-      text: isRtl
-        ? 'مرحباً! أنا مساعد علياء الذكي للاستشارات والتطوير. كيف يمكنني مساعدتك اليوم في استكشاف خبراتها في تحليل النظم والتحول الرقمي؟'
-        : "Hello! I am Alya's AI Strategy Assistant. How can I help you explore her systems analysis experience, technical skills, or project portfolio today?",
+  const launcherRef = useRef<HTMLButtonElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const transcriptEndRef = useRef<HTMLDivElement>(null);
+  const greetedRef = useRef(false);
+  const wasOpenRef = useRef(false);
+  const panelId = useId();
+  const titleId = useId();
+
+  const [speech] = useState(() => new SpeechOutput());
+  // Shared with the render loop; mutated freely without re-rendering React.
+  const driverRef = useRef<AvatarDriver>({
+    state: 'idle',
+    expanded: false,
+    reducedMotion: window.matchMedia('(prefers-reduced-motion: reduce)').matches,
+    pointer: null,
+    pointerMovedAt: 0,
+    sampleMouth: speech.sampleMouth,
+    gestureQueue: [],
+  });
+
+  const speak = useCallback(
+    (text: string) => {
+      if (muted) return;
+      void speech.speak(text, detectLang(text), {
+        onStart: () => setVoiceState('speaking'),
+        onEnd: () => setVoiceState('idle'),
+      });
+      setVoiceState('preparing');
     },
-  ]);
+    [muted, speech],
+  );
 
-  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const send = useCallback(
+    async (text: string) => {
+      const query = text.trim();
+      if (!query || isLoading) return;
+      speech.unlock();
+      speech.stop();
+      driverRef.current.gestureQueue.push('nod');
+      setInput('');
+      const reply = await handleSend(query);
+      if (reply) speak(reply);
+    },
+    [handleSend, isLoading, speak, speech],
+  );
 
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  };
+  const mic = useSpeechRecognition({ lang: isRtl ? 'ar-OM' : 'en-US', onFinal: (text) => void send(text) });
+
+  // ── Avatar state ──
+  const avatarState: AvatarState =
+    voiceState === 'speaking'
+      ? 'speaking'
+      : isLoading || voiceState === 'preparing'
+        ? 'thinking'
+        : mic.listening || (inputActive && input.length > 0)
+          ? 'listening'
+          : 'idle';
 
   useEffect(() => {
-    if (isOpen) {
-      scrollToBottom();
+    driverRef.current.state = avatarState;
+    driverRef.current.expanded = isOpen;
+  }, [avatarState, isOpen]);
+
+  // Lazy-load the 3D avatar once the page is idle, so it never competes with first paint.
+  useEffect(() => {
+    const w = window as Window & { requestIdleCallback?: (cb: () => void, o?: { timeout: number }) => number };
+    const start = () => (w.requestIdleCallback ? w.requestIdleCallback(() => setLoadAvatar(true), { timeout: 3000 }) : setTimeout(() => setLoadAvatar(true), 1500));
+    if (document.readyState === 'complete') start();
+    else window.addEventListener('load', start, { once: true });
+    return () => window.removeEventListener('load', start);
+  }, []);
+
+  // Eyes follow the pointer ("looks toward the user").
+  useEffect(() => {
+    const onMove = (e: PointerEvent) => {
+      driverRef.current.pointer = { x: e.clientX, y: e.clientY };
+      driverRef.current.pointerMovedAt = performance.now();
+    };
+    window.addEventListener('pointermove', onMove, { passive: true });
+    return () => window.removeEventListener('pointermove', onMove);
+  }, []);
+
+  useEffect(() => () => speech.dispose(), [speech]);
+
+  useEffect(() => {
+    if (isOpen) transcriptEndRef.current?.scrollIntoView({ block: 'end' });
+  }, [messages, isOpen, showTranscript]);
+
+  // Focus management: input on open, launcher on close.
+  useEffect(() => {
+    if (isOpen) inputRef.current?.focus({ preventScroll: true });
+    else if (wasOpenRef.current) launcherRef.current?.focus({ preventScroll: true });
+    wasOpenRef.current = isOpen;
+  }, [isOpen]);
+
+  const open = () => {
+    setLoadAvatar(true);
+    setIsOpen(true);
+    speech.unlock();
+    if (!greetedRef.current) {
+      greetedRef.current = true;
+      driverRef.current.gestureQueue.push('wave');
+      const greeting = messages[0]?.text;
+      if (greeting) speak(greeting);
     }
-  }, [messages, isOpen]);
+  };
 
-  const quickQuestions = isRtl
-    ? [
-        { label: '🚀 كيف تقود علياء التحول الرقمي؟', query: 'كيف تقود علياء التحول الرقمي في المؤسسات؟' },
-        { label: '💼 خبرتها في شركة أمان بمسقط', query: 'حدثني عن خبرة علياء البالغة 5 سنوات في شركة أمان بمسقط' },
-        { label: '⚡ المهارات والتقنيات البرمجية', query: 'ما هي المهارات والتقنيات البرمجية التي تبرع فيها علياء؟' },
-        { label: '✉️ التواصل وحجز استشارة', query: 'كيف يمكنني التواصل مع علياء أو طلب سيرتها الذاتية؟' },
-      ]
-    : [
-        { label: '🚀 Digital Transformation Leadership', query: 'How does Alya drive enterprise digital transformation?' },
-        { label: '💼 5+ Yrs Experience at AMAN', query: 'Tell me about Alya\'s 5+ years experience as Systems Analyst at AMAN in Muscat.' },
-        { label: '⚡ Technical Skills & Frameworks', query: 'What technical skills and architecture frameworks does Alya master?' },
-        { label: '✉️ Hire Alya / Contact CV', query: 'How can I contact Alya or download her CV for a job opportunity?' },
-      ];
+  const close = useCallback(() => {
+    speech.stop();
+    mic.stop();
+    setShowModelMenu(false);
+    setIsOpen(false);
+  }, [mic, speech]);
 
-  // High-Impact Marketing System Prompt — grounded in Alya's actual CV, third-person voice
-  const marketingSystemPrompt = `You are Alya Al-Siyabi's Career Marketing AI Assistant. Speak ABOUT Alya in the third person (never as "I"). Answer ONLY using the verified facts below — never invent employers, titles, technologies, or years of experience. Be enthusiastic, confident, and professional. Keep answers under 3 concise sentences. Answer in ${isRtl ? 'Arabic' : 'English'}.
-${isRtl ? 'مهم: اسمها بالعربية هو "علياء السيابية" — اكتبيه بهذا الشكل حصراً، ولا تكتبيه أبداً "أليا" أو أي تهجئة أخرى.' : ''}
-
-VERIFIED PROFILE:
-- Identity: Process Engineer turned Systems Analyst & Programmer, based in Al-Seeb, Muscat, Oman.
-- Current role: Systems Analyst & Programmer at AMAN Consultancy and Business Development, Muscat (2021–Present). Handles requirements gathering, system design (flowcharts & data models), technical client proposals, full-stack development with ASP.NET Core MVC (Clean Architecture) and Laravel, is growing skills in Next.js/Angular/Power BI, integrates AI APIs, and tests applications.
-- Prior roles: Process Engineer Trainee at T-kavin Engineering Consultancy & Public Authority for Water (5-month traineeship, 2018–2019) — P&ID diagrams, SCADA monitoring, water meter verification; Digital Marketing at The World of Muscat Real Estate (2016–2019) — social media management and campaign design.
-- Education: Master of Digital Transformation and Innovation, University of Technology and Applied Sciences (UTAS), 2026–2027 (in progress); BSc Process Engineering, German University of Technology (GUtech), 2011–2017.
-- Certifications: Dubai Center for AI Accelerator Program, ECBA, OXY Program for Entrepreneurial Development in Frontier Technology, Measurement Techniques Course, IC3, IELTS.
-- Languages: Arabic (native), English (fluent), German (fluent).
-- Skills: PHP, C#, JavaScript, HTML/CSS, ASP.NET Core MVC, Laravel, Next.js, Angular, React, Power BI, ChemCad, Figma, Canva, Photoshop.
-- Key projects: government portal for the Environment Authority (washaq.ea.gov.om); client platforms for Rakeeza and Aluminum Watad; healthcare platform for Alfaisal Medical Services; AMAN in-house consultancy hub (ach.aman.om) plus testing/development on aman.om; Elite Companies system for MOCIIP (designed the system, built a Power BI demo, owned product through staging); an AI-powered candidate-evaluation tool for AMAN using the Gemini and ChatGPT APIs; the Fostering System for SMEDA (programmer & product owner, in staging); Generative-AI complaint system testing for TRA and chatbot evaluation for Dubai Airports (DXP); and an agricultural data-collection & analytics platform for ADC Somalia as main developer.
-- Contact: Alya_alsiyabi93@outlook.com.
-
-If asked about something not covered above, say that detail isn't confirmed and suggest contacting Alya directly rather than guessing.`;
-
-  // 1. Groq API Call via Vercel / Dev Server Function (/api/groq)
-  const callGroqAPI = async (userMsg: string, modelId: string = 'allam-2-7b'): Promise<string | null> => {
-    try {
-      const res = await fetch('/api/groq', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          model: modelId,
-          messages: [
-            { role: 'system', content: marketingSystemPrompt },
-            { role: 'user', content: userMsg },
-          ],
-          temperature: 0.6,
-          max_tokens: 250,
-        }),
-      });
-
-      const contentType = res.headers.get('content-type') || '';
-      if (!res.ok || !contentType.includes('application/json')) {
-        const err = await res.text();
-        console.error('Groq API Error via /api/groq:', res.status, err);
-        return null;
+  useEffect(() => {
+    if (!isOpen) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        if (showModelMenu) setShowModelMenu(false);
+        else close();
       }
-
-      const data = await res.json();
-      const content = data.choices?.[0]?.message?.content || data.choices?.[0]?.message?.reasoning;
-      return content || null;
-    } catch (err) {
-      console.error('Groq Fetch Exception:', err);
-      return null;
-    }
-  };
-
-  // 2. Marketing Smart Fallback Engine (General Error Fallback)
-  const getMarketingFallback = (userMsg: string): string => {
-    const lower = userMsg.toLowerCase();
-
-    if (lower.includes('digital') || lower.includes('transformation') || lower.includes('تحول') || lower.includes('رقمي')) {
-      return isRtl
-        ? 'علياء عملت كمحللة أنظمة تجمع بين خلفيتها كمهندسة عمليات وخبرتها البرمجية، حيث تحلل احتياجات المؤسسات وتصمم أنظمة رقمية (مخططات، نماذج بيانات، مواصفات) بدلاً من العمليات اليدوية. وهي حالياً تكمل ماجستير التحول الرقمي والابتكار في UTAS. هل ترغب بمعرفة تفاصيل أحد مشاريعها؟'
-        : "Alya bridges her Process Engineering background with systems analysis—gathering requirements, mapping workflows, and designing system specifications (flowcharts, data models) for government, healthcare, and private clients. She's currently completing a Master's in Digital Transformation and Innovation at UTAS. Want details on a specific project?";
-    }
-
-    if (lower.includes('experience') || lower.includes('خبرة') || lower.includes('خبرات') || lower.includes('aman') || lower.includes('أمان')) {
-      return isRtl
-        ? 'منذ عام 2021 وعلياء تعمل كمحللة أنظمة ومبرمجة في شركة أمان للاستشارات وتطوير الأعمال بمسقط، حيث تجمع المتطلبات وتصمم الأنظمة وتطور الواجهات الأمامية والخلفية باستخدام ASP.NET Core وLaravel، بالإضافة إلى دمج واجهات برمجة الذكاء الاصطناعي. يمكنك تحميل سيرتها الذاتية الكاملة من قسم Hero!'
-        : "Since 2021, Alya has worked as a Systems Analyst & Programmer at AMAN Consultancy and Business Development in Muscat—gathering requirements, designing systems, and building full-stack features with ASP.NET Core MVC and Laravel, plus integrating AI APIs. Download her full CV from the Hero section!";
-    }
-
-    if (lower.includes('skill') || lower.includes('مهار') || lower.includes('تقني') || lower.includes('react') || lower.includes('three')) {
-      return isRtl
-        ? 'تجمع علياء بين البرمجة (PHP وC# وJavaScript، مع ASP.NET Core MVC وLaravel وNext.js وAngular وReact) وأدوات مثل Power BI وFigma، إلى جانب خلفيتها الهندسية في ChemCad. هل ترغب بالتواصل معها لمناقشة مشروعك؟'
-        : 'Alya combines programming (PHP, C#, JavaScript, with ASP.NET Core MVC, Laravel, Next.js, Angular, React) with tools like Power BI and Figma, plus an engineering background using ChemCad. Shall we connect you with her?';
-    }
-
-    if (lower.includes('contact') || lower.includes('hire') || lower.includes('email') || lower.includes('تواصل') || lower.includes('توظيف') || lower.includes('بريد')) {
-      return isRtl
-        ? `علياء مستعدة لقيادة نجاح مشروعك القادم! يمكنك التواصل معها مباشرة عبر البريد الإلكتروني: ${contactConfig.items.find(i => i.icon === 'Mail')?.value || 'Alya_alsiyabi93@outlook.com'}`
-        : `Alya is ready to bring her systems analysis and development skills to your team! You can email her directly at ${contactConfig.items.find(i => i.icon === 'Mail')?.value || 'Alya_alsiyabi93@outlook.com'} or request her full portfolio.`;
-    }
-
-    return isRtl
-      ? 'علياء السيابية محللة أنظمة ومبرمجة مقرها مسقط، بخلفية في هندسة العمليات وخبرة منذ 2021 في تحليل الأنظمة وتطوير البرمجيات لدى شركة أمان. يمكنك طرح أي سؤال عن مشاريعها أو مهاراتها!'
-      : 'Alya Al-Siyabi is a Muscat-based Systems Analyst & Programmer with a Process Engineering background, working at AMAN since 2021 on requirements analysis, system design, and full-stack development. Feel free to ask about her projects or skills!';
-  };
-
-  const handleSend = async (textToSend?: string) => {
-    const query = textToSend || input;
-    if (!query.trim() || isLoading) return;
-
-    const userMessage: Message = {
-      id: Date.now().toString(),
-      sender: 'user',
-      text: query,
     };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [isOpen, showModelMenu, close]);
 
-    setMessages((prev) => [...prev, userMessage]);
-    if (!textToSend) setInput('');
-    setIsLoading(true);
-
-    let reply: string | null = null;
-
-    if (selectedModel === 'groq') {
-      reply = await callGroqAPI(query, 'allam-2-7b');
-    } else if (selectedModel === 'gpt20b') {
-      reply = await callGroqAPI(query, 'openai/gpt-oss-20b');
+  const toggleMute = () => {
+    const next = !muted;
+    setMuted(next);
+    if (next) speech.stop();
+    try {
+      localStorage.setItem(MUTE_KEY, next ? '1' : '0');
+    } catch {
+      // storage unavailable (private mode): the preference just won't persist
     }
-
-    // Fallback if API returned null
-    if (!reply) {
-      reply = getMarketingFallback(query);
-    }
-
-    setIsLoading(false);
-    const botReply: Message = {
-      id: (Date.now() + 1).toString(),
-      sender: 'bot',
-      text: reply,
-    };
-    setMessages((prev) => [...prev, botReply]);
   };
 
-  const modelLabels: Record<ModelProvider, string> = {
-    groq: 'ALLaM 2.0 (Arabic & English 0.1s)',
-    gpt20b: 'GPT-OSS 20B (Groq LPU)',
+  const toggleMic = () => {
+    if (mic.listening) return mic.stop();
+    speech.unlock();
+    speech.stop();
+    mic.start();
   };
+
+  const t = (en: string, ar: string) => (isRtl ? ar : en);
+  const statusLabel: Record<AvatarState, string> = {
+    idle: t('Ready to help', 'جاهز للمساعدة'),
+    listening: t('Listening…', 'أستمع…'),
+    thinking: voiceState === 'preparing' ? t('Preparing voice…', 'أجهّز الصوت…') : t('Thinking…', 'أفكر…'),
+    speaking: t('Speaking…', 'أتحدث…'),
+  };
+
+  const lastBot = [...messages].reverse().find((m) => m.sender === 'bot');
+  const awaitingReply = isLoading || voiceState === 'preparing';
+  const hasUserMessages = messages.some((m) => m.sender === 'user');
+  const side = isRtl ? 'left-3 sm:left-6' : 'right-3 sm:right-6';
 
   return (
-    <>
-      {/* Floating Gold Robot Trigger Button */}
-      <button
-        onClick={() => setIsOpen(!isOpen)}
-        className={`fixed bottom-6 z-50 w-16 h-16 rounded-full bg-gradient-to-tr from-[#9a7516] via-[#d4af37] to-[#ffd700] text-[#050508] shadow-[0_0_30px_rgba(212,175,55,0.7)] border border-[#ffe082]/60 hover:scale-110 hover:shadow-[0_0_40px_rgba(255,215,0,0.9)] transition-all duration-300 flex items-center justify-center ${
-          isRtl ? 'left-6' : 'right-6'
-        }`}
-        aria-label="Open AI Assistant"
+    <div
+      className={`fixed z-50 bottom-3 sm:bottom-6 ${side} overflow-hidden border shadow-2xl transition-[width,height,border-radius,box-shadow] duration-500 ease-out ${
+        isOpen
+          ? 'w-[calc(100vw-1.5rem)] sm:w-[400px] h-[min(88dvh,680px)] rounded-[28px] border-[var(--border-highlight)] bg-[var(--glass-bg)] backdrop-blur-xl flex flex-col'
+          : 'w-[84px] h-[84px] rounded-full border-[#ffe082]/60 bg-[#0b0b10] shadow-[0_0_30px_rgba(212,175,55,0.55)] hover:shadow-[0_0_42px_rgba(255,215,0,0.8)]'
+      }`}
+      style={{ fontFamily: isRtl ? 'Cairo, system-ui, sans-serif' : 'Inter, system-ui, sans-serif' }}
+      dir={isRtl ? 'rtl' : 'ltr'}
+    >
+      {/* ── Avatar stage (same element in both modes, so the 3D scene is never re-created) ── */}
+      <div
+        className={`relative shrink-0 ${isOpen ? 'flex-1 min-h-[200px]' : 'w-full h-full'}`}
+        style={{
+          background:
+            'radial-gradient(circle at 50% 42%, rgba(212,175,55,0.28), rgba(212,175,55,0.06) 45%, transparent 70%)',
+        }}
       >
-        {isOpen ? (
-          <X size={26} className="text-[#050508]" />
-        ) : avatarVideoFailed ? (
-          <Bot size={28} className="text-[#050508] animate-bounce-short" />
-        ) : (
-          <span className="absolute inset-[3px] rounded-full overflow-hidden pointer-events-none">
-            <video
-              src="/videos/robot-avatar.mp4"
-              autoPlay
-              loop
-              muted
-              playsInline
-              onError={() => setAvatarVideoFailed(true)}
-              className="w-full h-full object-cover"
-            />
-          </span>
-        )}
-        <span className="absolute -top-1 -right-1 flex h-3.5 w-3.5 pointer-events-none">
-          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-200 opacity-75"></span>
-          <span className="relative inline-flex rounded-full h-3.5 w-3.5 bg-amber-400"></span>
-        </span>
-      </button>
-
-      {/* Glassmorphic Chat Drawer */}
-      {isOpen && (
         <div
-          className={`fixed bottom-24 z-50 w-[90vw] sm:w-[410px] h-[550px] rounded-3xl border border-[var(--border-highlight)] bg-[var(--glass-bg)] backdrop-blur-xl shadow-2xl flex flex-col overflow-hidden transition-all duration-300 animate-in fade-in slide-in-from-bottom-5 ${
-            isRtl ? 'left-6' : 'right-6'
-          }`}
-          style={{
-            fontFamily: isRtl ? 'Cairo, system-ui, sans-serif' : 'Inter, system-ui, sans-serif',
-          }}
+          className="absolute inset-0"
+          style={isOpen ? { maskImage: 'linear-gradient(to bottom, black 78%, transparent)', WebkitMaskImage: 'linear-gradient(to bottom, black 78%, transparent)' } : undefined}
         >
-          {/* Header */}
-          <div className="flex items-center justify-between px-4 py-3 border-b border-[var(--border-primary)] bg-gradient-to-r from-[rgba(212,175,55,0.18)] via-[rgba(201,168,76,0.1)] to-transparent">
-            <div className="flex items-center gap-2.5">
-              <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-[#9a7516] via-[#d4af37] to-[#ffd700] p-2 shadow-[0_0_12px_rgba(212,175,55,0.5)] flex items-center justify-center text-[#050508]">
-                <Bot size={22} />
+          {loadAvatar && !avatarFailed ? (
+            <Suspense fallback={<AvatarPlaceholder />}>
+              <AvatarCanvas driverRef={driverRef} onError={() => setAvatarFailed(true)} />
+            </Suspense>
+          ) : (
+            <AvatarPlaceholder />
+          )}
+        </div>
+
+        {!isOpen && (
+          <>
+            <button
+              ref={launcherRef}
+              type="button"
+              onClick={open}
+              onPointerEnter={() => setLoadAvatar(true)}
+              onFocus={() => setLoadAvatar(true)}
+              aria-label={t("Open Alya's AI assistant", 'افتح مساعد علياء الذكي')}
+              aria-expanded={false}
+              title={t("Talk to Alya's AI assistant", 'تحدث مع مساعد علياء الذكي')}
+              className="absolute inset-0 rounded-full focus:outline-none focus-visible:ring-4 focus-visible:ring-amber-400/70"
+            />
+            <span className="pointer-events-none absolute top-1 right-1 flex h-3.5 w-3.5" aria-hidden="true">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-200 opacity-75 motion-reduce:hidden" />
+              <span className="relative inline-flex rounded-full h-3.5 w-3.5 bg-amber-400" />
+            </span>
+          </>
+        )}
+
+        {isOpen && (
+          <div className="absolute inset-x-0 top-0 flex items-start justify-between gap-2 p-3">
+            <div className="flex flex-col gap-1.5 min-w-0">
+              <h2 id={titleId} className="text-xs font-bold text-[var(--text-heading)] drop-shadow">
+                {t('Alya AI Assistant', 'مساعد علياء الذكي')}
+              </h2>
+              <div
+                className="inline-flex items-center gap-1.5 self-start rounded-full border border-[var(--border-primary)] bg-[var(--glass-bg)] px-2.5 py-1 text-[10px] font-semibold text-[var(--text-heading)]"
+                aria-hidden="true"
+              >
+                <span className={`h-2 w-2 rounded-full ${STATE_DOT[avatarState]} ${avatarState !== 'idle' ? 'animate-pulse' : ''}`} />
+                {statusLabel[avatarState]}
               </div>
-              <div>
-                <h3 className="text-xs font-bold text-[var(--text-heading)] flex items-center gap-1.5">
-                  {isRtl ? 'مساعد علياء الذكي' : 'Alya AI Assistant'}
-                </h3>
-
-                {/* Model Selector Dropdown Badge */}
-                <div className="relative inline-block">
-                  <button
-                    onClick={() => setShowModelMenu(!showModelMenu)}
-                    className="text-[10px] text-amber-500 font-medium flex items-center gap-1 hover:underline focus:outline-none"
-                  >
-                    <Cpu size={11} />
-                    <span>{modelLabels[selectedModel]}</span>
-                    <ChevronDown size={11} />
-                  </button>
-
-                  {/* Dropdown Menu */}
-                  {showModelMenu && (
-                    <div className="absolute top-6 left-0 z-50 w-56 py-1 rounded-xl border border-[var(--border-highlight)] bg-[var(--bg-primary)] shadow-2xl backdrop-blur-md">
-                      {(['groq', 'gpt20b'] as ModelProvider[]).map((prov) => (
-                        <button
-                          key={prov}
-                          onClick={() => {
-                            setSelectedModel(prov);
-                            setShowModelMenu(false);
-                          }}
-                          className={`w-full text-left px-3 py-1.5 text-[11px] font-medium transition-colors flex items-center justify-between ${
-                            selectedModel === prov
-                              ? 'text-amber-400 bg-[rgba(255,140,0,0.12)]'
-                              : 'text-[var(--text-primary)] hover:bg-[var(--glass-bg)]'
-                          }`}
-                        >
-                          <span>{modelLabels[prov]}</span>
-                          {selectedModel === prov && <span className="w-1.5 h-1.5 rounded-full bg-amber-400"></span>}
-                        </button>
-                      ))}
-                    </div>
-                  )}
-                </div>
+              <div className="relative">
+                <button
+                  type="button"
+                  onClick={() => setShowModelMenu((v) => !v)}
+                  aria-haspopup="listbox"
+                  aria-expanded={showModelMenu}
+                  aria-label={t(`AI model: ${modelLabels[selectedModel]}`, `النموذج: ${modelLabels[selectedModel]}`)}
+                  className="flex items-center gap-1 text-[10px] font-medium text-amber-500 hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 rounded"
+                >
+                  <Cpu size={11} aria-hidden="true" />
+                  <span className="truncate max-w-[150px]">{modelLabels[selectedModel]}</span>
+                  <ChevronDown size={11} aria-hidden="true" />
+                </button>
+                {showModelMenu && (
+                  <div role="listbox" aria-label={t('Choose AI model', 'اختر النموذج')} className="absolute top-5 start-0 z-10 w-56 py-1 rounded-xl border border-[var(--border-highlight)] bg-[var(--bg-primary)] shadow-2xl">
+                    {(Object.keys(modelLabels) as ModelProvider[]).map((prov) => (
+                      <button
+                        key={prov}
+                        type="button"
+                        role="option"
+                        aria-selected={selectedModel === prov}
+                        onClick={() => {
+                          setSelectedModel(prov);
+                          setShowModelMenu(false);
+                        }}
+                        className={`w-full text-start px-3 py-1.5 text-[11px] font-medium flex items-center justify-between focus:outline-none focus-visible:bg-[var(--glass-bg)] ${
+                          selectedModel === prov ? 'text-amber-400 bg-[rgba(255,140,0,0.12)]' : 'text-[var(--text-primary)] hover:bg-[var(--glass-bg)]'
+                        }`}
+                      >
+                        <span>{modelLabels[prov]}</span>
+                        {selectedModel === prov && <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />}
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
-            <button
-              onClick={() => setIsOpen(false)}
-              className="p-1.5 rounded-full text-[var(--text-muted)] hover:text-[var(--text-heading)] hover:bg-[var(--glass-bg)] transition-colors"
-            >
-              <X size={15} />
-            </button>
-          </div>
-
-          {/* Messages Container */}
-          <div className="flex-1 p-4 overflow-y-auto space-y-3.5">
-            {messages.map((msg) => (
-              <div
-                key={msg.id}
-                className={`flex gap-2.5 ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}
+            <div className="flex items-center gap-1.5 shrink-0">
+              <IconButton
+                label={muted ? t('Unmute voice', 'تشغيل الصوت') : t('Mute voice', 'كتم الصوت')}
+                pressed={muted}
+                onClick={toggleMute}
               >
-                {msg.sender === 'bot' && (
-                  <div className="w-7 h-7 rounded-full bg-gradient-to-tr from-[#9a7516] to-[#d4af37] border border-[#ffd700]/50 flex items-center justify-center shrink-0 mt-0.5 shadow-[0_0_8px_rgba(212,175,55,0.4)] text-[#050508]">
-                    <Bot size={15} />
-                  </div>
-                )}
-                <div
-                  className={`max-w-[82%] px-4 py-2.5 rounded-2xl text-xs leading-relaxed ${
-                    msg.sender === 'user'
-                      ? 'bg-gradient-to-r from-[var(--accent-gold)] to-[#b5560b] text-[#050505] font-medium rounded-br-none'
-                      : 'border border-[var(--border-primary)] bg-[var(--glass-bg)] text-[var(--text-heading)] rounded-bl-none shadow-sm'
-                  }`}
-                >
-                  {msg.text}
-                </div>
-                {msg.sender === 'user' && (
-                  <div className="w-7 h-7 rounded-full bg-[var(--border-highlight)] text-[var(--text-heading)] flex items-center justify-center shrink-0 mt-0.5">
-                    <User size={14} />
-                  </div>
-                )}
-              </div>
-            ))}
-
-            {isLoading && (
-              <div className="flex items-center gap-2 text-xs text-amber-500 font-medium p-2">
-                <Loader2 size={15} className="animate-spin text-amber-500" />
-                <span>{isRtl ? 'المساعد الذكي يفكر...' : 'AI Assistant is thinking...'}</span>
-              </div>
-            )}
-            <div ref={messagesEndRef} />
+                {muted ? <VolumeX size={15} /> : <Volume2 size={15} />}
+              </IconButton>
+              <IconButton label={t('Close assistant', 'إغلاق المساعد')} onClick={close}>
+                <X size={15} />
+              </IconButton>
+            </div>
           </div>
+        )}
+      </div>
 
-          {/* Marketing Quick Suggestions Chips */}
-          <div className="px-3 py-2 border-t border-[var(--border-primary)] flex flex-wrap gap-1.5 bg-[rgba(0,0,0,0.1)]">
-            {quickQuestions.map((q) => (
+      {/* ── Conversation controls ── */}
+      {isOpen && (
+        <section id={panelId} aria-labelledby={titleId} className="flex flex-col min-h-0 shrink-0">
+          {/* Screen-reader announcements for state changes */}
+          <p className="sr-only" aria-live="polite">
+            {statusLabel[avatarState]}
+          </p>
+
+          <div className="px-4 pb-2">
+            <div className="flex items-center justify-between gap-2 mb-1.5">
               <button
-                key={q.label}
-                onClick={() => handleSend(q.query)}
-                className="px-2.5 py-1 rounded-full border border-amber-500/30 bg-[var(--glass-bg)] text-[10px] font-semibold text-amber-400 hover:border-amber-400 hover:bg-amber-500/10 transition-colors"
+                type="button"
+                onClick={() => setShowTranscript((v) => !v)}
+                aria-expanded={showTranscript}
+                className="inline-flex items-center gap-1 text-[10px] font-semibold uppercase tracking-wider text-[var(--text-muted)] hover:text-[var(--text-heading)] focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 rounded"
               >
-                {q.label}
+                <ScrollText size={12} aria-hidden="true" />
+                {showTranscript ? t('Hide transcript', 'إخفاء المحادثة') : t('Show transcript', 'عرض المحادثة')}
               </button>
-            ))}
+              {(voiceState !== 'idle') && (
+                <button
+                  type="button"
+                  onClick={() => speech.stop()}
+                  className="inline-flex items-center gap-1 rounded-full border border-amber-500/40 px-2.5 py-0.5 text-[10px] font-semibold text-amber-400 hover:bg-amber-500/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400"
+                >
+                  <Square size={9} fill="currentColor" aria-hidden="true" />
+                  {t('Stop speaking', 'إيقاف الكلام')}
+                </button>
+              )}
+            </div>
+
+            <div className={`overflow-y-auto overscroll-contain pe-1 ${showTranscript ? 'max-h-[34dvh]' : 'max-h-[7.5rem]'}`}>
+              {showTranscript ? (
+                <ol className="space-y-2" aria-label={t('Conversation transcript', 'نص المحادثة')}>
+                  {messages.map((m) => (
+                    <li key={m.id} className={`flex ${m.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
+                      <span className="sr-only">{m.sender === 'user' ? t('You:', 'أنت:') : t('Assistant:', 'المساعد:')}</span>
+                      <p
+                        className={`max-w-[88%] px-3 py-2 rounded-2xl text-xs leading-relaxed ${
+                          m.sender === 'user'
+                            ? 'bg-gradient-to-r from-[var(--accent-gold)] to-[#b5560b] text-[#050505] font-medium'
+                            : 'border border-[var(--border-primary)] bg-[var(--glass-bg)] text-[var(--text-heading)]'
+                        }`}
+                      >
+                        {m.text}
+                      </p>
+                    </li>
+                  ))}
+                </ol>
+              ) : (
+                <div aria-live="polite" aria-atomic="true">
+                  {awaitingReply ? (
+                    <p className="flex items-center gap-1 py-2" aria-label={statusLabel.thinking}>
+                      {[0, 1, 2].map((i) => (
+                        <span key={i} className="h-1.5 w-1.5 rounded-full bg-amber-400 animate-bounce" style={{ animationDelay: `${i * 0.15}s` }} />
+                      ))}
+                    </p>
+                  ) : (
+                    <p className="text-[13px] leading-relaxed text-[var(--text-heading)]">{lastBot?.text}</p>
+                  )}
+                </div>
+              )}
+              <div ref={transcriptEndRef} />
+            </div>
           </div>
 
-          {/* Input Form */}
+          {!hasUserMessages && (
+            <div className="px-3 pb-2 flex gap-1.5 overflow-x-auto no-scrollbar" role="group" aria-label={t('Suggested questions', 'أسئلة مقترحة')}>
+              {quickQuestions.map((q) => (
+                <button
+                  key={q.label}
+                  type="button"
+                  onClick={() => void send(q.query)}
+                  disabled={isLoading}
+                  className="shrink-0 px-2.5 py-1 rounded-full border border-amber-500/30 bg-[var(--glass-bg)] text-[10px] font-semibold text-amber-400 hover:border-amber-400 hover:bg-amber-500/10 disabled:opacity-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400"
+                >
+                  {q.label}
+                </button>
+              ))}
+            </div>
+          )}
+
           <form
             onSubmit={(e) => {
               e.preventDefault();
-              handleSend();
+              void send(input);
             }}
-            className="p-3 border-t border-[var(--border-primary)] flex items-center gap-2 bg-[var(--bg-primary)]"
+            className="m-3 mt-1 flex items-center gap-1.5 rounded-2xl border border-[var(--border-primary)] bg-[var(--bg-primary)] p-1.5 focus-within:border-amber-500"
           >
+            {mic.supported && (
+              <button
+                type="button"
+                onClick={toggleMic}
+                aria-pressed={mic.listening}
+                aria-label={mic.listening ? t('Stop listening', 'إيقاف الاستماع') : t('Speak your question', 'تحدث بسؤالك')}
+                className={`p-2.5 rounded-xl transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 ${
+                  mic.listening ? 'bg-teal-500 text-white animate-pulse' : 'text-amber-400 hover:bg-amber-500/10'
+                }`}
+              >
+                {mic.listening ? <MicOff size={16} /> : <Mic size={16} />}
+              </button>
+            )}
+            <label htmlFor={`${panelId}-input`} className="sr-only">
+              {t('Message the assistant', 'اكتب رسالتك للمساعد')}
+            </label>
             <input
+              ref={inputRef}
+              id={`${panelId}-input`}
               type="text"
-              value={input}
+              value={mic.listening && mic.interim ? mic.interim : input}
               onChange={(e) => setInput(e.target.value)}
-              placeholder={isRtl ? 'اسأل عن حلول تحول النظم والخبرات...' : 'Ask about systems transformation & hiring...'}
-              className="flex-1 px-3.5 py-2 rounded-xl border border-[var(--border-primary)] bg-[var(--glass-bg)] text-xs text-[var(--text-heading)] focus:outline-none focus:border-amber-500"
+              onFocus={() => setInputActive(true)}
+              onBlur={() => setInputActive(false)}
+              readOnly={mic.listening}
+              placeholder={
+                mic.listening
+                  ? t('Listening… speak now', 'أستمع… تحدث الآن')
+                  : t('Ask about systems transformation & hiring...', 'اسأل عن حلول تحول النظم والخبرات...')
+              }
+              className="flex-1 min-w-0 bg-transparent px-2 py-2 text-xs text-[var(--text-heading)] placeholder:text-[var(--text-muted)] focus:outline-none"
             />
             <button
               type="submit"
-              disabled={isLoading}
-              className="p-2.5 rounded-xl bg-gradient-to-r from-[#d4af37] to-[#b8860b] text-[#050508] font-bold hover:scale-105 transition-transform disabled:opacity-50 shadow-[0_0_10px_rgba(212,175,55,0.4)]"
+              disabled={isLoading || !input.trim()}
+              aria-label={t('Send message to assistant', 'إرسال الرسالة للمساعد')}
+              className="p-2.5 rounded-xl bg-gradient-to-r from-[#d4af37] to-[#b8860b] text-[#050508] hover:scale-105 transition-transform disabled:opacity-40 disabled:hover:scale-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400"
             >
-              <Send size={15} />
+              <Send size={15} className={isRtl ? '-scale-x-100' : ''} />
             </button>
           </form>
-        </div>
+          {mic.error && (
+            <p role="alert" className="px-4 pb-3 -mt-1 text-[10px] text-rose-400">
+              {mic.error === 'permission'
+                ? t('Microphone access was blocked. You can still type your question.', 'تم رفض الوصول إلى الميكروفون. يمكنك كتابة سؤالك.')
+                : t("Sorry, I couldn't hear that. Please try again or type.", 'لم أتمكن من السماع. حاول مجدداً أو اكتب سؤالك.')}
+            </p>
+          )}
+        </section>
       )}
-    </>
+    </div>
+  );
+}
+
+function AvatarPlaceholder() {
+  return (
+    <div className="absolute inset-0 flex items-center justify-center" aria-hidden="true">
+      <div className="w-14 h-14 rounded-full bg-gradient-to-tr from-[#9a7516] via-[#d4af37] to-[#ffd700] flex items-center justify-center text-[#050508] shadow-[0_0_20px_rgba(212,175,55,0.6)]">
+        <Bot size={28} />
+      </div>
+    </div>
+  );
+}
+
+function IconButton({ label, pressed, onClick, children }: { label: string; pressed?: boolean; onClick: () => void; children: React.ReactNode }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      aria-label={label}
+      aria-pressed={pressed}
+      title={label}
+      className="p-2 rounded-full border border-[var(--border-primary)] bg-[var(--glass-bg)] text-[var(--text-heading)] hover:border-amber-400 hover:text-amber-400 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400"
+    >
+      {children}
+    </button>
   );
 }

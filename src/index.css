@@ -305,3 +305,11 @@
     transition-duration: 0.01ms !important;
   }
 }
+
+/* Horizontal chip rows in the AI assistant */
+.no-scrollbar {
+  scrollbar-width: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}

@@ -1,3 +1,4 @@
+import fs from "fs"
 import path from "path"
 import react from "@vitejs/plugin-react"
 import { defineConfig, loadEnv } from "vite"
@@ -47,6 +48,47 @@ function apiDevServerPlugin(): Plugin {
               res.statusCode = 500;
               res.setHeader('Content-Type', 'application/json');
               res.end(JSON.stringify({ error: err.message || 'Server error' }));
+            }
+          });
+          return;
+        }
+
+        // Any other /api/<name> request runs the matching Vercel function in api/<name>.js,
+        // so the dev server behaves like production (used by /api/tts and /api/gemini).
+        const route = req.url?.match(/^\/api\/([a-z0-9-]+)(?:[/?]|$)/i)?.[1];
+        const file = route && path.resolve(__dirname, 'api', `${route}.js`);
+        if (file && fs.existsSync(file)) {
+          for (const [key, value] of Object.entries(env)) {
+            if (process.env[key] === undefined) process.env[key] = value;
+          }
+
+          let bodyStr = '';
+          req.on('data', (chunk) => (bodyStr += chunk));
+          req.on('end', async () => {
+            type VercelRes = typeof res & { status(code: number): VercelRes; json(data: unknown): VercelRes; send(data: unknown): VercelRes };
+            const vercelRes = res as VercelRes;
+            vercelRes.status = (code: number) => ((res.statusCode = code), vercelRes);
+            vercelRes.json = (data: unknown) => {
+              res.setHeader('Content-Type', 'application/json');
+              res.end(JSON.stringify(data));
+              return vercelRes;
+            };
+            vercelRes.send = (data: unknown) => (res.end(data as string | Buffer), vercelRes);
+
+            try {
+              let body: unknown = bodyStr;
+              try {
+                body = JSON.parse(bodyStr || '{}');
+              } catch {
+                // leave non-JSON bodies as a string, like Vercel does
+              }
+              (req as typeof req & { body?: unknown }).body = body;
+              const mod = await server.ssrLoadModule(file);
+              await mod.default(req, vercelRes);
+            } catch (err) {
+              res.statusCode = 500;
+              res.setHeader('Content-Type', 'application/json');
+              res.end(JSON.stringify({ error: err instanceof Error ? err.message : 'Server error' }));
             }
           });
           return;
