@@ -17,21 +17,19 @@ const MAX_SENTENCES = 2;
 const MAX_WORDS = 45;
 
 // Safety net for when the model ignores the length rule or hits max_tokens mid-sentence:
-// keep whole sentences only, up to MAX_SENTENCES / MAX_WORDS.
+// keep whole sentences only, up to MAX_SENTENCES / MAX_WORDS. A sentence ends at . ! ? ؟
+// followed by a space or the end, so "ASP.NET", "Next.js" and email addresses stay intact.
 function shortenReply(text: string): string {
   const clean = text.replace(/\*\*/g, '').replace(/\s+/g, ' ').trim();
-  const sentences = clean.match(/[^.!?؟]+[.!?؟]+["')\]]*/g);
-  if (!sentences) return clean;
+  const ends = [...clean.matchAll(/[.!?؟]+["')\]]*(?=\s|$)/g)].map((m) => m.index + m[0].length);
+  if (!ends.length) return clean;
 
-  let result = '';
-  let count = 0;
-  for (const sentence of sentences) {
-    const next = (result + ' ' + sentence.trim()).trim();
-    if (count > 0 && (count >= MAX_SENTENCES || next.split(' ').length > MAX_WORDS)) break;
-    result = next;
-    count++;
+  let cut = ends[0];
+  for (let i = 1; i < Math.min(ends.length, MAX_SENTENCES); i++) {
+    if (clean.slice(0, ends[i]).split(' ').length > MAX_WORDS) break;
+    cut = ends[i];
   }
-  return result;
+  return clean.slice(0, cut);
 }
 
 export function useAssistantChat() {
@@ -67,7 +65,7 @@ export function useAssistantChat() {
 
   // High-Impact Marketing System Prompt — grounded in Alya's actual CV, third-person voice
   const marketingSystemPrompt = `You are Alya Al-Siyabi's Career Marketing AI Assistant. Speak ABOUT Alya in the third person (never as "I"). Answer ONLY using the verified facts below — never invent employers, titles, technologies, or years of experience. Be enthusiastic, confident, and professional. Be brief: reply in 1–2 short sentences (35 words max), answer the question directly, and never open with filler like "Certainly!" or "I'd be happy to help". Summarize lists by naming only the 2–3 most relevant items. Answer in ${isRtl ? 'Arabic' : 'English'}.
-${isRtl ? 'مهم: اسمها بالعربية هو "علياء السيابية" — اكتبيه بهذا الشكل حصراً، ولا تكتبيه أبداً "أليا" أو أي تهجئة أخرى.' : ''}
+${isRtl ? 'مهم: اسمها بالعربية هو "علياء السيابية" — اكتبيه بهذا الشكل حصراً، ولا تكتبيه أبداً "أليا" أو أي تهجئة أخرى. أجب بجملة أو جملتين قصيرتين فقط (35 كلمة كحد أقصى)، وادخل في الإجابة مباشرة دون مقدمات مثل "بالطبع، يمكنني مساعدتك".' : ''}
 
 VERIFIED PROFILE:
 - Identity: Process Engineer turned Systems Analyst & Programmer, based in Al-Seeb, Muscat, Oman.

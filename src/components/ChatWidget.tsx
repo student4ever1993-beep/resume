@@ -204,10 +204,10 @@ export default function ChatWidget() {
 
   return (
     <div
-      className={`fixed z-50 bottom-3 sm:bottom-6 ${side} overflow-hidden border shadow-2xl transition-[width,height,border-radius,box-shadow] duration-500 ease-out ${
+      className={`fixed z-50 bottom-3 sm:bottom-6 ${side} border shadow-2xl transition-[width,height,border-radius,box-shadow] duration-500 ease-out ${
         isOpen
-          ? 'w-[calc(100vw-1.5rem)] sm:w-[400px] h-[min(88dvh,680px)] rounded-[28px] border-[var(--border-highlight)] bg-[var(--glass-bg)] backdrop-blur-xl flex flex-col'
-          : 'w-[84px] h-[84px] rounded-full border-[#ffe082]/60 bg-[#0b0b10] shadow-[0_0_30px_rgba(212,175,55,0.55)] hover:shadow-[0_0_42px_rgba(255,215,0,0.8)]'
+          ? 'overflow-hidden w-[calc(100vw-1.5rem)] sm:w-[400px] h-[min(88dvh,680px)] rounded-[28px] border-[var(--border-highlight)] bg-[var(--glass-bg)] backdrop-blur-xl flex flex-col'
+          : 'w-[96px] h-[96px] rounded-full border-[#ffe082]/60 bg-[#0b0b10] shadow-[0_0_30px_rgba(212,175,55,0.55)] hover:shadow-[0_0_42px_rgba(255,215,0,0.8)]'
       }`}
       style={{ fontFamily: isRtl ? 'Cairo, system-ui, sans-serif' : 'Inter, system-ui, sans-serif' }}
       dir={isRtl ? 'rtl' : 'ltr'}
@@ -220,8 +220,9 @@ export default function ChatWidget() {
             'radial-gradient(circle at 50% 42%, rgba(212,175,55,0.28), rgba(212,175,55,0.06) 45%, transparent 70%)',
         }}
       >
+        {/* In launcher mode the robot is inset from the gold frame so its dark edges never touch it. */}
         <div
-          className="absolute inset-0"
+          className={`absolute transition-[inset] duration-500 ${isOpen ? 'inset-0' : 'inset-[10px]'}`}
           style={isOpen ? { maskImage: 'linear-gradient(to bottom, black 78%, transparent)', WebkitMaskImage: 'linear-gradient(to bottom, black 78%, transparent)' } : undefined}
         >
           {loadAvatar && !avatarFailed ? (

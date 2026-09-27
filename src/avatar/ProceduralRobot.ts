@@ -120,7 +120,7 @@ interface Arm {
 export class ProceduralRobot implements AvatarRig {
   readonly object = new THREE.Group();
   readonly framing = {
-    compact: { target: new THREE.Vector3(0, 1.1, 0), distance: 2.05 },
+    compact: { target: new THREE.Vector3(0, 0.6, 0), distance: 4.3 },
     expanded: { target: new THREE.Vector3(0, 0.62, 0), distance: 4.6 },
   };
 
