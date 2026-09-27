@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { footerConfig } from '../config';
+import Starfield from '../effects/Starfield';
 
 export default function Footer() {
   const { t, i18n } = useTranslation();
@@ -46,12 +47,16 @@ export default function Footer() {
         zIndex: 2,
         padding: '80px 24px 40px',
         textAlign: isRtl ? 'right' : 'left',
+        overflow: 'hidden',
       }}
     >
+      <Starfield />
       <div
         style={{
           maxWidth: '1200px',
           margin: '0 auto',
+          position: 'relative',
+          zIndex: 2,
         }}
       >
         {/* Top Area */}

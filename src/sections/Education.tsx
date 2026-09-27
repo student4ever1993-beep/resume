@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import Starfield from '../effects/Starfield';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -76,13 +77,17 @@ export default function Education() {
         backgroundColor: 'transparent',
         position: 'relative',
         zIndex: 2,
+        overflow: 'hidden',
       }}
     >
+      <Starfield />
       <div
         style={{
           maxWidth: '1100px',
           margin: '0 auto',
           padding: '120px 24px',
+          position: 'relative',
+          zIndex: 2,
         }}
       >
         {/* Education Section */}

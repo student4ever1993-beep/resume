@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import Starfield from '../effects/Starfield';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -9,90 +10,6 @@ interface ExperienceEntry {
   title: string;
   company: string;
   period: string;
-}
-
-// Sub-component for a performance-optimized HTML5 Canvas starfield
-function StarsBackground() {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-
-    let animationFrameId: number;
-    let stars: Array<{ x: number; y: number; size: number; speed: number; opacity: number }> = [];
-
-    const handleResize = () => {
-      canvas.width = canvas.parentElement?.clientWidth || window.innerWidth;
-      canvas.height = canvas.parentElement?.clientHeight || window.innerHeight;
-      initStars();
-    };
-
-    const initStars = () => {
-      stars = [];
-      const numStars = Math.floor((canvas.width * canvas.height) / 8000);
-      for (let i = 0; i < numStars; i++) {
-        stars.push({
-          x: Math.random() * canvas.width,
-          y: Math.random() * canvas.height,
-          size: Math.random() * 1.5 + 0.5,
-          speed: Math.random() * 0.15 + 0.05,
-          opacity: Math.random() * 0.7 + 0.3,
-        });
-      }
-    };
-
-    const animate = () => {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      const isLightMode = document.documentElement.classList.contains('light');
-      ctx.fillStyle = isLightMode ? '#b8860b' : '#c9a84c';
-
-      stars.forEach((star) => {
-        ctx.save();
-        ctx.globalAlpha = isLightMode ? star.opacity * 0.8 : star.opacity;
-        ctx.beginPath();
-        // Golden color for stars
-        ctx.arc(star.x, star.y, star.size, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.restore();
-
-        // Move stars downward slowly
-        star.y += star.speed;
-        if (star.y > canvas.height) {
-          star.y = 0;
-          star.x = Math.random() * canvas.width;
-        }
-      });
-
-      animationFrameId = requestAnimationFrame(animate);
-    };
-
-    handleResize();
-    window.addEventListener('resize', handleResize);
-    animate();
-
-    return () => {
-      window.removeEventListener('resize', handleResize);
-      cancelAnimationFrame(animationFrameId);
-    };
-  }, []);
-
-  return (
-    <canvas
-      ref={canvasRef}
-      style={{
-        position: 'absolute',
-        inset: 0,
-        width: '100%',
-        height: '100%',
-        pointerEvents: 'none',
-        zIndex: 1,
-        opacity: 0.65,
-      }}
-    />
-  );
 }
 
 export default function Experience() {
@@ -158,7 +75,7 @@ export default function Experience() {
       }}
     >
       {/* Moving Stars Background */}
-      <StarsBackground />
+      <Starfield />
 
       {/* Background gradients */}
       <div

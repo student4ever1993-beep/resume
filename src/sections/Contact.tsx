@@ -4,6 +4,7 @@ import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { Mail, MapPin, Linkedin, Copy, Check, Send, Sparkles, ExternalLink } from 'lucide-react';
 import { contactConfig } from '../config';
+import Starfield from '../effects/Starfield';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -90,6 +91,8 @@ export default function Contact() {
       ref={sectionRef}
       className="relative z-10 py-24 sm:py-32 px-4 overflow-hidden bg-transparent"
     >
+      <Starfield />
+
       {/* Background Ambient Glow */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[400px] bg-[var(--accent-gold)]/10 blur-[130px] rounded-full pointer-events-none" />
 

@@ -5,6 +5,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import SplitType from 'split-type';
 import { Briefcase, GraduationCap, Award, Settings } from 'lucide-react';
 import HeroBackground from '../effects/HeroBackground';
+import Starfield from '../effects/Starfield';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -147,6 +148,7 @@ export default function Manifesto() {
       }}
     >
       <HeroBackground showSphere={false} />
+      <Starfield />
 
       <div
         ref={containerRef}

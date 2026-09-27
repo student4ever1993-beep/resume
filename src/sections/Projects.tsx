@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { projectsConfig } from '../config';
+import Starfield from '../effects/Starfield';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -130,8 +131,11 @@ export default function Projects() {
         overflow: 'hidden',
       }}
     >
+      <Starfield />
       <style>{`
         .proj-wrap {
+          position: relative;
+          z-index: 2;
           max-width: 1200px;
           margin: 0 auto;
           padding: 120px 24px;
