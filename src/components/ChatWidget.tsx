@@ -20,6 +20,7 @@ export default function ChatWidget() {
   const [isLoading, setIsLoading] = useState(false);
   const [selectedModel, setSelectedModel] = useState<ModelProvider>('groq');
   const [showModelMenu, setShowModelMenu] = useState(false);
+  const [avatarVideoFailed, setAvatarVideoFailed] = useState(false);
 
   const [messages, setMessages] = useState<Message[]>([
     {
@@ -176,15 +177,27 @@ Your goal is to MARKET Alya's skills persuasively to clients, partners, and empl
       {/* Floating Gold Robot Trigger Button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className={`fixed bottom-6 z-50 p-3.5 rounded-full bg-gradient-to-tr from-[#9a7516] via-[#d4af37] to-[#ffd700] text-[#050508] shadow-[0_0_30px_rgba(212,175,55,0.7)] border border-[#ffe082]/60 hover:scale-110 hover:shadow-[0_0_40px_rgba(255,215,0,0.9)] transition-all duration-300 flex items-center justify-center ${
+        className={`fixed bottom-6 z-50 w-16 h-16 rounded-full bg-gradient-to-tr from-[#9a7516] via-[#d4af37] to-[#ffd700] text-[#050508] shadow-[0_0_30px_rgba(212,175,55,0.7)] border border-[#ffe082]/60 hover:scale-110 hover:shadow-[0_0_40px_rgba(255,215,0,0.9)] transition-all duration-300 flex items-center justify-center ${
           isRtl ? 'left-6' : 'right-6'
         }`}
         aria-label="Open AI Assistant"
       >
         {isOpen ? (
           <X size={26} className="text-[#050508]" />
-        ) : (
+        ) : avatarVideoFailed ? (
           <Bot size={28} className="text-[#050508] animate-bounce-short" />
+        ) : (
+          <span className="absolute inset-[3px] rounded-full overflow-hidden pointer-events-none">
+            <video
+              src="/videos/robot-avatar.mp4"
+              autoPlay
+              loop
+              muted
+              playsInline
+              onError={() => setAvatarVideoFailed(true)}
+              className="w-full h-full object-cover"
+            />
+          </span>
         )}
         <span className="absolute -top-1 -right-1 flex h-3.5 w-3.5 pointer-events-none">
           <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-200 opacity-75"></span>

@@ -10,6 +10,7 @@ interface EducationEntry {
   institution: string;
   period: string;
   status?: string;
+  logo?: string;
 }
 
 export default function Education() {
@@ -158,38 +159,73 @@ export default function Education() {
                   style={{
                     display: 'flex',
                     alignItems: 'center',
+                    justifyContent: 'space-between',
                     gap: '12px',
                     marginBottom: '16px',
                     flexDirection: isRtl ? 'row-reverse' : 'row',
                   }}
                 >
-                  <p
+                  <div
                     style={{
-                      fontFamily: '"JetBrains Mono", monospace',
-                      fontSize: '11px',
-                      fontWeight: 400,
-                      color: 'var(--accent-gold)',
-                      letterSpacing: '1px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '12px',
+                      flexDirection: isRtl ? 'row-reverse' : 'row',
                     }}
                   >
-                    {entry.period}
-                  </p>
-                  {entry.status && (
-                    <span
+                    <p
                       style={{
-                        fontFamily: isRtl ? 'Cairo, system-ui, sans-serif' : 'Inter, system-ui, sans-serif',
-                        fontSize: '10px',
-                        fontWeight: 600,
-                        color: '#050508',
-                        background: 'var(--accent-gold)',
-                        padding: '3px 10px',
-                        borderRadius: '100px',
-                        letterSpacing: isRtl ? '0' : '0.5px',
-                        textTransform: 'uppercase',
+                        fontFamily: '"JetBrains Mono", monospace',
+                        fontSize: '11px',
+                        fontWeight: 400,
+                        color: 'var(--accent-gold)',
+                        letterSpacing: '1px',
                       }}
                     >
-                      {entry.status}
-                    </span>
+                      {entry.period}
+                    </p>
+                    {entry.status && (
+                      <span
+                        style={{
+                          fontFamily: isRtl ? 'Cairo, system-ui, sans-serif' : 'Inter, system-ui, sans-serif',
+                          fontSize: '10px',
+                          fontWeight: 600,
+                          color: '#050508',
+                          background: 'var(--accent-gold)',
+                          padding: '3px 10px',
+                          borderRadius: '100px',
+                          letterSpacing: isRtl ? '0' : '0.5px',
+                          textTransform: 'uppercase',
+                        }}
+                      >
+                        {entry.status}
+                      </span>
+                    )}
+                  </div>
+                  {entry.logo && (
+                    <div
+                      style={{
+                        background: '#ffffff',
+                        borderRadius: '6px',
+                        padding: '6px 10px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        flexShrink: 0,
+                      }}
+                    >
+                      <img
+                        src={entry.logo}
+                        alt={entry.institution}
+                        style={{
+                          height: '36px',
+                          width: 'auto',
+                          maxWidth: '120px',
+                          objectFit: 'contain',
+                          display: 'block',
+                        }}
+                      />
+                    </div>
                   )}
                 </div>
 

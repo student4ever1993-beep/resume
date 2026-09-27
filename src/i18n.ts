@@ -102,12 +102,14 @@ const resources = {
             degree: "Master of Digital Transformation and Innovation",
             institution: "University of Technology and Applied Sciences (UTAS)",
             period: "2026 – 2027",
-            status: "In Progress"
+            status: "In Progress",
+            logo: "/images/utas.png"
           },
           {
             degree: "Bachelor of Science in Process Engineering",
             institution: "German University of Technology in Oman (GUtech)",
-            period: "2012 – 2017"
+            period: "2012 – 2017",
+            logo: "/images/gutech.png"
           }
         ],
         workshopsLabel: "CONTINUOUS LEARNING",
@@ -315,12 +317,14 @@ const resources = {
             degree: "ماجستير التحول الرقمي والابتكار",
             institution: "جامعة التقنية والعلوم التطبيقية (UTAS)",
             period: "2026 – 2027",
-            status: "قيد الدراسة"
+            status: "قيد الدراسة",
+            logo: "/images/utas.png"
           },
           {
             degree: "بكالوريوس العلوم في هندسة العمليات",
             institution: "الجامعة الألمانية للتكنولوجيا في عمان (جيوتك)",
-            period: "2012 – 2017"
+            period: "2012 – 2017",
+            logo: "/images/gutech.png"
           }
         ],
         workshopsLabel: "التعليم المستمر",
