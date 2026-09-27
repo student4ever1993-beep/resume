@@ -37,6 +37,7 @@ function apiDevServerPlugin(): Plugin {
                   messages: body.messages || [],
                   temperature: body.temperature ?? 0.6,
                   max_tokens: body.max_tokens ?? 250,
+                  ...(body.reasoning_effort && { reasoning_effort: body.reasoning_effort }),
                 }),
               });
 

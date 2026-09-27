@@ -9,6 +9,7 @@ An editorial luxury travel landing page template with a cinematic hero video, sc
 - Scroll-scrubbed manifesto text reveal using SplitType + GSAP
 - Split-layout principles section with sticky 3D helix effect
 - Membership tiers with alternating image/text layout
+- Interactive 3D AI avatar assistant with voice, lip sync and mic input (see [docs/AVATAR.md](docs/AVATAR.md))
 - Refined editorial footer with brand block and structured link columns
 
 ## Tech Stack

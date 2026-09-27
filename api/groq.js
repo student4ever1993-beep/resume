@@ -19,7 +19,7 @@ export default async function handler(req, res) {
   try {
     // 3. Extract parameters from incoming request body
     const body = req.body || {};
-    const { model, messages, temperature, max_tokens } = typeof body === 'string' ? JSON.parse(body) : body;
+    const { model, messages, temperature, max_tokens, reasoning_effort } = typeof body === 'string' ? JSON.parse(body) : body;
 
     if (!messages || !Array.isArray(messages)) {
       return res.status(400).json({
@@ -40,6 +40,7 @@ export default async function handler(req, res) {
         messages,
         temperature: temperature ?? 0.6,
         max_tokens: max_tokens ?? 250,
+        ...(reasoning_effort && { reasoning_effort }),
       }),
     });
 

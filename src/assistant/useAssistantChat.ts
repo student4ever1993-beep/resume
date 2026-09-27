@@ -13,6 +13,27 @@ export interface Message {
 
 export type ModelProvider = 'groq' | 'gpt20b';
 
+const MAX_SENTENCES = 2;
+const MAX_WORDS = 45;
+
+// Safety net for when the model ignores the length rule or hits max_tokens mid-sentence:
+// keep whole sentences only, up to MAX_SENTENCES / MAX_WORDS.
+function shortenReply(text: string): string {
+  const clean = text.replace(/\*\*/g, '').replace(/\s+/g, ' ').trim();
+  const sentences = clean.match(/[^.!?؟]+[.!?؟]+["')\]]*/g);
+  if (!sentences) return clean;
+
+  let result = '';
+  let count = 0;
+  for (const sentence of sentences) {
+    const next = (result + ' ' + sentence.trim()).trim();
+    if (count > 0 && (count >= MAX_SENTENCES || next.split(' ').length > MAX_WORDS)) break;
+    result = next;
+    count++;
+  }
+  return result;
+}
+
 export function useAssistantChat() {
   const { i18n } = useTranslation();
   const isRtl = i18n.language === 'ar';
@@ -45,7 +66,7 @@ export function useAssistantChat() {
       ];
 
   // High-Impact Marketing System Prompt — grounded in Alya's actual CV, third-person voice
-  const marketingSystemPrompt = `You are Alya Al-Siyabi's Career Marketing AI Assistant. Speak ABOUT Alya in the third person (never as "I"). Answer ONLY using the verified facts below — never invent employers, titles, technologies, or years of experience. Be enthusiastic, confident, and professional. Keep answers under 3 concise sentences. Answer in ${isRtl ? 'Arabic' : 'English'}.
+  const marketingSystemPrompt = `You are Alya Al-Siyabi's Career Marketing AI Assistant. Speak ABOUT Alya in the third person (never as "I"). Answer ONLY using the verified facts below — never invent employers, titles, technologies, or years of experience. Be enthusiastic, confident, and professional. Be brief: reply in 1–2 short sentences (35 words max), answer the question directly, and never open with filler like "Certainly!" or "I'd be happy to help". Summarize lists by naming only the 2–3 most relevant items. Answer in ${isRtl ? 'Arabic' : 'English'}.
 ${isRtl ? 'مهم: اسمها بالعربية هو "علياء السيابية" — اكتبيه بهذا الشكل حصراً، ولا تكتبيه أبداً "أليا" أو أي تهجئة أخرى.' : ''}
 
 VERIFIED PROFILE:
@@ -59,7 +80,9 @@ VERIFIED PROFILE:
 - Key projects: government portal for the Environment Authority (washaq.ea.gov.om); client platforms for Rakeeza and Aluminum Watad; healthcare platform for Alfaisal Medical Services; AMAN in-house consultancy hub (ach.aman.om) plus testing/development on aman.om; Elite Companies system for MOCIIP (designed the system, built a Power BI demo, owned product through staging); an AI-powered candidate-evaluation tool for AMAN using the Gemini and ChatGPT APIs; the Fostering System for SMEDA (programmer & product owner, in staging); Generative-AI complaint system testing for TRA and chatbot evaluation for Dubai Airports (DXP); and an agricultural data-collection & analytics platform for ADC Somalia as main developer.
 - Contact: Alya_alsiyabi93@outlook.com.
 
-If asked about something not covered above, say that detail isn't confirmed and suggest contacting Alya directly rather than guessing.`;
+If asked about something not covered above, say that detail isn't confirmed and suggest contacting Alya directly rather than guessing.
+
+REMEMBER: 1–2 short sentences, 35 words max. Replies are read aloud, so no markdown or bullet lists.`;
 
   // 1. Groq API Call via Vercel / Dev Server Function (/api/groq)
   const callGroqAPI = async (userMsg: string, modelId: string = 'allam-2-7b'): Promise<string | null> => {
@@ -77,6 +100,9 @@ If asked about something not covered above, say that detail isn't confirmed and 
           ],
           temperature: 0.6,
           max_tokens: 250,
+          // gpt-oss is a reasoning model: without this, hidden reasoning can use the whole
+          // token budget and leave an empty answer.
+          ...(modelId.startsWith('openai/gpt-oss') && { reasoning_effort: 'low' }),
         }),
       });
 
@@ -89,7 +115,7 @@ If asked about something not covered above, say that detail isn't confirmed and 
 
       const data = await res.json();
       const content = data.choices?.[0]?.message?.content || data.choices?.[0]?.message?.reasoning;
-      return content || null;
+      return content ? shortenReply(content) : null;
     } catch (err) {
       console.error('Groq Fetch Exception:', err);
       return null;
