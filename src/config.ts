@@ -147,7 +147,7 @@ export const heroConfig: HeroConfig = {
   eyebrow: "SYSTEMS ANALYST & DEVELOPER",
   titleLine: "ALYA AL SIYABI",
   titleEmphasis: "Digital Transformation",
-  subtitleLine1: "Systems Analyst at AMAN.",
+  subtitleLine1: "Systems Analyst & Programmer at AMAN.",
   subtitleLine2: "Based in Muscat, Oman.",
   ctaText: "View My Work",
   ctaTargetId: "#projects",

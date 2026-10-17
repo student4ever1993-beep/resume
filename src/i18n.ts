@@ -19,7 +19,7 @@ const resources = {
         eyebrow: "SYSTEMS ANALYST & DEVELOPER",
         titleLine: "ALYA AL SIYABI",
         titleEmphasis: "Digital Transformation",
-        subtitleLine1: "Systems Analyst at AMAN.",
+        subtitleLine1: "Systems Analyst & Programmer at AMAN.",
         subtitleLine2: "Based in Muscat, Oman.",
         ctaText: "View My Work",
         tagline: "Let's build the next challenge together",
@@ -32,7 +32,7 @@ const resources = {
         introQuote: "Bridging the gap between process engineering, software systems, and digital strategy.",
         stats: {
           experience: { value: "5+ Years", label: "Systems Analysis" },
-          masters: { value: "MSc UTAS", label: "Digital Innovation" },
+          masters: { value: "MSc UTAS", label: "Digital Transformation & Innovation" },
           bachelors: { value: "BSc GUtech", label: "Process Engineering" },
           projects: { value: "11+ Systems", label: "Delivered Projects" }
         }
@@ -239,7 +239,7 @@ const resources = {
     translation: {
       site: {
         title: "علياء السيابية — محللة نظم ومطورة برمجيات",
-        description: "علياء السيابية هي محللة نظم ومطورة في شركة أمان للاستشارات وتطوير الأعمال، مقيمة في مسقط، سلطنة عمان."
+        description: "علياء السيابية هي محللة نظم ومطورة في شركة أمان للاستشارات والتقنية، مقيمة في مسقط، سلطنة عمان."
       },
       nav: {
         about: "نبذة عني",
@@ -252,7 +252,7 @@ const resources = {
         eyebrow: "محلل نظم ومطورة برمجيات",
         titleLine: "علياء السيابية",
         titleEmphasis: "التحول الرقمي",
-        subtitleLine1: "محلل نظم في شركة أمان للاستشارات والتكنولوجيا",
+        subtitleLine1: "محللة نظم ومبرمجة في شركة أمان للاستشارات والتقنية",
         subtitleLine2: "مسقط، سلطنة عمان.",
         ctaText: "عرض أعمالي",
         tagline: "لنبني التحدي القادم معاً",
@@ -265,7 +265,7 @@ const resources = {
         introQuote: "ربط الفجوة بين هندسة العمليات، النظم البرمجية، واستراتيجيات التحول الرقمي.",
         stats: {
           experience: { value: "٥+ سنوات", label: "البرمجة وتحليل النظم والعمليات" },
-          masters: { value: "ماجستير UTAS", label: "الابتكار الرقمي" },
+          masters: { value: "ماجستير UTAS", label: "التحول الرقمي والابتكار" },
           bachelors: { value: "بكالوريوس GUtech", label: "هندسة العمليات" },
           projects: { value: "١١+ مشروعاً", label: "الأنظمة المنفذة" }
         }
@@ -276,7 +276,7 @@ const resources = {
         entries: [
           {
             title: "محلل نظم ومبرمجة –  التحول الرقمي",
-            company: "أمان للاستشارات وتطوير الأعمال",
+            company: "أمان للاستشارات والتقنية",
             period: "2021 – الحالي"
           },
           {
