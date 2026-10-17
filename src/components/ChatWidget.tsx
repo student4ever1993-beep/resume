@@ -1,12 +1,14 @@
 import { lazy, Suspense, useCallback, useEffect, useId, useRef, useState } from 'react';
-import { Bot, ChevronDown, Cpu, Mic, MicOff, ScrollText, Send, Square, Volume2, VolumeX, X } from 'lucide-react';
+import { Bot, ChevronDown, Cpu, MessageCircle, MessageSquare, Mic, MicOff, ScrollText, Send, Square, Volume2, VolumeX, X } from 'lucide-react';
 import { useAssistantChat, type ModelProvider } from '../assistant/useAssistantChat';
 import { SpeechOutput } from '../avatar/speech';
 import { useSpeechRecognition } from '../avatar/useSpeechRecognition';
 import type { AvatarDriver, AvatarState } from '../avatar/types';
 
-// 3D avatar front-end for the AI assistant. Conversation logic is in useAssistantChat;
-// this component handles presentation, voice (TTS + mic) and the avatar's state.
+// Front-end for the AI assistant, in two modes the visitor chooses between:
+//   • avatar: 3D robot with voice (TTS + mic) and lip sync
+//   • chat:   plain text chat window (no 3D, no audio)
+// Conversation logic is shared and lives in useAssistantChat.
 
 const AvatarCanvas = lazy(() => import('../avatar/AvatarCanvas'));
 
@@ -16,6 +18,16 @@ const readMuted = () => {
     return localStorage.getItem(MUTE_KEY) === '1';
   } catch {
     return false;
+  }
+};
+
+type AssistantMode = 'avatar' | 'chat';
+const MODE_KEY = 'alya-assistant-mode';
+const readMode = (): AssistantMode => {
+  try {
+    return localStorage.getItem(MODE_KEY) === 'chat' ? 'chat' : 'avatar';
+  } catch {
+    return 'avatar';
   }
 };
 
@@ -36,6 +48,8 @@ export default function ChatWidget() {
     useAssistantChat();
 
   const [isOpen, setIsOpen] = useState(false);
+  const [mode, setMode] = useState<AssistantMode>(readMode);
+  const isAvatar = mode === 'avatar';
   const [input, setInput] = useState('');
   const [inputActive, setInputActive] = useState(false);
   const [muted, setMuted] = useState(readMuted);
@@ -67,14 +81,14 @@ export default function ChatWidget() {
 
   const speak = useCallback(
     (text: string) => {
-      if (muted) return;
+      if (muted || !isAvatar) return;
       void speech.speak(text, detectLang(text), {
         onStart: () => setVoiceState('speaking'),
         onEnd: () => setVoiceState('idle'),
       });
       setVoiceState('preparing');
     },
-    [muted, speech],
+    [muted, isAvatar, speech],
   );
 
   const send = useCallback(
@@ -109,13 +123,15 @@ export default function ChatWidget() {
   }, [avatarState, isOpen]);
 
   // Lazy-load the 3D avatar once the page is idle, so it never competes with first paint.
+  // In chat mode it is never loaded.
   useEffect(() => {
+    if (!isAvatar) return;
     const w = window as Window & { requestIdleCallback?: (cb: () => void, o?: { timeout: number }) => number };
     const start = () => (w.requestIdleCallback ? w.requestIdleCallback(() => setLoadAvatar(true), { timeout: 3000 }) : setTimeout(() => setLoadAvatar(true), 1500));
     if (document.readyState === 'complete') start();
     else window.addEventListener('load', start, { once: true });
     return () => window.removeEventListener('load', start);
-  }, []);
+  }, [isAvatar]);
 
   // Eyes follow the pointer ("looks toward the user").
   useEffect(() => {
@@ -141,8 +157,9 @@ export default function ChatWidget() {
   }, [isOpen]);
 
   const open = () => {
-    setLoadAvatar(true);
     setIsOpen(true);
+    if (!isAvatar) return;
+    setLoadAvatar(true);
     speech.unlock();
     if (!greetedRef.current) {
       greetedRef.current = true;
@@ -182,6 +199,23 @@ export default function ChatWidget() {
     }
   };
 
+  const switchMode = (next: AssistantMode) => {
+    if (next === mode) return;
+    setMode(next);
+    if (next === 'chat') {
+      speech.stop();
+      mic.stop();
+    } else {
+      setLoadAvatar(true);
+      greetedRef.current = true; // don't re-greet when switching mid-conversation
+    }
+    try {
+      localStorage.setItem(MODE_KEY, next);
+    } catch {
+      // storage unavailable: the choice lasts for this visit only
+    }
+  };
+
   const toggleMic = () => {
     if (mic.listening) return mic.stop();
     speech.unlock();
@@ -202,192 +236,274 @@ export default function ChatWidget() {
   const hasUserMessages = messages.some((m) => m.sender === 'user');
   const side = isRtl ? 'left-3 sm:left-6' : 'right-3 sm:right-6';
 
+  const launcherProps = {
+    ref: launcherRef,
+    type: 'button' as const,
+    onClick: open,
+    'aria-label': t("Open Alya's AI assistant", 'افتح مساعد علياء الذكي'),
+    'aria-expanded': false,
+    title: t("Talk to Alya's AI assistant", 'تحدث مع مساعد علياء الذكي'),
+  };
+
+  const pulseDot = (
+    <span className="pointer-events-none absolute top-1 right-1 flex h-3.5 w-3.5" aria-hidden="true">
+      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-200 opacity-75 motion-reduce:hidden" />
+      <span className="relative inline-flex rounded-full h-3.5 w-3.5 bg-amber-400" />
+    </span>
+  );
+
+  const title = (
+    <h2 id={titleId} className="text-xs font-bold text-[var(--text-heading)] drop-shadow">
+      {t('Alya AI Assistant', 'مساعد علياء الذكي')}
+    </h2>
+  );
+
+  const modelSelector = (
+    <div className="relative">
+      <button
+        type="button"
+        onClick={() => setShowModelMenu((v) => !v)}
+        aria-haspopup="listbox"
+        aria-expanded={showModelMenu}
+        aria-label={t(`AI model: ${modelLabels[selectedModel]}`, `النموذج: ${modelLabels[selectedModel]}`)}
+        className="flex items-center gap-1 text-[10px] font-medium text-amber-500 hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 rounded"
+      >
+        <Cpu size={11} aria-hidden="true" />
+        <span className="truncate max-w-[150px]">{modelLabels[selectedModel]}</span>
+        <ChevronDown size={11} aria-hidden="true" />
+      </button>
+      {showModelMenu && (
+        <div role="listbox" aria-label={t('Choose AI model', 'اختر النموذج')} className="absolute top-5 start-0 z-10 w-56 py-1 rounded-xl border border-[var(--border-highlight)] bg-[var(--bg-primary)] shadow-2xl">
+          {(Object.keys(modelLabels) as ModelProvider[]).map((prov) => (
+            <button
+              key={prov}
+              type="button"
+              role="option"
+              aria-selected={selectedModel === prov}
+              onClick={() => {
+                setSelectedModel(prov);
+                setShowModelMenu(false);
+              }}
+              className={`w-full text-start px-3 py-1.5 text-[11px] font-medium flex items-center justify-between focus:outline-none focus-visible:bg-[var(--glass-bg)] ${
+                selectedModel === prov ? 'text-amber-400 bg-[rgba(255,140,0,0.12)]' : 'text-[var(--text-primary)] hover:bg-[var(--glass-bg)]'
+              }`}
+            >
+              <span>{modelLabels[prov]}</span>
+              {selectedModel === prov && <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+
+  const actions = (
+    <div className="flex items-center gap-1.5 shrink-0">
+      <div role="group" aria-label={t('Assistant mode', 'وضع المساعد')} className="flex rounded-full border border-[var(--border-primary)] bg-[var(--glass-bg)] p-0.5">
+        {([
+          ['avatar', Bot, t('Avatar', 'الأفاتار'), t('Talk to the 3D avatar with voice', 'تحدث مع الأفاتار ثلاثي الأبعاد بالصوت')],
+          ['chat', MessageSquare, t('Chat', 'محادثة'), t('Text chat only', 'محادثة نصية فقط')],
+        ] as const).map(([value, Icon, label, hint]) => (
+          <button
+            key={value}
+            type="button"
+            onClick={() => switchMode(value)}
+            aria-pressed={mode === value}
+            title={hint}
+            className={`flex items-center gap-1 rounded-full px-2 py-1 text-[10px] font-semibold transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 ${
+              mode === value ? 'bg-gradient-to-r from-[#d4af37] to-[#b8860b] text-[#050508]' : 'text-[var(--text-muted)] hover:text-[var(--text-heading)]'
+            }`}
+          >
+            <Icon size={12} aria-hidden="true" />
+            {label}
+          </button>
+        ))}
+      </div>
+      {isAvatar && (
+        <IconButton label={muted ? t('Unmute voice', 'تشغيل الصوت') : t('Mute voice', 'كتم الصوت')} pressed={muted} onClick={toggleMute}>
+          {muted ? <VolumeX size={15} /> : <Volume2 size={15} />}
+        </IconButton>
+      )}
+      <IconButton label={t('Close assistant', 'إغلاق المساعد')} onClick={close}>
+        <X size={15} />
+      </IconButton>
+    </div>
+  );
+
+  const messageList = (
+    <ol className="space-y-2" aria-label={t('Conversation transcript', 'نص المحادثة')}>
+      {messages.map((m) => (
+        <li key={m.id} className={`flex ${m.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
+          <span className="sr-only">{m.sender === 'user' ? t('You:', 'أنت:') : t('Assistant:', 'المساعد:')}</span>
+          <p
+            className={`max-w-[88%] px-3 py-2 rounded-2xl text-xs leading-relaxed ${
+              m.sender === 'user'
+                ? 'bg-gradient-to-r from-[var(--accent-gold)] to-[#b5560b] text-[#050505] font-medium'
+                : 'border border-[var(--border-primary)] bg-[var(--glass-bg)] text-[var(--text-heading)]'
+            }`}
+          >
+            {m.text}
+          </p>
+        </li>
+      ))}
+    </ol>
+  );
+
+  const typingDots = (
+    <p className="flex items-center gap-1 py-2" aria-label={statusLabel.thinking}>
+      {[0, 1, 2].map((i) => (
+        <span key={i} className="h-1.5 w-1.5 rounded-full bg-amber-400 animate-bounce" style={{ animationDelay: `${i * 0.15}s` }} />
+      ))}
+    </p>
+  );
+
+  const closedClass = isAvatar
+    ? 'w-[96px] h-[96px] rounded-full border-[#ffe082]/60 bg-[#0b0b10] shadow-[0_0_30px_rgba(212,175,55,0.55)] hover:shadow-[0_0_42px_rgba(255,215,0,0.8)]'
+    : 'w-16 h-16 rounded-full border-[#ffe082]/60 bg-gradient-to-tr from-[#9a7516] via-[#d4af37] to-[#ffd700] shadow-[0_0_30px_rgba(212,175,55,0.7)] hover:scale-110 hover:shadow-[0_0_40px_rgba(255,215,0,0.9)]';
+
   return (
     <div
-      className={`fixed z-50 bottom-3 sm:bottom-6 ${side} border shadow-2xl transition-[width,height,border-radius,box-shadow] duration-500 ease-out ${
+      className={`fixed z-50 bottom-3 sm:bottom-6 ${side} border shadow-2xl transition-[width,height,border-radius,box-shadow,transform] duration-500 ease-out ${
         isOpen
-          ? 'overflow-hidden w-[calc(100vw-1.5rem)] sm:w-[400px] h-[min(88dvh,680px)] rounded-[28px] border-[var(--border-highlight)] bg-[var(--glass-bg)] backdrop-blur-xl flex flex-col'
-          : 'w-[96px] h-[96px] rounded-full border-[#ffe082]/60 bg-[#0b0b10] shadow-[0_0_30px_rgba(212,175,55,0.55)] hover:shadow-[0_0_42px_rgba(255,215,0,0.8)]'
+          ? 'overflow-hidden w-[calc(100vw-1.5rem)] sm:w-[400px] h-[min(680px,calc(100dvh-7rem))] sm:h-[min(680px,calc(100dvh-8.75rem))] rounded-[28px] border-[var(--border-highlight)] bg-[var(--glass-bg)] backdrop-blur-xl flex flex-col'
+          : closedClass
       }`}
       style={{ fontFamily: isRtl ? 'Cairo, system-ui, sans-serif' : 'Inter, system-ui, sans-serif' }}
       dir={isRtl ? 'rtl' : 'ltr'}
     >
-      {/* ── Avatar stage (same element in both modes, so the 3D scene is never re-created) ── */}
-      <div
-        className={`relative shrink-0 ${isOpen ? 'flex-1 min-h-[200px]' : 'w-full h-full'}`}
-        style={{
-          background:
-            'radial-gradient(circle at 50% 42%, rgba(212,175,55,0.28), rgba(212,175,55,0.06) 45%, transparent 70%)',
-        }}
-      >
-        {/* In launcher mode the robot is inset from the gold frame so its dark edges never touch it. */}
+      {isAvatar ? (
+        /* ── Avatar stage (same element open and closed, so the 3D scene is never re-created) ── */
         <div
-          className={`absolute transition-[inset] duration-500 ${isOpen ? 'inset-0' : 'inset-[10px]'}`}
-          style={isOpen ? { maskImage: 'linear-gradient(to bottom, black 78%, transparent)', WebkitMaskImage: 'linear-gradient(to bottom, black 78%, transparent)' } : undefined}
+          className={`relative shrink-0 ${isOpen ? 'flex-1 min-h-[200px]' : 'w-full h-full'}`}
+          style={{
+            background:
+              'radial-gradient(circle at 50% 42%, rgba(212,175,55,0.28), rgba(212,175,55,0.06) 45%, transparent 70%)',
+          }}
         >
-          {loadAvatar && !avatarFailed ? (
-            <Suspense fallback={<AvatarPlaceholder />}>
-              <AvatarCanvas driverRef={driverRef} onError={() => setAvatarFailed(true)} />
-            </Suspense>
-          ) : (
-            <AvatarPlaceholder />
+          {/* In launcher mode the robot is inset from the gold frame so its dark edges never touch it. */}
+          <div
+            className={`absolute transition-[inset] duration-500 ${isOpen ? 'inset-0' : 'inset-[10px]'}`}
+            style={isOpen ? { maskImage: 'linear-gradient(to bottom, black 78%, transparent)', WebkitMaskImage: 'linear-gradient(to bottom, black 78%, transparent)' } : undefined}
+          >
+            {loadAvatar && !avatarFailed ? (
+              <Suspense fallback={<AvatarPlaceholder />}>
+                <AvatarCanvas driverRef={driverRef} onError={() => setAvatarFailed(true)} />
+              </Suspense>
+            ) : (
+              <AvatarPlaceholder />
+            )}
+          </div>
+
+          {!isOpen && (
+            <>
+              <button
+                {...launcherProps}
+                onPointerEnter={() => setLoadAvatar(true)}
+                onFocus={() => setLoadAvatar(true)}
+                className="absolute inset-0 rounded-full focus:outline-none focus-visible:ring-4 focus-visible:ring-amber-400/70"
+              />
+              {pulseDot}
+            </>
+          )}
+
+          {isOpen && (
+            <div className="absolute inset-x-0 top-0 flex items-start justify-between gap-2 p-3">
+              <div className="flex flex-col gap-1.5 min-w-0">
+                {title}
+                <div
+                  className="inline-flex items-center gap-1.5 self-start rounded-full border border-[var(--border-primary)] bg-[var(--glass-bg)] px-2.5 py-1 text-[10px] font-semibold text-[var(--text-heading)]"
+                  aria-hidden="true"
+                >
+                  <span className={`h-2 w-2 rounded-full ${STATE_DOT[avatarState]} ${avatarState !== 'idle' ? 'animate-pulse' : ''}`} />
+                  {statusLabel[avatarState]}
+                </div>
+                {modelSelector}
+              </div>
+              {actions}
+            </div>
           )}
         </div>
-
-        {!isOpen && (
-          <>
-            <button
-              ref={launcherRef}
-              type="button"
-              onClick={open}
-              onPointerEnter={() => setLoadAvatar(true)}
-              onFocus={() => setLoadAvatar(true)}
-              aria-label={t("Open Alya's AI assistant", 'افتح مساعد علياء الذكي')}
-              aria-expanded={false}
-              title={t("Talk to Alya's AI assistant", 'تحدث مع مساعد علياء الذكي')}
-              className="absolute inset-0 rounded-full focus:outline-none focus-visible:ring-4 focus-visible:ring-amber-400/70"
-            />
-            <span className="pointer-events-none absolute top-1 right-1 flex h-3.5 w-3.5" aria-hidden="true">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-200 opacity-75 motion-reduce:hidden" />
-              <span className="relative inline-flex rounded-full h-3.5 w-3.5 bg-amber-400" />
-            </span>
-          </>
-        )}
-
-        {isOpen && (
-          <div className="absolute inset-x-0 top-0 flex items-start justify-between gap-2 p-3">
-            <div className="flex flex-col gap-1.5 min-w-0">
-              <h2 id={titleId} className="text-xs font-bold text-[var(--text-heading)] drop-shadow">
-                {t('Alya AI Assistant', 'مساعد علياء الذكي')}
-              </h2>
-              <div
-                className="inline-flex items-center gap-1.5 self-start rounded-full border border-[var(--border-primary)] bg-[var(--glass-bg)] px-2.5 py-1 text-[10px] font-semibold text-[var(--text-heading)]"
-                aria-hidden="true"
-              >
-                <span className={`h-2 w-2 rounded-full ${STATE_DOT[avatarState]} ${avatarState !== 'idle' ? 'animate-pulse' : ''}`} />
-                {statusLabel[avatarState]}
-              </div>
-              <div className="relative">
-                <button
-                  type="button"
-                  onClick={() => setShowModelMenu((v) => !v)}
-                  aria-haspopup="listbox"
-                  aria-expanded={showModelMenu}
-                  aria-label={t(`AI model: ${modelLabels[selectedModel]}`, `النموذج: ${modelLabels[selectedModel]}`)}
-                  className="flex items-center gap-1 text-[10px] font-medium text-amber-500 hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 rounded"
-                >
-                  <Cpu size={11} aria-hidden="true" />
-                  <span className="truncate max-w-[150px]">{modelLabels[selectedModel]}</span>
-                  <ChevronDown size={11} aria-hidden="true" />
-                </button>
-                {showModelMenu && (
-                  <div role="listbox" aria-label={t('Choose AI model', 'اختر النموذج')} className="absolute top-5 start-0 z-10 w-56 py-1 rounded-xl border border-[var(--border-highlight)] bg-[var(--bg-primary)] shadow-2xl">
-                    {(Object.keys(modelLabels) as ModelProvider[]).map((prov) => (
-                      <button
-                        key={prov}
-                        type="button"
-                        role="option"
-                        aria-selected={selectedModel === prov}
-                        onClick={() => {
-                          setSelectedModel(prov);
-                          setShowModelMenu(false);
-                        }}
-                        className={`w-full text-start px-3 py-1.5 text-[11px] font-medium flex items-center justify-between focus:outline-none focus-visible:bg-[var(--glass-bg)] ${
-                          selectedModel === prov ? 'text-amber-400 bg-[rgba(255,140,0,0.12)]' : 'text-[var(--text-primary)] hover:bg-[var(--glass-bg)]'
-                        }`}
-                      >
-                        <span>{modelLabels[prov]}</span>
-                        {selectedModel === prov && <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
+      ) : !isOpen ? (
+        /* ── Chat-mode launcher: lightweight button, no 3D ── */
+        <>
+          <button
+            {...launcherProps}
+            className="absolute inset-0 rounded-full flex items-center justify-center text-[#050508] focus:outline-none focus-visible:ring-4 focus-visible:ring-amber-400/70"
+          >
+            <MessageCircle size={28} aria-hidden="true" />
+          </button>
+          {pulseDot}
+        </>
+      ) : (
+        /* ── Chat-mode header ── */
+        <div className="flex items-start justify-between gap-2 px-4 py-3 border-b border-[var(--border-primary)] bg-gradient-to-r from-[rgba(212,175,55,0.18)] via-[rgba(201,168,76,0.1)] to-transparent">
+          <div className="flex items-center gap-2.5 min-w-0">
+            <div className="w-9 h-9 shrink-0 rounded-full bg-gradient-to-tr from-[#9a7516] via-[#d4af37] to-[#ffd700] flex items-center justify-center text-[#050508] shadow-[0_0_12px_rgba(212,175,55,0.5)]" aria-hidden="true">
+              <Bot size={20} />
             </div>
-            <div className="flex items-center gap-1.5 shrink-0">
-              <IconButton
-                label={muted ? t('Unmute voice', 'تشغيل الصوت') : t('Mute voice', 'كتم الصوت')}
-                pressed={muted}
-                onClick={toggleMute}
-              >
-                {muted ? <VolumeX size={15} /> : <Volume2 size={15} />}
-              </IconButton>
-              <IconButton label={t('Close assistant', 'إغلاق المساعد')} onClick={close}>
-                <X size={15} />
-              </IconButton>
+            <div className="flex flex-col gap-1 min-w-0">
+              {title}
+              {modelSelector}
             </div>
           </div>
-        )}
-      </div>
+          {actions}
+        </div>
+      )}
 
-      {/* ── Conversation controls ── */}
+      {/* ── Conversation ── */}
       {isOpen && (
-        <section id={panelId} aria-labelledby={titleId} className="flex flex-col min-h-0 shrink-0">
+        <section id={panelId} aria-labelledby={titleId} className={`flex flex-col min-h-0 ${isAvatar ? 'shrink-0' : 'flex-1'}`}>
           {/* Screen-reader announcements for state changes */}
           <p className="sr-only" aria-live="polite">
             {statusLabel[avatarState]}
           </p>
 
-          <div className="px-4 pb-2">
-            <div className="flex items-center justify-between gap-2 mb-1.5">
-              <button
-                type="button"
-                onClick={() => setShowTranscript((v) => !v)}
-                aria-expanded={showTranscript}
-                className="inline-flex items-center gap-1 text-[10px] font-semibold uppercase tracking-wider text-[var(--text-muted)] hover:text-[var(--text-heading)] focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 rounded"
-              >
-                <ScrollText size={12} aria-hidden="true" />
-                {showTranscript ? t('Hide transcript', 'إخفاء المحادثة') : t('Show transcript', 'عرض المحادثة')}
-              </button>
-              {(voiceState !== 'idle') && (
+          {isAvatar ? (
+            <div className="px-4 pb-2">
+              <div className="flex items-center justify-between gap-2 mb-1.5">
                 <button
                   type="button"
-                  onClick={() => speech.stop()}
-                  className="inline-flex items-center gap-1 rounded-full border border-amber-500/40 px-2.5 py-0.5 text-[10px] font-semibold text-amber-400 hover:bg-amber-500/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400"
+                  onClick={() => setShowTranscript((v) => !v)}
+                  aria-expanded={showTranscript}
+                  className="inline-flex items-center gap-1 text-[10px] font-semibold uppercase tracking-wider text-[var(--text-muted)] hover:text-[var(--text-heading)] focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 rounded"
                 >
-                  <Square size={9} fill="currentColor" aria-hidden="true" />
-                  {t('Stop speaking', 'إيقاف الكلام')}
+                  <ScrollText size={12} aria-hidden="true" />
+                  {showTranscript ? t('Hide transcript', 'إخفاء المحادثة') : t('Show transcript', 'عرض المحادثة')}
                 </button>
-              )}
-            </div>
+                {voiceState !== 'idle' && (
+                  <button
+                    type="button"
+                    onClick={() => speech.stop()}
+                    className="inline-flex items-center gap-1 rounded-full border border-amber-500/40 px-2.5 py-0.5 text-[10px] font-semibold text-amber-400 hover:bg-amber-500/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400"
+                  >
+                    <Square size={9} fill="currentColor" aria-hidden="true" />
+                    {t('Stop speaking', 'إيقاف الكلام')}
+                  </button>
+                )}
+              </div>
 
-            <div className={`overflow-y-auto overscroll-contain pe-1 ${showTranscript ? 'max-h-[34dvh]' : 'max-h-[7.5rem]'}`}>
-              {showTranscript ? (
-                <ol className="space-y-2" aria-label={t('Conversation transcript', 'نص المحادثة')}>
-                  {messages.map((m) => (
-                    <li key={m.id} className={`flex ${m.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
-                      <span className="sr-only">{m.sender === 'user' ? t('You:', 'أنت:') : t('Assistant:', 'المساعد:')}</span>
-                      <p
-                        className={`max-w-[88%] px-3 py-2 rounded-2xl text-xs leading-relaxed ${
-                          m.sender === 'user'
-                            ? 'bg-gradient-to-r from-[var(--accent-gold)] to-[#b5560b] text-[#050505] font-medium'
-                            : 'border border-[var(--border-primary)] bg-[var(--glass-bg)] text-[var(--text-heading)]'
-                        }`}
-                      >
-                        {m.text}
-                      </p>
-                    </li>
-                  ))}
-                </ol>
-              ) : (
-                <div aria-live="polite" aria-atomic="true">
-                  {awaitingReply ? (
-                    <p className="flex items-center gap-1 py-2" aria-label={statusLabel.thinking}>
-                      {[0, 1, 2].map((i) => (
-                        <span key={i} className="h-1.5 w-1.5 rounded-full bg-amber-400 animate-bounce" style={{ animationDelay: `${i * 0.15}s` }} />
-                      ))}
-                    </p>
-                  ) : (
-                    <p className="text-[13px] leading-relaxed text-[var(--text-heading)]">{lastBot?.text}</p>
-                  )}
-                </div>
-              )}
+              <div className={`overflow-y-auto overscroll-contain pe-1 ${showTranscript ? 'max-h-[34dvh]' : 'max-h-[7.5rem]'}`}>
+                {showTranscript ? (
+                  messageList
+                ) : (
+                  <div aria-live="polite" aria-atomic="true">
+                    {awaitingReply ? typingDots : <p className="text-[13px] leading-relaxed text-[var(--text-heading)]">{lastBot?.text}</p>}
+                  </div>
+                )}
+                <div ref={transcriptEndRef} />
+              </div>
+            </div>
+          ) : (
+            /* Chat mode: the full conversation is the main view. */
+            <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain p-4" aria-live="polite">
+              {messageList}
+              {isLoading && typingDots}
               <div ref={transcriptEndRef} />
             </div>
-          </div>
+          )}
 
           {!hasUserMessages && (
-            <div className="px-3 pb-2 flex gap-1.5 overflow-x-auto no-scrollbar" role="group" aria-label={t('Suggested questions', 'أسئلة مقترحة')}>
+            <div className={`px-3 pb-2 flex gap-1.5 overflow-x-auto no-scrollbar ${isAvatar ? '' : 'pt-2 border-t border-[var(--border-primary)]'}`} role="group" aria-label={t('Suggested questions', 'أسئلة مقترحة')}>
               {quickQuestions.map((q) => (
                 <button
                   key={q.label}
@@ -409,7 +525,7 @@ export default function ChatWidget() {
             }}
             className="m-3 mt-1 flex items-center gap-1.5 rounded-2xl border border-[var(--border-primary)] bg-[var(--bg-primary)] p-1.5 focus-within:border-amber-500"
           >
-            {mic.supported && (
+            {isAvatar && mic.supported && (
               <button
                 type="button"
                 onClick={toggleMic}
@@ -450,7 +566,7 @@ export default function ChatWidget() {
               <Send size={15} className={isRtl ? '-scale-x-100' : ''} />
             </button>
           </form>
-          {mic.error && (
+          {isAvatar && mic.error && (
             <p role="alert" className="px-4 pb-3 -mt-1 text-[10px] text-rose-400">
               {mic.error === 'permission'
                 ? t('Microphone access was blocked. You can still type your question.', 'تم رفض الوصول إلى الميكروفون. يمكنك كتابة سؤالك.')

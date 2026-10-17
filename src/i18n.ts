@@ -135,6 +135,12 @@ const resources = {
         clientLabel: "Client",
         list: [
           {
+            name: "Qur'an Teleprompter & Ayah Detection",
+            role: "Developer",
+            contribution: "Real-time system that listens to the Imam's live recitation, detects which ayah he is reciting using an Arabic speech-recognition model, and turns the mushaf page on a teleprompter display automatically during prayer",
+            client: "One of the major mosques in a sister country"
+          },
+          {
             name: "Elite Company",
             role: "Developer / Systems Analyst",
             contribution: "Participated in design and development; contributed to demo using Power BI and building system",
@@ -145,6 +151,18 @@ const resources = {
             role: "Developer",
             contribution: "Main developer",
             client: "ADC Somalia"
+          },
+          {
+            name: "AMAN Digital Twin",
+            role: "Main Developer",
+            contribution: "Built an AI twin for every employee: it learns from their documents and connected tools (e.g. Calendar), answers colleagues' questions, and shows a live memory graph of the sources behind each answer",
+            client: "Aman"
+          },
+          {
+            name: "Tutor Match Oman",
+            role: "Developer",
+            contribution: "Bilingual (Arabic / English) platform to find, compare and book Ministry-verified private tutors across Oman, with AI smart matching and an interactive map of nearby tutors",
+            client: "Independent project"
           },
           {
             name: "Fostering System",
@@ -190,8 +208,8 @@ const resources = {
           },
           {
             name: "AI Chatbots (TRA & DXB Chat)",
-            role: "Tester",
-            contribution: "Tested AI chatbots",
+            role: "Agentic AI Flow Developer & Tester",
+            contribution: "Designed and built the agentic AI flows behind both chatbots, then tested their quality and performance",
             client: "TRA / Dubai Airports"
           },
           {
@@ -350,6 +368,12 @@ const resources = {
         clientLabel: "الجهة المستفيدة",
         list: [
           {
+            name: "ملقّن القرآن الكريم وتتبّع الآيات (Qur'an Teleprompter)",
+            role: "مطور برمجيات",
+            contribution: "نظام فوري يستمع إلى تلاوة الإمام مباشرةً، ويحدّد الآية التي يتلوها باستخدام نموذج للتعرّف على الكلام العربي، ويقلّب صفحات المصحف تلقائياً على شاشة العرض أثناء الصلاة",
+            client: "أحد المساجد الكبرى في دولة شقيقة"
+          },
+          {
             name: "الشركات المجيدة  (Elite Company)",
             role: "مطور / محلل نظم",
             contribution: "المساهمة في التصميم والتطوير وبناء النظام واستخدام Power BI للعرض التوضيحي",
@@ -360,6 +384,18 @@ const resources = {
             role: "مطور برمجيات",
             contribution: "المطور الرئيسي للمشروع",
             client: "مركز تطوير الزراعة بالصومال (ADC Somalia)"
+          },
+          {
+            name: "التوأم الرقمي لأمان (AMAN Digital Twin)",
+            role: "المطور الرئيسي",
+            contribution: "بناء توأم رقمي ذكي لكل موظف يتعلّم من مستنداته وأدواته المتصلة (مثل التقويم)، ويجيب عن أسئلة الزملاء، مع خريطة ذاكرة حيّة تُبرز مصادر كل إجابة",
+            client: "شركة أمان"
+          },
+          {
+            name: "معلّمي عُمان (Tutor Match Oman)",
+            role: "مطور برمجيات",
+            contribution: "منصة ثنائية اللغة للبحث عن المدرّسين الخصوصيين الموثّقين من وزارة التربية والتعليم ومقارنتهم وحجزهم في جميع أنحاء عُمان، مع مطابقة ذكية وخريطة تفاعلية لأقرب المدرّسين",
+            client: "مشروع مستقل"
           },
           {
             name: "نظام تصعيد (Tassaid)",
@@ -405,8 +441,8 @@ const resources = {
           },
           {
             name: "روبوتات الدردشة التفاعلية (TRA & DXB Chat)",
-            role: "فاحص جودة وأنظمة",
-            contribution: "اختبار جودة ورصد أداء روبوتات الدردشة بالذكاء الاصطناعي",
+            role: "مطور تدفقات الذكاء الاصطناعي الوكيل وفاحص جودة",
+            contribution: "تصميم وبناء تدفقات الذكاء الاصطناعي الوكيل (Agentic AI) لروبوتَي الدردشة، ثم اختبار جودتهما وأدائهما",
             client: "هيئة تنظيم الاتصالات / مطارات دبي"
           },
           {

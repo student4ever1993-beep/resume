@@ -273,6 +273,14 @@ export const projectsConfig: ProjectsConfig = {
   title: "Relevant Projects",
   projects: [
     {
+      name: "Qur'an Teleprompter & Ayah Detection",
+      role: "Developer",
+      tags: ["Python", "NeMo FastConformer ASR", "FastAPI + WebSocket", "Docker"],
+      contribution: "Real-time system that detects the ayah an Imam is reciting and turns the mushaf page on a display automatically",
+      client: "One of the major mosques in a sister country",
+      image: "images/quran_teleprompter.jpg",
+    },
+    {
       name: "Elite Company",
       tags: ["Power BI", "ASP .Net Clean Architecture", "Microsoft SQL Server","Next.js"],
       role: "Developer / Systems Analyst",
@@ -287,6 +295,22 @@ export const projectsConfig: ProjectsConfig = {
       contribution: "Main developer",
       client: "ADC Somalia",
       image: "images/agro.png",
+    },
+    {
+      name: "AMAN Digital Twin",
+      role: "Main Developer",
+      tags: ["Agentic AI", "RAG", "Memory Graph", "Connectors"],
+      contribution: "Main developer of an AI twin for every employee that learns from their documents and connected tools and answers colleagues' questions",
+      client: "Aman",
+      image: "images/aman_digital_twin.jpg",
+    },
+    {
+      name: "Tutor Match Oman",
+      role: "Developer",
+      tags: ["Next.js", "Leaflet", "OpenStreetMap", "AI Smart Matching"],
+      contribution: "Bilingual platform to find, compare and book Ministry-verified private tutors across Oman",
+      client: "Independent project",
+      image: "images/tutor_match_oman.jpg",
     },
     {
       name: "Fostering System",
@@ -350,8 +374,9 @@ export const projectsConfig: ProjectsConfig = {
     },
     {
       name: "AI Chatbots (TRA & DXB Chat)",
-      role: "Tester and Bot Developer",
-      contribution: "Tested AI chatbots",      tags: ["JS", "AIDA FLOW"],
+      role: "Agentic AI Flow Developer & Tester",
+      contribution: "Designed and built the agentic AI flows of both chatbots, and tested them",
+      tags: ["Agentic AI", "AIDA FLOW", "JS"],
 
       client: "TRA / Dubai Airports",
       image: "images/tra_chatbot.png",
