@@ -90,7 +90,7 @@ export default function Anatomy() {
               marginBottom: '16px',
             }}
           >
-            EXPERTISE
+            {t('skills.sectionLabel')}
           </p>
           <h2
             style={{
@@ -100,7 +100,7 @@ export default function Anatomy() {
               color: 'var(--text-heading)',
             }}
           >
-            Technical Skills
+            {t('skills.title')}
           </h2>
         </div>
 
