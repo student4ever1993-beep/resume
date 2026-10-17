@@ -122,7 +122,7 @@ export interface FooterConfig {
 // ─── Site Config ───────────────────────────────────────────
 
 export const siteConfig: SiteConfig = {
-  language: "en",
+  language: "ar",
   siteTitle: "Alya Al Siyabi — Systems Analyst & Developer",
   siteDescription: "Alya Al Siyabi is a Systems Analyst and Developer at AMAN, based in Muscat, Oman. Specializing in digital transformation, web development, and process engineering.",
 }

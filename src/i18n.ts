@@ -238,8 +238,8 @@ const resources = {
   ar: {
     translation: {
       site: {
-        title: "علياء السيابية — محلل نظم ومطورة برمجيات",
-        description: "علياء السيابية هي محلل نظم ومطورة في شركة أمان للاستشارات وتطوير الأعمال، مقيمة في مسقط، سلطنة عمان."
+        title: "علياء السيابية — محللة نظم ومطورة برمجيات",
+        description: "علياء السيابية هي محللة نظم ومطورة في شركة أمان للاستشارات وتطوير الأعمال، مقيمة في مسقط، سلطنة عمان."
       },
       nav: {
         about: "نبذة عني",
@@ -474,7 +474,7 @@ i18n
   .use(initReactI18next)
   .init({
     resources,
-    lng: 'en',
+    lng: 'ar', // Arabic is the default; visitors can switch to English in the navigation
     fallbackLng: 'en',
     interpolation: {
       escapeValue: false
@@ -482,7 +482,7 @@ i18n
   });
 
 // Handle direction change based on language
-i18n.on('languageChanged', (lng) => {
+const applyLanguage = (lng: string) => {
   const dir = lng === 'ar' ? 'rtl' : 'ltr';
   document.documentElement.dir = dir;
   document.documentElement.lang = lng;
@@ -493,6 +493,10 @@ i18n.on('languageChanged', (lng) => {
   } else {
     document.documentElement.classList.remove('rtl-font');
   }
-});
+};
+
+i18n.on('languageChanged', applyLanguage);
+// init() already ran before the listener was attached, so apply the initial language too.
+applyLanguage(i18n.language);
 
 export default i18n;
